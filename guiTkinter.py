@@ -28,11 +28,47 @@ my_canvas.bind('<Configure>', lambda e: my_canvas.configure(scrollregion = my_ca
 second_frame = tk.Frame(my_canvas)
 my_canvas.create_window((0,0), window=second_frame, anchor="nw")
 
-colum = csvManager.getHeader()
+
+def getValueByHead(head):
+    with open('SS_100lines.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        data = []
+        i = 0
+        for row in reader:
+            #print(head)
+            data.append(row[head])
+            i+=1
+            #if i == 3: break
+    return data
+
+def showByChoose(dimention):
+    data = []
+    for i in dimention:
+        data.append(getValueByHead(i))
+        #print(getValueByHead(i))
+    return data
+
+#dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
+dimention = ["City","State"]
+for thing,i in zip(dimention,range(len(dimention))):
+    tk.Label(second_frame, text=str(thing),bg = "white").grid(row=0, column=i, pady=20, padx=20)
+    data = showByChoose(dimention)
+    #print(data)
+    for k in data:
+        j = 1
+        #print("\n")
+        for w in k :
+            tk.Label(second_frame, text=str(w),bg = "white").grid(row=j, column=i, pady=20, padx=20)
+            j+=1
+
+
+'''colum = csvManager.getHeader()
 for thing,i in zip(colum,range(len(colum))):
     tk.Label(second_frame, text=str(thing),bg = "white").grid(row=0, column=i, pady=20, padx=20)
     row = csvManager.getValueByHead(thing)
+    j = 1
     for k in row:
+<<<<<<< HEAD
         print(k)
     #if i == 5:
     #    break
@@ -50,5 +86,9 @@ with open('Superstore.csv', newline='') as csvfile:
         i+=1
         if i == 100:
             break
+=======
+        tk.Label(second_frame, text=str(k),bg = "white").grid(row=j, column=i, pady=20, padx=20)
+        j+=1'''
+>>>>>>> 43971702ddf172088b4d0f5658c853a911242668
 
 window.mainloop()
