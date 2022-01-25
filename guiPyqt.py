@@ -52,5 +52,5 @@ class MainWindow(QtWidgets.QMainWindow):
 
 app=QtWidgets.QApplication(sys.argv)
 window=MainWindow()
-window.show()
+window.showFullScreen()
 app.exec_()
