@@ -36,7 +36,7 @@ for thing,i in zip(colum,range(len(colum))):
         print(k)
     #if i == 5:
     #    break
-'''with open('Superstore.csv', newline='') as csvfile:
+with open('Superstore.csv', newline='') as csvfile:
     reader = csv.DictReader(csvfile)
     data = []
     i = 0
@@ -49,6 +49,6 @@ for thing,i in zip(colum,range(len(colum))):
             j+=1
         i+=1
         if i == 100:
-            break'''
+            break
 
 window.mainloop()
