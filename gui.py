@@ -30,6 +30,9 @@ my_canvas.create_window((0,0), window=second_frame, anchor="nw")
 colum = csvManager.getHeader()
 for thing,i in zip(colum,range(len(colum))):
     #print(i,thing)
-    tk.Label(second_frame, text=str(thing)).grid(row=0, column=i, pady=10, padx=10)
+    tk.Label(second_frame, text=str(thing),bg = "white").grid(row=0, column=i, pady=20, padx=20)
+    row = csvManager.getValueByHead(thing)
+    for thing2,j in zip(row,range(len(row))):
+        tk.Label(second_frame, text=str(thing2),bg = "white").grid(row=j+1, column=i, pady=20, padx=20)
 
 window.mainloop()
