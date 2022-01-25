@@ -38,19 +38,19 @@ class MainWindow(QtWidgets.QMainWindow):
         dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
         self.table = QtWidgets.QTableView()
         #data = csvManager.getDataWithPandasByHead(dimention)
-        databuf = csvManager.getDataWithPandas()
-        #tmp = data.values.tolist()
-        #name = data.columns.tolist()
-        #print([data.columns.tolist()])
-        data = pd.DataFrame(databuf,columns=[databuf.columns.tolist()],index=databuf["Row ID"])
-        print(data)
-        #data = pd.DataFrame(list(tmp), columns = name,index=data["Row ID"])
-        self.model = TableModel(databuf)
+        sortedData = csvManager.setDimentionSort(dimention,dimention)
+        self.model = TableModel(sortedData)
+        
+        
+        #data = csvManager.getDataWithPandas()
+        #data = pd.DataFrame(databuf,columns=[databuf.columns.tolist()],index=databuf["Row ID"])
+
+        #self.model = TableModel(data)
         self.table.setModel(self.model)
         self.setCentralWidget(self.table)
 
 
 app=QtWidgets.QApplication(sys.argv)
 window=MainWindow()
-window.showFullScreen()
-app.exec_()
+window.showMaximized()
+sys.exit(app.exec())
