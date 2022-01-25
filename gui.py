@@ -1,6 +1,7 @@
+import csv
 import tkinter as tk
 import csvManager
-  
+
 #creating window
 window=tk.Tk()
 width= window.winfo_screenwidth() 
@@ -27,12 +28,31 @@ my_canvas.bind('<Configure>', lambda e: my_canvas.configure(scrollregion = my_ca
 second_frame = tk.Frame(my_canvas)
 my_canvas.create_window((0,0), window=second_frame, anchor="nw")
 
+'''def getValueByHead():
+    with open('TableauDataAnalysis/Superstore.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        data = []
+        for row in reader:
+            for i in row:
+                print(i)
+        #print(data)
+    return data'''
 colum = csvManager.getHeader()
 for thing,i in zip(colum,range(len(colum))):
-    #print(i,thing)
     tk.Label(second_frame, text=str(thing),bg = "white").grid(row=0, column=i, pady=20, padx=20)
-    row = csvManager.getValueByHead(thing)
-    for thing2,j in zip(row,range(len(row))):
-        tk.Label(second_frame, text=str(thing2),bg = "white").grid(row=j+1, column=i, pady=20, padx=20)
+with open('TableauDataAnalysis/Superstore.csv', newline='') as csvfile:
+    reader = csv.DictReader(csvfile)
+    data = []
+    i = 0
+    for row in reader:
+        j=0
+        #print("\n")
+        for col in colum:
+            #print(row[col])
+            tk.Label(second_frame, text=row[col],bg = "white").grid(row=i+1, column=j, pady=20, padx=20)
+            j+=1
+        i+=1
+        if i == 10:
+            break
 
 window.mainloop()
