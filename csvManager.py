@@ -26,9 +26,9 @@ def showByChoose(dimention):
     return data
 
 def getDataWithPandas():
-    df = pd.read_csv('SS_20lines.csv', encoding='windows-1252')
+    df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     return df
 
 def getDataWithPandasByHead(head):
-    df = pd.read_csv('SS_20lines.csv', encoding='windows-1252')
+    df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     return df[head]
