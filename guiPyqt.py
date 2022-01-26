@@ -32,34 +32,39 @@ class TableModel(QtCore.QAbstractTableModel):
 
 
 class MainWindow(QtWidgets.QMainWindow):
+    
+    def dataSource(self):
+        self.data = csvManager.getDataWithPandas()
+
+    def dataSourceSort(self,dimention):
+        self.data = csvManager.setAllDataByOneDimention(dimention)
+        
+    def sheetPageRow(self,dimention):
+        self.data = csvManager.setDimentionSort(dimention)
+        
+    def sheetPageCol(self,dimention):
+        tmp = csvManager.setDimentionSort(dimention)
+        self.data = tmp.T
+    
     def __init__(self):
         super().__init__()
+        self.data = None
         
         dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
-        dimention2 = ["Country/Region","Region","State","City","Postal Code","Product ID"]
         self.table = QtWidgets.QTableView()
         
-        '''sortedData = csvManager.setDimentionSort(dimention2)     
-        self.model = TableModel(sortedData.T)  '''                 #invert row column
-
-        sortedData = csvManager.setDimentionSort(dimention2)     #sort data with list column
-        self.model = TableModel(sortedData)
-
-        '''data = csvManager.getDataWithPandasByHead(dimention2)    #header list
-        #data = csvManager.getDataWithPandas()                      #all header (invert)
-        self.model = TableModel(data.T)'''
-
-        #data = csvManager.getDataWithPandasByHead(dimention2)    #data with header list
-        #self.model = TableModel(data)
-
-        #data = csvManager.setAllDataByOneDimention("Sales")    #sort each header
+        #data = csvManager.setRowAndColumn(["City","State"],["Row ID"])
         #self.model = TableModel(data)
         
-        #data = csvManager.getDataWithPandas()
-        #data = pd.DataFrame(databuf,columns=[databuf.columns.tolist()],index=databuf["Row ID"])
-
-
-        #self.model = TableModel(data)
+        #MainWindow.dataSource(self)
+        
+        #MainWindow.dataSourceSort(self,"Sales")
+        
+        #MainWindow.sheetPageRow(self,dimention)
+        
+        #MainWindow.sheetPageCol(self,dimention)
+        
+        self.model = TableModel(self.data)
         self.table.setModel(self.model)
         self.setCentralWidget(self.table)
 
