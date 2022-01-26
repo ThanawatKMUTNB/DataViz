@@ -24,10 +24,10 @@ class TableModel(QtCore.QAbstractTableModel):
     def headerData(self, section, orientation, role):
         # section is the index of the column/row.
         if role == Qt.DisplayRole:
-            if orientation == Qt.Horizontal:
+            if orientation == Qt.Horizontal: #x
                 return str(self._data.columns[section])
 
-            if orientation == Qt.Vertical:
+            if orientation == Qt.Vertical: #y
                 return str(self._data.index[section])
 
 
