@@ -30,6 +30,7 @@ def getDataWithPandas():
     return df
 
 def getDataWithPandasByHead(head):
+
     df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     data = pd.DataFrame(df,columns=[df.columns.tolist()],index=df["Row ID"])
     return df[head]
