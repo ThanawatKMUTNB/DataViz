@@ -35,9 +35,9 @@ def getDataWithPandasByHead(head):
     #data = pd.DataFrame(df,columns=[df.columns.tolist()],index=df["Row ID"])
     return df[head]
 
-def setDimentionSort(data,dimention):
-    sortedData = getDataWithPandasByHead(data)
-    print(sortedData)
+def setDimentionSort(dimention):
+    sortedData = getDataWithPandasByHead(dimention)
+    #print(sortedData)
     new = sortedData.sort_values(by=dimention)
     return new
 
