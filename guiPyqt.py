@@ -56,10 +56,11 @@ class MainWindow(QtWidgets.QMainWindow):
         #data = csvManager.setAllDataByOneDimention("Sales")    #sort each header
         #self.model = TableModel(data)
         
-        
-
         #data = csvManager.getDataWithPandas()
         #data = pd.DataFrame(databuf,columns=[databuf.columns.tolist()],index=databuf["Row ID"])
+
+        h = 'Sales'
+        print(csvManager.isDimension(h))
 
         #self.model = TableModel(data)
         self.table.setModel(self.model)
