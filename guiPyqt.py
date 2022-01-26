@@ -32,31 +32,39 @@ class TableModel(QtCore.QAbstractTableModel):
 
 
 class MainWindow(QtWidgets.QMainWindow):
+    
+    def dataSource(self):
+        self.data = csvManager.getDataWithPandas()
+
+    def dataSourceSort(self,dimention):
+        self.data = csvManager.setAllDataByOneDimention(dimention)
+        
+    def sheetPageRow(self,dimention):
+        self.data = csvManager.setDimentionSort(dimention)
+        
+    def sheetPageCol(self,dimention):
+        tmp = csvManager.setDimentionSort(dimention)
+        self.data = tmp.T
+    
     def __init__(self):
         super().__init__()
+        self.data = None
         
         dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
-        dimention2 = ["Country/Region","Region","State","City","Postal Code","Product ID"]
         self.table = QtWidgets.QTableView()
         
-        data = csvManager.getDataWithPandasByHead(dimention)
-        sortedData = csvManager.setDimentionSort(dimention)
-        self.model = TableModel(sortedData.T)
-        
-        #data = csvManager.getDataWithPandas()
-        #self.model = TableModel(data.T)
-        
-        #data = csvManager.setAllDataByOneDimention("Sales")
+        #data = csvManager.setRowAndColumn(["City","State"],["Row ID"])
         #self.model = TableModel(data)
         
-        #data = csvManager.getDataWithPandasByHead(dimention)
-        #sortedData = csvManager.setDimentionSort(dimention)
-        #self.model = TableModel(sortedData)
+        #MainWindow.dataSource(self)
         
-        #data = csvManager.getDataWithPandas()
-        #data = pd.DataFrame(databuf,columns=[databuf.columns.tolist()],index=databuf["Row ID"])
-
-        #self.model = TableModel(data)
+        #MainWindow.dataSourceSort(self,"Sales")
+        
+        #MainWindow.sheetPageRow(self,dimention)
+        
+        #MainWindow.sheetPageCol(self,dimention)
+        
+        self.model = TableModel(self.data)
         self.table.setModel(self.model)
         self.setCentralWidget(self.table)
 
