@@ -56,7 +56,7 @@ class MainWindow(QtWidgets.QMainWindow):
         #data = csvManager.setRowAndColumn(["City","State"],["Row ID"])
         #self.model = TableModel(data)
         
-        #MainWindow.dataSource(self)
+        MainWindow.dataSource(self)
         
         #MainWindow.dataSourceSort(self,"Sales")
         

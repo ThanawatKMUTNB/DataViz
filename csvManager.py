@@ -64,8 +64,8 @@ print(sortedData)'''
 #dd = setAllDataByOneDimention("Sales")
 #print(dd)
 
-dd = setRowAndColumn(["State"],["Row ID"])
-print(dd)
+'''dd = setRowAndColumn(["State"],["Row ID"])
+print(dd)'''
 
 '''h = 'Order Date'
 print(isDimension(h))
