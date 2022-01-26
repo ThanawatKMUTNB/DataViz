@@ -4,8 +4,9 @@ def getDataWithPandas():
     df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     return df
 
-def setAllDataByOneDimention(Dimention):
+def setAllDataByOneDimention(Dimention): #sort each column
     data = getDataWithPandas()
+    #print(type(data))
     new = data.sort_values(by=str(Dimention))
     return new
 
