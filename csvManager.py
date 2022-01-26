@@ -31,4 +31,4 @@ def getDataWithPandas():
 
 def getDataWithPandasByHead(head):
     df = pd.read_csv('SS_20lines.csv', encoding='windows-1252')
-    return df[head]
+    return df[head] #column

@@ -34,8 +34,7 @@ class MainWindow(QtWidgets.QMainWindow):
         #data = csvManager.getDataWithPandasByHead(dimention)
         data = csvManager.getDataWithPandas()
         #print(data)
-
-        self.model = TableModel(data.values.tolist())
+        self.model = TableModel(data.values.tolist()) #change pandas to list and add to tabel
         self.table.setModel(self.model)
         self.setCentralWidget(self.table)
 
