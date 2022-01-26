@@ -18,7 +18,7 @@ def getValueByHead(head):
             i+=1
             #if i == 3: break
     return data
-
+    
 def showByChoose(dimention):
     data = []
     for i in dimention:
@@ -26,9 +26,21 @@ def showByChoose(dimention):
     return data
 
 def getDataWithPandas():
-    df = pd.read_csv('SS_20lines.csv', encoding='windows-1252')
+    df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     return df
 
 def getDataWithPandasByHead(head):
-    df = pd.read_csv('SS_20lines.csv', encoding='windows-1252')
-    return df[head] #column
+
+    df = pd.read_csv('Superstore.csv', encoding='windows-1252')
+    data = pd.DataFrame(df,columns=[df.columns.tolist()],index=df["Row ID"])
+    return df[head]
+
+def setDimentionSort(data,dimention):
+    sortedData = getDataWithPandasByHead(data)
+    print(sortedData)
+    new = sortedData.sort_values(by=dimention)
+    return new
+
+'''dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
+sortedData = setDimentionSort(dimention,"Postal Code")
+print(sortedData)'''

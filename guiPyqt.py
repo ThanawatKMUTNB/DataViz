@@ -1,28 +1,34 @@
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
+import pandas as pd
 import csvManager
 
 class TableModel(QtCore.QAbstractTableModel):
+    
     def __init__(self, data):
         super(TableModel, self).__init__()
         self._data = data
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
-            # See below for the nested-list data structure.
-            # .row() indexes into the outer list,
-            # .column() indexes into the sub-list
-            return self._data[index.row()][index.column()]
+            value = self._data.iloc[index.row(), index.column()]
+            return str(value)
 
     def rowCount(self, index):
-        # The length of the outer list.
-        return len(self._data)
+        return self._data.shape[0]
 
     def columnCount(self, index):
-        # The following takes the first sub-list, and returns
-        # the length (only works if all rows are an equal length)
-        return len(self._data[0])
+        return self._data.shape[1]
+
+    def headerData(self, section, orientation, role):
+        # section is the index of the column/row.
+        if role == Qt.DisplayRole:
+            if orientation == Qt.Horizontal:
+                return str(self._data.columns[section])
+
+            if orientation == Qt.Vertical:
+                return str(self._data.index[section])
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -32,14 +38,20 @@ class MainWindow(QtWidgets.QMainWindow):
         dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
         self.table = QtWidgets.QTableView()
         #data = csvManager.getDataWithPandasByHead(dimention)
-        data = csvManager.getDataWithPandas()
-        #print(data)
-        self.model = TableModel(data.values.tolist()) #change pandas to list and add to tabel
+
+        sortedData = csvManager.setDimentionSort(dimention,dimention)
+        self.model = TableModel(sortedData)
+        
+        
+        #data = csvManager.getDataWithPandas()
+        #data = pd.DataFrame(databuf,columns=[databuf.columns.tolist()],index=databuf["Row ID"])
+
+        #self.model = TableModel(data)
         self.table.setModel(self.model)
         self.setCentralWidget(self.table)
 
 
 app=QtWidgets.QApplication(sys.argv)
 window=MainWindow()
-window.show()
-app.exec_()
+window.showMaximized()
+sys.exit(app.exec())
