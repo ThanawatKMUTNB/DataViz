@@ -40,6 +40,22 @@ def setRowAndColumn(Row,Column):
     #print(df.columns.tolist())
     return df
     
+def isDimension(header):
+    df = pd.read_csv('Superstore.csv', encoding='windows-1252')
+    Dimen = []
+    Meas = []
+    for head in df.columns:
+        if (df.dtypes[head] == 'int64' or df.dtypes[head] == 'float64') and head != 'Row ID' and head != 'Postal Code':
+            Meas.append(head)
+        elif df.dtypes[head] == 'object' or head == 'Row ID' or head == 'Postal Code':
+            Dimen.append(head)
+    
+    if header in Dimen:
+        return True
+    elif header in Meas:
+        return False
+    else:
+        return 'No header in this file'
 
 '''dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
 sortedData = setDimentionSort(dimention,"Postal Code")
@@ -48,4 +64,8 @@ print(sortedData)'''
 #dd = setAllDataByOneDimention("Sales")
 #print(dd)
 
-setRowAndColumn(["City","State"],["Row ID"])
+#setRowAndColumn(["City","State"],["Row ID"])
+
+'''h = 'Order Date'
+print(isDimension(h))
+'''
