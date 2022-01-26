@@ -39,17 +39,22 @@ class MainWindow(QtWidgets.QMainWindow):
         dimention2 = ["Country/Region","Region","State","City","Postal Code","Product ID"]
         self.table = QtWidgets.QTableView()
         
-        #data = csvManager.setAllDataByOneDimention("Sales")
+        sortedData = csvManager.setDimentionSort(dimention)     
+        self.model = TableModel(sortedData.T)                   #invert row column
+
+        data = csvManager.getDataWithPandasByHead(dimention)
+        #data = csvManager.getDataWithPandas()                  #all header (invert)
+        self.model = TableModel(data.T)
+
+        #data = csvManager.setAllDataByOneDimention("Sales")    #sort each header
         #self.model = TableModel(data)
         
-        #data = csvManager.getDataWithPandasByHead(dimention)
-<<<<<<< HEAD
-        sortedData = csvManager.setDimentionSort(dimention)
-        self.model = TableModel(sortedData)
-=======
-        #sortedData = csvManager.setDimentionSort(dimention)
+        #data = csvManager.getDataWithPandasByHead(dimention)    #data with list column
+        #self.model = TableModel(data)
+
+        #sortedData = csvManager.setDimentionSort(dimention)     #sort data with list column
         #self.model = TableModel(sortedData)
->>>>>>> 4851c2c9f011835966a5e9b3ace4ebc5c9c13a09
+
         
         #data = csvManager.getDataWithPandas()
         #data = pd.DataFrame(databuf,columns=[databuf.columns.tolist()],index=databuf["Row ID"])
