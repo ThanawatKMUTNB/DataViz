@@ -19,18 +19,34 @@ class MainWindow(QMainWindow):
 
 		df.set_index('Region',inplace=True)
 		profit = []
+		disc = []
+		quan = []
+		sale = []
 		for i in Reg:
 			profit.append(sum(df.loc[i,'Profit']))
+			disc.append(sum(df.loc[i,'Discount']))
+			quan.append(sum(df.loc[i,'Quantity']))
+			sale.append(sum(df.loc[i,'Sales']))
 
 
 		set0 = QBarSet('Profit')
+		set1 = QBarSet('Discount') 
+		set2 = QBarSet('Quantity')
+		set3 = QBarSet('Sales')
 
 
 		set0.append(profit)
+		set1.append(disc)
+		set2.append(quan)
+		set3.append(sale)
+
 
 
 		series = QBarSeries()
 		series.append(set0)
+		series.append(set1)
+		series.append(set2)
+		series.append(set3)
 
 
 		chart = QChart()
@@ -38,7 +54,7 @@ class MainWindow(QMainWindow):
 		chart.setTitle('Bar Chart Demo')
 		chart.setAnimationOptions(QChart.SeriesAnimations)
 
-		months = ('test1')
+		#months = ('test1')
 		months = tuple(Reg)
 
 		axisX = QBarCategoryAxis()
