@@ -21,13 +21,13 @@ class TableModel(QtCore.QAbstractTableModel):
     def columnCount(self, index):
         return self._data.shape[1]
 
-    def headerData(self, section, orientation, role):
+    def headerData(self, section, orientation, role): #show Header on column
         # section is the index of the column/row.
         if role == Qt.DisplayRole:
-            if orientation == Qt.Horizontal:
+            if orientation == Qt.Horizontal: #x
                 return str(self._data.columns[section])
 
-            if orientation == Qt.Vertical:
+            if orientation == Qt.Vertical: #y
                 return str(self._data.index[section])
 
 
@@ -36,10 +36,11 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         
         dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
+        dimention2 = ["Country/Region","Region","State","City","Postal Code","Product ID"]
         self.table = QtWidgets.QTableView()
         
-        #data = csvManager.setAllDataByOneDimention("Sales")
-        #self.model = TableModel(data)
+        data = csvManager.setAllDataByOneDimention("Sales")
+        self.model = TableModel(data)
         
         #data = csvManager.getDataWithPandasByHead(dimention)
         #sortedData = csvManager.setDimentionSort(dimention)
