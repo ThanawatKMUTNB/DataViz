@@ -29,9 +29,9 @@ def setRowAndColumn(Row,Column):
     #print(sortedCol)
     #print(pd.DataFrame(sortedDataByKey))
     #df = sortedDataByKey.set_index(Column, Row)
-    #df = sortedDataByKey.pivot_table(index=Row, columns=Column).swaplevel(axis=1).sort_index(1)
+    df = sortedDataByKey.pivot_table(index=Row, columns=Column).swaplevel(axis=1).sort_index(1)
     
-    df = sortedDataByKey.groupby(sortedDataByKey.columns.get_level_values(0), axis=1).sum()
+    #df = sortedDataByKey.groupby(sortedDataByKey.columns.get_level_values(0), axis=1).sum()
     
     #df1 = pd.MultiIndex.from_frame(df)
     #dictPandas = df.to_dict('split')
@@ -64,7 +64,8 @@ print(sortedData)'''
 #dd = setAllDataByOneDimention("Sales")
 #print(dd)
 
-#setRowAndColumn(["City","State"],["Row ID"])
+dd = setRowAndColumn(["State"],["Row ID"])
+print(dd)
 
 '''h = 'Order Date'
 print(isDimension(h))
