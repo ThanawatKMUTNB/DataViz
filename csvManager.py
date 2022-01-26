@@ -1,4 +1,3 @@
-import csv
 import pandas as pd
 
 def getDataWithPandas():
@@ -26,5 +25,5 @@ def setDimentionSort(dimention):
 sortedData = setDimentionSort(dimention,"Postal Code")
 print(sortedData)'''
 
-dd = setAllDataByOneDimention("Sales")
-print(dd)
+#dd = setAllDataByOneDimention("Sales")
+#print(dd)
