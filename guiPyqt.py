@@ -39,8 +39,15 @@ class MainWindow(QtWidgets.QMainWindow):
         dimention2 = ["Country/Region","Region","State","City","Postal Code","Product ID"]
         self.table = QtWidgets.QTableView()
         
-        data = csvManager.setAllDataByOneDimention("Sales")
-        self.model = TableModel(data)
+        data = csvManager.getDataWithPandasByHead(dimention)
+        sortedData = csvManager.setDimentionSort(dimention)
+        self.model = TableModel(sortedData.T)
+        
+        #data = csvManager.getDataWithPandas()
+        #self.model = TableModel(data.T)
+        
+        #data = csvManager.setAllDataByOneDimention("Sales")
+        #self.model = TableModel(data)
         
         #data = csvManager.getDataWithPandasByHead(dimention)
         #sortedData = csvManager.setDimentionSort(dimention)
