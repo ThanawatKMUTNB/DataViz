@@ -37,25 +37,27 @@ class MainWindow(QtWidgets.QMainWindow):
         
         dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
         dimention2 = ["Country/Region","Region","State","City","Postal Code","Product ID"]
+        tmp = dimention2.append()
         self.table = QtWidgets.QTableView()
         
-        sortedData = csvManager.setDimentionSort(dimention)     
-        self.model = TableModel(sortedData.T)                   #invert row column
+        '''sortedData = csvManager.setDimentionSort(dimention2)     
+        self.model = TableModel(sortedData.T)  '''                 #invert row column
 
-        data = csvManager.getDataWithPandasByHead(dimention)
-        #data = csvManager.getDataWithPandas()                  #all header (invert)
-        self.model = TableModel(data.T)
+        sortedData = csvManager.setDimentionSort(dimention2)     #sort data with list column
+        self.model = TableModel(sortedData)
+
+        '''data = csvManager.getDataWithPandasByHead(dimention2)    #header list
+        #data = csvManager.getDataWithPandas()                      #all header (invert)
+        self.model = TableModel(data.T)'''
+
+        #data = csvManager.getDataWithPandasByHead(dimention2)    #data with header list
+        #self.model = TableModel(data)
 
         #data = csvManager.setAllDataByOneDimention("Sales")    #sort each header
         #self.model = TableModel(data)
         
-        #data = csvManager.getDataWithPandasByHead(dimention)    #data with list column
-        #self.model = TableModel(data)
-
-        #sortedData = csvManager.setDimentionSort(dimention)     #sort data with list column
-        #self.model = TableModel(sortedData)
-
         
+
         #data = csvManager.getDataWithPandas()
         #data = pd.DataFrame(databuf,columns=[databuf.columns.tolist()],index=databuf["Row ID"])
 
