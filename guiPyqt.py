@@ -46,14 +46,12 @@ class MainWindow(QtWidgets.QMainWindow):
         #sortedData = csvManager.setDimentionSort(dimention)
         #self.model = TableModel(sortedData)
         
-        
         #data = csvManager.getDataWithPandas()
         #data = pd.DataFrame(databuf,columns=[databuf.columns.tolist()],index=databuf["Row ID"])
 
         #self.model = TableModel(data)
         self.table.setModel(self.model)
         self.setCentralWidget(self.table)
-
 
 app=QtWidgets.QApplication(sys.argv)
 window=MainWindow()
