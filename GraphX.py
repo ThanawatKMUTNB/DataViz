@@ -16,13 +16,13 @@ class MainWindow(QMainWindow):
 			if i not in Reg:
 				Reg.append(i)
 
-		df.set_index('Region',inplace=True)
+		df.set_index('Region',inplace=True) 
 		profit = []
 		disc = []
 		quan = []
 		sale = []
 		for i in Reg:
-			profit.append(sum(df.loc[i,'Profit']))
+			profit.append(sum(df.loc[i,'Profit']))  
 			disc.append(sum(df.loc[i,'Discount']))
 			quan.append(sum(df.loc[i,'Quantity']))
 			sale.append(sum(df.loc[i,'Sales']))
