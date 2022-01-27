@@ -50,7 +50,7 @@ def isDimension(header):
         return 'No header in this file'
 
 def getAxisYName(dimention):
-    k = setDimentionSort([dimention])
+    k = setDimentionSort(dimention)
     head = k[dimention].drop_duplicates()
     reg2 = head.drop_duplicates()
     reg2 = reg2[::-1].values.tolist()
