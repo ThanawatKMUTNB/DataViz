@@ -61,10 +61,10 @@ class MainWindow(QMainWindow):
 		reg2 = csvManager.getAxisYName(row)
 		months = tuple(reg2)
 
-		'''axisY = QBarCategoryAxis()
+		axisY = QBarCategoryAxis()
 		axisY.append(months)
 		chart.addAxis(axisY, Qt.AlignLeft)
-		series.attachAxis(axisY)'''
+		series.attachAxis(axisY)
 
 		axisX = QValueAxis()
 		chart.addAxis(axisX, Qt.AlignBottom)
