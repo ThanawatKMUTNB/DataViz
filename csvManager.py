@@ -1,4 +1,8 @@
+from itertools import chain
 import pandas as pd
+def getHead():
+    df = pd.read_csv('Superstore.csv', encoding='windows-1252')
+    return list(df.columns)
 
 def getDataWithPandas():
     df = pd.read_csv('Superstore.csv', encoding='windows-1252')
@@ -13,7 +17,8 @@ def setAllDataByOneDimention(Dimention): #sort each column
 def getDataWithPandasByHead(head):
     df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     #data = pd.DataFrame(df,columns=[df.columns.tolist()],index=df["Row ID"])
-    return df[head]
+    df = df[head]
+    return df
 
 def setDimentionSort(dimention):
     sortedData = getDataWithPandasByHead(dimention)
@@ -23,21 +28,8 @@ def setDimentionSort(dimention):
 
 def setRowAndColumn(Row,Column):
     sortKey = Row + Column
-    #sortedRow = setDimentionSort(Row)
     sortedDataByKey = setDimentionSort(sortKey)
-    #print(sortedRow)
-    #print(sortedCol)
-    #print(pd.DataFrame(sortedDataByKey))
-    #df = sortedDataByKey.set_index(Column, Row)
-    df = sortedDataByKey.pivot_table(index=Row, columns=Column).swaplevel(axis=1).sort_index(1)
-    
-    #df = sortedDataByKey.groupby(sortedDataByKey.columns.get_level_values(0), axis=1).sum()
-    
-    #df1 = pd.MultiIndex.from_frame(df)
-    #dictPandas = df.to_dict('split')
-    #df1 = pd.DataFrame(dictPandas)
-    #print(df1)
-    #print(df.columns.tolist())
+    df = sortedDataByKey
     return df
     
 def isDimension(header):
@@ -57,6 +49,25 @@ def isDimension(header):
     else:
         return 'No header in this file'
 
+def getAxisYName(dimention):
+    k = setDimentionSort([dimention])
+    head = k[dimention].drop_duplicates()
+    reg2 = head.drop_duplicates()
+    reg2 = reg2[::-1].values.tolist()
+    return reg2
+
+def getDataForBar(Row,Col):
+    k = setDimentionSort(Row+Col)
+    grouped = k.groupby(Row)
+    sumK = grouped.sum()
+    listsumk = sumK.values.tolist()
+    oneList = list(chain.from_iterable(listsumk))
+    return oneList[::-1]
+
+def setAvgGraphX(Row,Col):
+    k = setDimentionSort(Row+Col)
+    k = k.T
+    sumK = k.sum(axis=1)
 '''dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
 sortedData = setDimentionSort(dimention,"Postal Code")
 print(sortedData)'''
@@ -64,8 +75,8 @@ print(sortedData)'''
 #dd = setAllDataByOneDimention("Sales")
 #print(dd)
 
-'''dd = setRowAndColumn(["State"],["Row ID"])
-print(dd)'''
+#dd = setRowAndColumn(["City","State"],["Row ID","Product ID"])
+#print(dd)
 
 '''h = 'Order Date'
 print(isDimension(h))

@@ -1,5 +1,6 @@
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 from PyQt5.QtCore import Qt
 import pandas as pd
 import csvManager
@@ -56,11 +57,11 @@ class MainWindow(QtWidgets.QMainWindow):
         #data = csvManager.setRowAndColumn(["City","State"],["Row ID"])
         #self.model = TableModel(data)
         
-        MainWindow.dataSource(self)
+        #MainWindow.dataSource(self)
         
         #MainWindow.dataSourceSort(self,"Sales")
         
-        #MainWindow.sheetPageRow(self,dimention)
+        MainWindow.sheetPageRow(self,dimention)
         
         #MainWindow.sheetPageCol(self,dimention)
         
