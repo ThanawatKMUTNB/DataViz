@@ -12,7 +12,6 @@ class MainWindow(QMainWindow):
 	def __init__(self):
 		super().__init__()
 		self.resize(800, 600)
-<<<<<<< HEAD
 
 		df = pd.read_csv('Superstore.csv', encoding='windows-1252')
 		Reg = []
@@ -43,17 +42,15 @@ class MainWindow(QMainWindow):
 		set3.append(sale)
 
 
-=======
->>>>>>> 694b5391dea8af0fb831a28f2cc37588783d8666
 		series = QHorizontalBarSeries()
   
 		row = 'Region'
 		colList = ['Discount','Profit','Sales']
 		for col in colList:
 			tmp = csvManager.getDataForBar([row],[col])
-			set = QBarSet(col)
-			set.append(tmp)
-			series.append(set)
+			set0 = QBarSet(col)
+			set0.append(tmp)
+			series.append(set0)
   
 		chart = QChart()
 		chart.addSeries(series)
