@@ -68,6 +68,7 @@ def setAvgGraphX(Row,Col):
     k = setDimentionSort(Row+Col)
     k = k.T
     sumK = k.sum(axis=1)
+    
 '''dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
 sortedData = setDimentionSort(dimention,"Postal Code")
 print(sortedData)'''
@@ -77,7 +78,3 @@ print(sortedData)'''
 
 #dd = setRowAndColumn(["City","State"],["Row ID","Product ID"])
 #print(dd)
-
-'''h = 'Order Date'
-print(isDimension(h))
-'''
