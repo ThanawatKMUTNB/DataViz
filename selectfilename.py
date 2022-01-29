@@ -38,13 +38,13 @@ class MyApp(QWidget):
             print('Got Nothing')
 
     def getFileName(self):  #1 file
-        file_filter = 'Data File (*.xlsx *.csv *.dat);; Excel File (*.xlsx *.xls)'
+        file_filter = 'Excel File (*.xlsx *.csv *.xls)'
         response = QFileDialog.getOpenFileName(
             parent=self,
             caption='Select a data file',
             directory=os.getcwd(),
             filter=file_filter,
-            initialFilter='Excel File (*.xlsx *.xls)'
+            initialFilter='Excel File (*.xlsx *.xls *.csv)' #defult filter
         )
         print('\n#########################################\n')
         print(response[0])
