@@ -18,9 +18,9 @@ class MainWindow(QMainWindow):
 		colList = ['Discount','Profit','Sales']
 		for col in colList:
 			tmp = csvManager.getDataForBar([row],[col])
-			set = QBarSet(col)
-			set.append(tmp)
-			series.append(set)
+			set0 = QBarSet(col)
+			set0.append(tmp)
+			series.append(set0)
   
 		chart = QChart()
 		chart.addSeries(series)
