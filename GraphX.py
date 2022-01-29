@@ -58,7 +58,7 @@ class MainWindow(QMainWindow):
 
 		chart.setAnimationOptions(QChart.SeriesAnimations)
 
-		reg2 = csvManager.getAxisYName(row)
+		reg2 = csvManager.getAxisYName([row])
 		months = tuple(reg2)
 
 		axisY = QBarCategoryAxis()
@@ -73,7 +73,7 @@ class MainWindow(QMainWindow):
 		axisX.applyNiceNumbers()
 
 		chart.legend().setVisible(True)
-		chart.legend().setAlignment(Qt.AlignBottom)
+		chart.legend().setAlignment(Qt.AlignBottom)'''
 
 		chartView = QChartView(chart)
 		chartView.setRenderHint(QPainter.Antialiasing)
