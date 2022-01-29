@@ -12,45 +12,15 @@ class MainWindow(QMainWindow):
 	def __init__(self):
 		super().__init__()
 		self.resize(800, 600)
-
-		df = pd.read_csv('Superstore.csv', encoding='windows-1252')
-		Reg = []
-		for i in df['Region'].values:
-			if i not in Reg:
-				Reg.append(i)
-
-		df.set_index('Region',inplace=True) 
-		profit = []
-		disc = []
-		quan = []
-		sale = []
-		for i in Reg:
-			profit.append(sum(df.loc[i,'Profit']))  
-			disc.append(sum(df.loc[i,'Discount']))
-			quan.append(sum(df.loc[i,'Quantity']))
-			sale.append(sum(df.loc[i,'Sales']))
-
-		set0 = QBarSet('Profit')    #set label
-		set1 = QBarSet('Discount') 
-		set2 = QBarSet('Quantity')
-		set3 = QBarSet('Sales')
-
-
-		set0.append(profit) #data each month
-		set1.append(disc)
-		set2.append(quan)
-		set3.append(sale)
-
-
 		series = QHorizontalBarSeries()
   
 		row = 'Region'
 		colList = ['Discount','Profit','Sales']
 		for col in colList:
 			tmp = csvManager.getDataForBar([row],[col])
-			set0 = QBarSet(col)
-			set0.append(tmp)
-			series.append(set0)
+			set = QBarSet(col)
+			set.append(tmp)
+			series.append(set)
   
 		chart = QChart()
 		chart.addSeries(series)
@@ -61,17 +31,14 @@ class MainWindow(QMainWindow):
 		reg2 = csvManager.getAxisYName([row])
 		months = tuple(reg2)
 
-		axisY = QBarCategoryAxis()
+		'''axisY = QBarCategoryAxis()
 		axisY.append(months)
 		chart.addAxis(axisY, Qt.AlignLeft)
 		series.attachAxis(axisY)
-
 		axisX = QValueAxis()
 		chart.addAxis(axisX, Qt.AlignBottom)
 		series.attachAxis(axisX)
-
 		axisX.applyNiceNumbers()
-
 		chart.legend().setVisible(True)
 		chart.legend().setAlignment(Qt.AlignBottom)'''
 
