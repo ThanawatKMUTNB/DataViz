@@ -61,9 +61,9 @@ class MainWindow(QtWidgets.QMainWindow):
         
         #MainWindow.dataSourceSort(self,"Sales")
         
-        MainWindow.sheetPageRow(self,dimention)
+        #MainWindow.sheetPageRow(self,dimention)
         
-        #MainWindow.sheetPageCol(self,dimention)
+        MainWindow.sheetPageCol(self,dimention)
         
         self.model = TableModel(self.data)
         self.table.setModel(self.model)
