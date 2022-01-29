@@ -48,6 +48,8 @@ class MainWindow(QMainWindow):
 		series.append(set2)
 		series.append(set3)
 
+		#series.setLabelsVisible()
+
 
 		chart = QChart()
 		chart.addSeries(series)

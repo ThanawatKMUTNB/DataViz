@@ -28,8 +28,10 @@ class MainWindow(QMainWindow):
 
 		chart.setAnimationOptions(QChart.SeriesAnimations)
 
+		series.setLabelsVisible()
+
 		reg2 = csvManager.getAxisYName([row])
-		months = tuple(reg2)
+		months = tuple(chain.from_iterable(reg2))
 
 		axisY = QBarCategoryAxis()
 		axisY.append(months)
