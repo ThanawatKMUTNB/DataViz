@@ -31,7 +31,10 @@ class MainWindow(QMainWindow):
 		series.setLabelsVisible()
 
 		reg2 = csvManager.getAxisYName([row])
-		months = tuple(chain.from_iterable(reg2))
+
+		oneList = list(chain.from_iterable(reg2))
+		months = tuple(oneList)
+
 
 		axisY = QBarCategoryAxis()
 		axisY.append(months)

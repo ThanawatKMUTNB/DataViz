@@ -24,6 +24,7 @@ def setDimentionSort(dimention):
     sortedData = getDataWithPandasByHead(dimention)
     #print(sortedData)
     new = sortedData.sort_values(by=dimention)
+    new[''] = pd.Series("abc", index=new.index)
     return new
 
 def setRowAndColumn(Row,Column):
@@ -69,8 +70,8 @@ def setAvgGraphX(Row,Col):
     k = k.T
     sumK = k.sum(axis=1)
     
-'''dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
-sortedData = setDimentionSort(dimention,"Postal Code")
+dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
+'''sortedData = setDimentionSort(dimention,"Postal Code")
 print(sortedData)'''
 
 #dd = setAllDataByOneDimention("Sales")
@@ -78,3 +79,6 @@ print(sortedData)'''
 
 #dd = setRowAndColumn(["City","State"],["Row ID","Product ID"])
 #print(dd)
+
+dd = setDimentionSort(dimention)
+print(type(dd))
