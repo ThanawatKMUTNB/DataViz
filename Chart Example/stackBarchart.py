@@ -30,7 +30,7 @@ class Window(QMainWindow):
         set3 = QBarSet("Logan")
         set4 = QBarSet("Karim")
  
-        set0 << 1 << 2 << 3 << 4 << 5 << 6
+        set0 << 1 << 2 << 3 << 4 << 5 << 6  #Jan -> Jun
         set1 << 5 << 0 << 0 << 4 << 0 << 7
         set2 << 3 << 5 << 8 << 13 << 8 << 5
         set3 << 5 << 6 << 7 << 3 << 4 << 5
