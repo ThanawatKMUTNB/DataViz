@@ -23,14 +23,14 @@ class TableModel(QtCore.QAbstractTableModel):
     def columnCount(self, index):
         return self._data.shape[1]
 
-    def headerData(self, section, orientation, role): #show Header on column
+    '''def headerData(self, section, orientation, role): #show Header on column
         # section is the index of the column/row.
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal: #x
                 return ''.join(self._data.columns[section])
 
             if orientation == Qt.Vertical: #y
-                return ''.join(self._data.index[section])
+                return ''.join(self._data.index[section])'''
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -76,7 +76,7 @@ class MainWindow(QtWidgets.QMainWindow):
         #MainWindow.sheetPageCol(self,dimention)
         
         MainWindow.sheetPageRowAndCol(self,Row,Col)
-        #print(self.data)
+        print((self.data).columns.tolist())
         self.model = TableModel(self.data)
         self.table.setModel(self.model)
         self.setCentralWidget(self.table)

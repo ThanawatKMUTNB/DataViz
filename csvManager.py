@@ -26,7 +26,10 @@ def getDataWithPandasByHead(head):
 def setDimentionSort(dimention):
     sortedData = getDataWithPandasByHead(dimention)
     #print(sortedData)
+    #print(oneList)
     new = sortedData.sort_values(by=dimention)
+    new.set_index([dimention[0]])
+    print(new)
     #new[''] = pd.Series("abc", index=new.index)
     pd.MultiIndex.from_frame(new)
     return new
@@ -125,7 +128,5 @@ def setRowAndColumn(Row,Col):
     return s
 
 
-dd = setRowAndColumn(["Region","Ship Mode"],["Region"])
 #dd = pd.MultiIndex.from_frame(dd)
 #index = pd.MultiIndex.from_tuples(dd)
-print(dd)
