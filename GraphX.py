@@ -1,6 +1,6 @@
 from itertools import chain
 import sys
-from PyQt5.QtWidgets import (QApplication, QMainWindow)
+from PyQt5.QtWidgets import (QApplication, QMainWindow,QScrollArea)
 from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 from PyQt5.Qt import Qt
 from PyQt5.QtGui import QPainter
@@ -9,22 +9,23 @@ import csvManager
 
 class MainWindow(QMainWindow):
         
-	def __init__(self):
+	def __init__(self,Dimention,Measure):
 		super().__init__()
 		self.resize(800, 600)
+		self.scroll = QScrollArea()
 		series = QHorizontalBarSeries()
-  
-		row = 'Region'
-		colList = ['Discount','Profit','Sales']
-		for col in colList:
-			tmp = csvManager.getDataForBar([row],[col])
-			set0 = QBarSet(col)
-			set0.append(tmp)
-			series.append(set0)
-  
+		row = Dimention
+		#colList = ['Discount','Profit','Sales']
+		#for col in colList:
+		tmp = csvManager.getDataForBar([row],[Measure])
+		set0 = QBarSet(Measure)
+		set0.append(tmp)
+		series.append(set0)
+
 		chart = QChart()
 		chart.addSeries(series)
-		chart.setTitle('Horizontal Bar Chart Demo')
+		s = str(Dimention+' '+Measure)
+		chart.setTitle(s)
 
 		chart.setAnimationOptions(QChart.SeriesAnimations)
 
@@ -54,7 +55,8 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
 	app = QApplication(sys.argv)
 
-	window = MainWindow()
+	window = MainWindow('State','Discount')
+	window2 = MainWindow('Region','Profit')
 	window.show()
-
+	window2.show()
 	sys.exit(app.exec_())
