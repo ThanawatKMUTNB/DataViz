@@ -1,4 +1,6 @@
 from itertools import chain
+from re import S
+import numpy as np
 import pandas as pd
 def getHead():
     df = pd.read_csv('Superstore.csv', encoding='windows-1252')
@@ -15,6 +17,7 @@ def setAllDataByOneDimention(Dimention): #sort each column
     return new
 
 def getDataWithPandasByHead(head):
+    #df = pd.read_csv('SS_20lines.csv', encoding='windows-1252')
     df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     #data = pd.DataFrame(df,columns=[df.columns.tolist()],index=df["Row ID"])
     df = df[head]
@@ -24,14 +27,9 @@ def setDimentionSort(dimention):
     sortedData = getDataWithPandasByHead(dimention)
     #print(sortedData)
     new = sortedData.sort_values(by=dimention)
-    new[''] = pd.Series("abc", index=new.index)
+    #new[''] = pd.Series("abc", index=new.index)
+    pd.MultiIndex.from_frame(new)
     return new
-
-def setRowAndColumn(Row,Column):
-    sortKey = Row + Column
-    sortedDataByKey = setDimentionSort(sortKey)
-    df = sortedDataByKey
-    return df
     
 def isDimension(header):
     df = pd.read_csv('Superstore.csv', encoding='windows-1252')
@@ -80,5 +78,54 @@ print(sortedData)'''
 #dd = setRowAndColumn(["City","State"],["Row ID","Product ID"])
 #print(dd)
 
-dd = setDimentionSort(dimention)
-print(type(dd))
+def setRowAndColumn(Row,Col):
+    sortedDataByRow = setDimentionSort(Row)
+    sortedDataByCol = setDimentionSort(Col)
+    #print(sortedDataByCol)
+    df = pd.DataFrame(sortedDataByRow).drop_duplicates()
+    dfCol = pd.DataFrame(sortedDataByCol).drop_duplicates()
+    #print(dfCol)
+    
+    oneList = list(chain.from_iterable(np.array([df.T])))
+    oneListCol = list(chain.from_iterable(np.array([dfCol.T])))
+    
+    #print(dataF)
+    #s2 = pd.merge(df, dfCol, how="inner", on=list(set(Row) & set(Col)))
+    #s = pd.Series('ss', index=oneList)
+    s = pd.DataFrame(" ",index = oneList,columns=oneListCol)
+    #print(s)
+    sameDimention = list(set(Row) & set(Col))
+    for j in sameDimention:
+        valueSameDimen = getDataWithPandasByHead(j).drop_duplicates()
+        for i in valueSameDimen:
+            s.at[[i],[i]] = "abc"
+
+
+    #s = s.iloc[Row, Col] = "abc"
+    #s2 = pd.concat([df, dfCol], axis=1, ignore_index=True)
+    
+    '''listRow = [list(row) for row in s.index]
+    subRow = np.array(listRow).T.tolist()
+    for i,j in zip(reversed(subRow),Row):
+        s.insert(0,j,i)'''
+    #s2 = df.join(dfCol,on=list(set(Row) & set(Col)))
+    #s2 = pd.concat(df,dfCol, on = list(set(Row) & set(Col)), how = 'outer')
+    #merged[merged['population'].isnull()]
+    #s2 = s2.drop('abbreviation', 1) # drop duplicate info
+    #s2 = s2.head()
+    
+    '''listCol = [list(col) for col in s.head()]
+    subCol = np.array(listCol).T.tolist()
+    for i in reversed(subCol):
+        print(i)
+        s.loc[-1] = i  # adding a row
+        print(s)
+        #s.index = s.index + 1# shifting index
+        #s.sort_index(inplace=True)'''
+    return s
+
+
+dd = setRowAndColumn(["Region","Ship Mode"],["Region"])
+#dd = pd.MultiIndex.from_frame(dd)
+#index = pd.MultiIndex.from_tuples(dd)
+print(dd)
