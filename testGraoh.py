@@ -52,7 +52,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._chart.addSeries(self._line_serie)
         self._chart.createDefaultAxes()
         self._chart.legend().hide()
-        self._chart.setAnimationOptions(QtChart.QChart.SeriesAnimations)
+        #self._chart.setAnimationOptions(QtChart.QChart.SeriesAnimations)
 
         self._chart.axisX(self._candlestick_serie).setCategories(tm)
         self._chart.axisX(self._candlestick_serie).setVisible(False)
