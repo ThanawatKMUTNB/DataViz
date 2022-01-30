@@ -2,6 +2,7 @@ import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from PyQt5.QtCore import Qt
+import numpy as np
 import pandas as pd
 import csvManager
 
@@ -26,10 +27,10 @@ class TableModel(QtCore.QAbstractTableModel):
         # section is the index of the column/row.
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal: #x
-                return str(self._data.columns[section])
+                return ''.join(self._data.columns[section])
 
             if orientation == Qt.Vertical: #y
-                return str(self._data.index[section])
+                return ''.join(self._data.index[section])
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -42,16 +43,25 @@ class MainWindow(QtWidgets.QMainWindow):
         
     def sheetPageRow(self,dimention):
         self.data = csvManager.setDimentionSort(dimention)
-        
+        self.data[" "] = "abc"
+                
     def sheetPageCol(self,dimention):
         tmp = csvManager.setDimentionSort(dimention)
+        tmp[" "] = "abc"
         self.data = tmp.T
+        
+    def sheetPageRowAndCol(self,Row,Col):
+        if len(set(Col)) == 0: MainWindow.sheetPageRow(self,Row)
+        elif len(set(Row)) == 0: MainWindow.sheetPageCol(self,Col)
+        else : self.data = csvManager.setRowAndColumn(Row,Col)
     
     def __init__(self):
         super().__init__()
         self.data = None
         
         dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
+        Row = ["Region","Ship Mode","Segment"]
+        Col = ["Region"]
         self.table = QtWidgets.QTableView()
         
         #data = csvManager.setRowAndColumn(["City","State"],["Row ID"])
@@ -65,6 +75,8 @@ class MainWindow(QtWidgets.QMainWindow):
         
         #MainWindow.sheetPageCol(self,dimention)
         
+        MainWindow.sheetPageRowAndCol(self,Row,Col)
+        #print(self.data)
         self.model = TableModel(self.data)
         self.table.setModel(self.model)
         self.setCentralWidget(self.table)
