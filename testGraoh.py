@@ -55,7 +55,7 @@ class MainWindow(QtWidgets.QMainWindow):
         #self._chart.setAnimationOptions(QtChart.QChart.SeriesAnimations)
 
         self._chart.axisX(self._candlestick_serie).setCategories(tm)
-        self._chart.axisX(self._candlestick_serie).setVisible(False)
+        #self._chart.axisX(self._candlestick_serie).setVisible(False)
 
         self._chart_view.setChart(self._chart)
         self.adjust_axes(100, 200)

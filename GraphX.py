@@ -40,10 +40,12 @@ class MainWindow(QMainWindow):
 		axisY.append(months)
 		chart.addAxis(axisY, Qt.AlignLeft)
 		series.attachAxis(axisY)
+
 		axisX = QValueAxis()
 		chart.addAxis(axisX, Qt.AlignBottom)
 		series.attachAxis(axisX)
 		axisX.applyNiceNumbers()
+
 		chart.legend().setVisible(True)
 		chart.legend().setAlignment(Qt.AlignBottom)
 
@@ -54,7 +56,7 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
 	app = QApplication(sys.argv)
 
-	window = MainWindow('State','Discount')
+	window = MainWindow('Region','Discount')
 	#window2 = MainWindow('Region','Profit')
 	window.show()
 	#window2.show()
