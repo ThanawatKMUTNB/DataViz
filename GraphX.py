@@ -1,4 +1,4 @@
-from itertools import chain
+'''from itertools import chain
 import sys
 from PyQt5.QtWidgets import (QApplication, QMainWindow,QScrollArea)
 from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
@@ -59,4 +59,4 @@ if __name__ == '__main__':
 	window2 = MainWindow('Region','Profit')
 	window.show()
 	window2.show()
-	sys.exit(app.exec_())
+	sys.exit(app.exec_())'''
