@@ -11,6 +11,8 @@ from matplotlib.figure import Figure
 from PyQt5.QtChart import QChart, QChartView, QBarSet, QPercentBarSeries, QBarCategoryAxis
 from PyQt5.QtGui import QPainter
 from PyQt5.QtCore import Qt
+from PyQt5 import QtCore, QtGui, QtWidgets , QtChart
+from PyQt5.QtChart import QChart
 import pandas as pd
 #import csvManagergdkjf
 
@@ -32,14 +34,14 @@ class UI(QMainWindow):
         self.button = self.findChild(QtWidgets.QPushButton, 'Tooltips') # Find the button
         self.button.clicked.connect(AnyButton.ButtonTooltips)
         self.button = self.findChild(QtWidgets.QPushButton, 'Barchart') # Find the button
-        self.button.clicked.connect(ShowGraph.showbarchart)
+        self.button.clicked.connect(lambda checked: ShowGraph.showbarchart(self))
+        #self.button.clicked.connect(ShowGraph.showbarchart)
         self.button = self.findChild(QtWidgets.QPushButton, 'Piechart') # Find the button
-        self.button.clicked.connect(ShowGraph.showpiechart)
+        self.button.clicked.connect(lambda checked: ShowGraph.showpiechart(self))
         self.button = self.findChild(QtWidgets.QPushButton, 'Linegraph') # Find the button
         self.button.clicked.connect(ShowGraph.showlinegraph)
         self.button = self.findChild(QtWidgets.QPushButton, 'stackbar') # Find the button
-        self.button.clicked.connect(ShowGraph.showstackbar)
-        
+        self.button.clicked.connect(lambda checked: ShowGraph.showstackbar(self))
         self.show()
 
 class AnyButton() :
@@ -66,7 +68,6 @@ class ShowGraph(FigureCanvas):
     def showlinegraph() :
         print("Show line")
     def showbarchart(self) :
-        print("Show Bar")
         df = pd.read_csv('Superstore.csv', encoding='windows-1252')
         Reg = []
 		
@@ -130,17 +131,71 @@ class ShowGraph(FigureCanvas):
  
         self.setCentralWidget(chartView)
 
-    def showpiechart() :
+    def showpiechart(self) :
         print("Show Pie")
-    def showstackbar() :
+        series = QtChart.QPieSeries()
+        series.append("Jane", 1)
+        series.append("Joe", 2)
+        series.append("Andy", 3)
+        series.append("Barbara", 4)
+        series.append("Axel", 5)
+
+        chart = QtChart.QChart()
+        chart.addSeries(series)
+        chart.setTitle("Simple piechart example")
+        chart.setAnimationOptions(QChart.SeriesAnimations)
+        chart.legend().hide()
+
+        series.setLabelsVisible()
+        #series.setLabelsPosition(QtChart.QPieSlice.LabelInsideHorizontal)
+
+        for slice in series.slices():
+            slice.setLabel("{:.1f}%".format(100 * slice.percentage()))
+
+        chartView = QtChart.QChartView(chart)
+        chartView.setRenderHint(QtGui.QPainter.Antialiasing)
+        self.setCentralWidget(chartView)
+        
+
+    def showstackbar(self) :
         print("Show stack")
-
-class MplCanvas(FigureCanvasQTAgg):
-
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
-        fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot(111)
-        super(MplCanvas, self).__init__(fig)
+        set0 = QBarSet("Parwiz")
+        set1 = QBarSet("Bob")
+        set2 = QBarSet("Tom")
+        set3 = QBarSet("Logan")
+        set4 = QBarSet("Karim")
+ 
+        set0 << 1 << 2 << 3 << 4 << 5 << 6  #Jan -> Jun
+        set1 << 5 << 0 << 0 << 4 << 0 << 7
+        set2 << 3 << 5 << 8 << 13 << 8 << 5
+        set3 << 5 << 6 << 7 << 3 << 4 << 5
+        set4 << 9 << 7 << 5 << 3 << 1 << 2
+ 
+        series = QPercentBarSeries()
+        series.append(set0)
+        series.append(set1)
+        series.append(set2)
+        series.append(set3)
+        series.append(set4)
+ 
+        chart = QChart()
+        chart.addSeries(series)
+        chart.setTitle("Percent Example")
+        chart.setAnimationOptions(QChart.SeriesAnimations)
+ 
+        categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
+        axis = QBarCategoryAxis()
+        axis.append(categories)
+        chart.createDefaultAxes()
+        chart.setAxisX(axis, series)
+ 
+        chart.legend().setVisible(True)
+        chart.legend().setAlignment(Qt.AlignBottom)
+ 
+        chartView = QChartView(chart)
+        chartView.setRenderHint(QPainter.Antialiasing)
+ 
+        self.setCentralWidget(chartView)
 
 
 app = QApplication(sys.argv)
