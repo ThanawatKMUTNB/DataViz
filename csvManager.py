@@ -3,11 +3,13 @@ from re import S
 import numpy as np
 import pandas as pd
 def getHead():
-    df = pd.read_csv('Superstore.csv', encoding='windows-1252')
+    df = pd.read_csv('SS_20lines.csv', encoding='windows-1252')
+    #df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     return list(df.columns)
 
 def getDataWithPandas():
-    df = pd.read_csv('Superstore.csv', encoding='windows-1252')
+    df = pd.read_csv('SS_20lines.csv', encoding='windows-1252')
+    #df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     return df
 
 def setAllDataByOneDimention(Dimention): #sort each column
@@ -29,7 +31,6 @@ def setDimentionSort(dimention):
     #print(oneList)
     new = sortedData.sort_values(by=dimention)
     new.set_index([dimention[0]])
-    print(new)
     #new[''] = pd.Series("abc", index=new.index)
     pd.MultiIndex.from_frame(new)
     return new
@@ -100,41 +101,26 @@ def setRowAndColumn(Row,Col):
     oneList = list(chain.from_iterable(np.array([df.T])))
     oneListCol = list(chain.from_iterable(np.array([dfCol.T])))
     
-    #print(dataF)
-    #s2 = pd.merge(df, dfCol, how="inner", on=list(set(Row) & set(Col)))
-    #s = pd.Series('ss', index=oneList)
     s = pd.DataFrame(" ",index = oneList,columns=oneListCol)
-    #print(s)
+    #print(s.loc["East","Same Day"])
     sameDimention = list(set(Row) & set(Col))
-    for j in sameDimention:
-        valueSameDimen = getDataWithPandasByHead(j).drop_duplicates()
-        for i in valueSameDimen:
-            s.at[[i],[i]] = "abc"
+    #print(dfCol[sameDimention])
+    #print(sameDimention)
+    valueSameDimen = setDimentionSort(sameDimention).drop_duplicates().values.tolist()
+    #print(valueSameDimen)
+    #print(s)
+    for i in valueSameDimen:
+        #print(tuple(i))
+        #print(s.loc[tuple(i),tuple(i)])
+        s.loc[tuple(i),tuple(i)] = "abc"
+        #print(str(' '.join(set(i))).split())
+        #print(s.loc[', '.join(i)])
+        #s.loc[', '.join(i)] = "abc"
+        #s[i,i] = "abc"
 
-
-    #s = s.iloc[Row, Col] = "abc"
-    #s2 = pd.concat([df, dfCol], axis=1, ignore_index=True)
-    
-    '''listRow = [list(row) for row in s.index]
-    subRow = np.array(listRow).T.tolist()
-    for i,j in zip(reversed(subRow),Row):
-        s.insert(0,j,i)'''
-    #s2 = df.join(dfCol,on=list(set(Row) & set(Col)))
-    #s2 = pd.concat(df,dfCol, on = list(set(Row) & set(Col)), how = 'outer')
-    #merged[merged['population'].isnull()]
-    #s2 = s2.drop('abbreviation', 1) # drop duplicate info
-    #s2 = s2.head()
-    
-    '''listCol = [list(col) for col in s.head()]
-    subCol = np.array(listCol).T.tolist()
-    for i in reversed(subCol):
-        print(i)
-        s.loc[-1] = i  # adding a row
-        print(s)
-        #s.index = s.index + 1# shifting index
-        #s.sort_index(inplace=True)'''
     return s
 
-
-#dd = pd.MultiIndex.from_frame(dd)
-#index = pd.MultiIndex.from_tuples(dd)
+#Row = ["Region","Ship Mode","Segment"]
+#Col = ["Region","Ship Mode"]
+#dd = setRowAndColumn(Row,Col)
+#print(dd)

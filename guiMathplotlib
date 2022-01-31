@@ -1,5 +1,7 @@
 from itertools import chain
 import sys
+
+from matplotlib import figure
 import csvManager
 import matplotlib
 import matplotlib.pyplot as plt
@@ -20,24 +22,22 @@ class MplCanvas(FigureCanvasQTAgg):
 
 
 class MainWindow(QtWidgets.QMainWindow):
-
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-
-        # Create the maptlotlib FigureCanvas object,
-        # which defines a single set of axes as self.axes.
-        sc = MplCanvas(self, width=5, height=4, dpi=100)
-        #sc.axes.plot([0,1,2,3,4], [10,1,20,3,40])
+        self.data = None
         
-        Row = "Region"
+        sc = MplCanvas(self, width=5, height=4, dpi=100)
+        
+        
+        Row = "State"
         tmp = csvManager.getDataForBar([Row],["Discount"])
         reg2 = csvManager.getAxisYName([Row])
         reg2 = list(chain.from_iterable(reg2))
-        sc.axes.bar(reg2, tmp, color ='maroon',width = 0.4)
-        
+        sc.axes.bar(reg2, tmp,width = 0.4)
+        #figure.tight_layout()
         self.setCentralWidget(sc)
 
-        self.show()
+        self.showMaximized()
 
 
 app = QtWidgets.QApplication(sys.argv)

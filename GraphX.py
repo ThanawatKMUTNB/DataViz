@@ -59,5 +59,5 @@ if __name__ == '__main__':
 	window = MainWindow('Region','Discount')
 	#window2 = MainWindow('Region','Profit')
 	window.show()
-	#window2.show()
 	sys.exit(app.exec_())
+
