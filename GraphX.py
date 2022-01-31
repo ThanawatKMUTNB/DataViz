@@ -1,6 +1,6 @@
 '''from itertools import chain
 import sys
-from PyQt5.QtWidgets import (QApplication, QMainWindow,QScrollArea)
+from PyQt5.QtWidgets import (QApplication, QMainWindow)
 from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 from PyQt5.Qt import Qt
 from PyQt5.QtGui import QPainter
@@ -12,12 +12,11 @@ class MainWindow(QMainWindow):
 	def __init__(self,Dimention,Measure):
 		super().__init__()
 		self.resize(800, 600)
-		self.scroll = QScrollArea()
+
 		series = QHorizontalBarSeries()
-		row = Dimention
 		#colList = ['Discount','Profit','Sales']
 		#for col in colList:
-		tmp = csvManager.getDataForBar([row],[Measure])
+		tmp = csvManager.getDataForBar([Dimention],[Measure])
 		set0 = QBarSet(Measure)
 		set0.append(tmp)
 		series.append(set0)
@@ -31,7 +30,7 @@ class MainWindow(QMainWindow):
 
 		series.setLabelsVisible()
 
-		reg2 = csvManager.getAxisYName([row])
+		reg2 = csvManager.getAxisYName([Dimention])
 
 		oneList = list(chain.from_iterable(reg2))
 		months = tuple(oneList)
@@ -56,7 +55,8 @@ if __name__ == '__main__':
 	app = QApplication(sys.argv)
 
 	window = MainWindow('State','Discount')
-	window2 = MainWindow('Region','Profit')
+	#window2 = MainWindow('Region','Profit')
 	window.show()
 	window2.show()
 	sys.exit(app.exec_())'''
+

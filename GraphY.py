@@ -10,14 +10,14 @@ class MainWindow(QMainWindow):
 		super().__init__()
 		self.resize(800, 600)
 
-
+		Dimen = 'Ship Mode'
 		df = pd.read_csv('Superstore.csv', encoding='windows-1252')
 		Reg = []
-		for i in df['Region'].values:
+		for i in df[Dimen].values:
 			if i not in Reg:
 				Reg.append(i)
 
-		df.set_index('Region',inplace=True)
+		df.set_index(Dimen,inplace=True)
 		profit = []
 		disc = []
 		quan = []
