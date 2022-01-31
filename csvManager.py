@@ -71,6 +71,14 @@ def setAvgGraphX(Row,Col):
     k = setDimentionSort(Row+Col)
     k = k.T
     sumK = k.sum(axis=1)
+
+def getsizeDimention(dimention):
+    df = pd.read_csv('Superstore.csv', encoding='windows-1252')
+    tmp = []
+    for i in df[dimention].values:
+        if i not in tmp:
+            tmp.append(i)
+    return len(tmp)
     
 dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
 '''sortedData = setDimentionSort(dimention,"Postal Code")

@@ -11,10 +11,27 @@ from itertools import chain
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        Dimention = 'Region'
+        Dimention = 'City'
         Measure = 'Quantity'
 
-        self.step = 0.01
+        n = csvManager.getsizeDimention(Dimention)
+        r = False
+        if n > 500:
+            self.step = 0.01
+        elif n > 300:
+            self.step = 0.02
+        elif n > 100:
+            self.step = 0.03
+        elif n > 50:
+            self.step = 0.05
+        elif n > 20:
+            self.step = 0.08
+        elif n > 8:
+            self.step = 0.1
+        else:
+            self.step = 1
+            r = True
+
         self._chart_view = QtChart.QChartView()
         self.scrollbar = QtWidgets.QScrollBar(
             QtCore.Qt.Horizontal,
@@ -33,19 +50,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self._chart = QtChart.QChart()
         self.series = QtChart.QBarSeries()
 
-        
-
-        '''df = pd.read_csv('Superstore.csv', encoding='windows-1252')
-        Reg = []
-        for i in df['Region'].values:
-            if i not in Reg:
-                Reg.append(i)
-
-        df.set_index('Region',inplace=True)
-        profit = []
-
-        for i in Reg:
-            profit.append(sum(df.loc[i,'Profit']))'''
         tmp = csvManager.getDataForBar([Dimention],[Measure])
 
             #all graph
@@ -57,7 +61,7 @@ class MainWindow(QtWidgets.QMainWindow):
         oneList = list(chain.from_iterable(reg2))
         months = tuple(oneList)
 
-        min_x, max_x = 0, len(months)  
+        min_x, max_x = 0, len(months)+10  
 
         self._chart.addSeries(self.series)
         self._chart.createDefaultAxes()
@@ -77,8 +81,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         '''self._chart.legend().setVisible(True)
         self._chart.legend().setAlignment(Qt.AlignBottom)'''
-
-        #self._chart.axisX(self.series).setCategories(months) #############
+        if r:
+            self._chart.axisX(self.series).setCategories(months) #############
         #self._chart.axisX(self.series).setVisible(False)
         self.series.setLabelsVisible()
         self._chart_view.setChart(self._chart)
