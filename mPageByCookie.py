@@ -142,6 +142,8 @@ class Ui_MainWindow(object):
         self.pushButton.setGeometry(QtCore.QRect(50, 490, 93, 28))
         self.pushButton.setObjectName("pushButton")
         self.tabWidget.addTab(self.tab, "")
+
+        #Tab2
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.tableWidget_2 = QtWidgets.QTableWidget(self.tab_2)
@@ -213,6 +215,51 @@ class Ui_MainWindow(object):
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(3, item)
         self.tabWidget.addTab(self.tab_2, "")
+
+        #tab3
+        self.tab_3 = QtWidgets.QWidget()
+        self.tab_3.setObjectName("tab_3")
+        """self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")"""
+        self.Linegraph = QtWidgets.QPushButton(self.tab_3)
+        self.Linegraph.setGeometry(QtCore.QRect(20, 430, 93, 28))
+        self.Linegraph.setObjectName("Linegraph")
+        self.Label = QtWidgets.QPushButton(self.tab_3)
+        self.Label.setGeometry(QtCore.QRect(20, 110, 93, 28))
+        self.Label.setObjectName("Label")
+        self.Color = QtWidgets.QPushButton(self.tab_3)
+        self.Color.setGeometry(QtCore.QRect(20, 80, 93, 28))
+        self.Color.setObjectName("Color")
+        self.Size = QtWidgets.QPushButton(self.tab_3)
+        self.Size.setGeometry(QtCore.QRect(20, 170, 93, 28))
+        self.Size.setObjectName("Size")
+        self.Piechart = QtWidgets.QPushButton(self.tab_3)
+        self.Piechart.setGeometry(QtCore.QRect(20, 460, 93, 28))
+        self.Piechart.setObjectName("Piechart")
+        self.Barchart = QtWidgets.QPushButton(self.tab_3)
+        self.Barchart.setGeometry(QtCore.QRect(20, 400, 93, 28))
+        self.Barchart.setObjectName("Barchart")
+        self.stackbar = QtWidgets.QPushButton(self.tab_3)
+        self.stackbar.setGeometry(QtCore.QRect(20, 490, 93, 28))
+        self.stackbar.setObjectName("stackbar")
+        self.Showgraph = QtWidgets.QListView(self.tab_3)
+        self.Showgraph.setGeometry(QtCore.QRect(120, 80, 661, 441))
+        self.Showgraph.setObjectName("Showgraph")
+        self.Tooltips = QtWidgets.QPushButton(self.tab_3)
+        self.Tooltips.setGeometry(QtCore.QRect(20, 140, 93, 28))
+        self.Tooltips.setObjectName("Tooltips")
+        self.Detail = QtWidgets.QPushButton(self.tab_3)
+        self.Detail.setGeometry(QtCore.QRect(20, 200, 93, 28))
+        self.Detail.setObjectName("Detail")
+        MainWindow.setCentralWidget(self.tab_3)
+        self.menubar = QtWidgets.QMenuBar(self.tab_3)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
+        self.menubar.setObjectName("menubar")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(self.tab_3)
+        self.tabWidget.addTab(self.tab_3, "")
+
+
         
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -316,6 +363,18 @@ class Ui_MainWindow(object):
         item = self.tableWidget.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "New Column"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Tab 2"))
+        #Tab3
+        self.Linegraph.setText(_translate("MainWindow", "Line graph"))
+        self.Label.setText(_translate("MainWindow", "Label"))
+        self.Color.setText(_translate("MainWindow", "Color"))
+        self.Size.setText(_translate("MainWindow", "Size"))
+        self.Piechart.setText(_translate("MainWindow", "Pie chart"))
+        self.Barchart.setText(_translate("MainWindow", "Bar chart"))
+        self.stackbar.setText(_translate("MainWindow", "Stack bar"))
+        self.Tooltips.setText(_translate("MainWindow", "Tooltips"))
+        self.Detail.setText(_translate("MainWindow", "Detail"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "Tab 3"))
+        
 
 
 if __name__ == "__main__":
