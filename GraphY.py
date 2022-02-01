@@ -30,6 +30,7 @@ class MainWindow(QMainWindow):
 		#months = ('test1')
 		months = tuple(reversed(oneList))
 		#print(months)
+		series.setLabelsVisible()
 		axisX = QBarCategoryAxis()
 		axisX.append(months)
 		axisY = QValueAxis()
