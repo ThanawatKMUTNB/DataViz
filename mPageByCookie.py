@@ -1,3 +1,6 @@
+from operator import mod
+import os
+import pathlib
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
@@ -35,7 +38,18 @@ class TableModel(QtCore.QAbstractTableModel):
             '''if orientation == Qt.Vertical: #y
                 return ''.join(self._data.index[section])'''
 class Ui_MainWindow(object):
-    
+    folderpath = ''
+    fileNameList = []
+    def launchDialog(self):
+        self.folderpath = QFileDialog.getExistingDirectory()
+        filename = os.listdir(self.folderpath)
+        tmp = []
+        for i in filename:
+            if i.endswith(".xls") or i.endswith(".csv") or i.endswith(".xlsx"):
+                tmp.append(i)
+        self.fileNameList = tmp
+        #print(self.fileNameList)
+
     def dataSource(self):
         self.data = csvManager.getDataWithPandas()
 
@@ -132,15 +146,25 @@ class Ui_MainWindow(object):
             self.DataSource_2.setVerticalHeaderItem(i, item)'''
         
         #self.DataSource_2.setItem(0, 0, item)
+        
+        self.pushButton = QtWidgets.QPushButton(self.tab)
+        self.pushButton.setGeometry(QtCore.QRect(50, 490, 93, 28))
+        self.pushButton.setObjectName("Select File")
+        self.pushButton.clicked.connect(self.launchDialog)
+        
         self.listView = QtWidgets.QListView(self.tab)
         self.listView.setGeometry(QtCore.QRect(10, 10, 171, 271))
         self.listView.setObjectName("listView")
         self.listView_2 = QtWidgets.QListView(self.tab)
         self.listView_2.setGeometry(QtCore.QRect(10, 290, 171, 191))
         self.listView_2.setObjectName("listView_2")
-        self.pushButton = QtWidgets.QPushButton(self.tab)
-        self.pushButton.setGeometry(QtCore.QRect(50, 490, 93, 28))
-        self.pushButton.setObjectName("pushButton")
+        model = QtGui.QStandardItemModel()
+        self.listView.setModel(model)
+        '''for i in self.fileNameList:
+            item = QtGui.QStandardItem(i)
+            model.appendRow(item)
+        self.listView.setGeometry(QtCore.QRect(10, 10, 171, 271))'''
+        
         self.tabWidget.addTab(self.tab, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
@@ -270,7 +294,8 @@ class Ui_MainWindow(object):
         
         #self.DataSource_2.setSortingEnabled(__sortingEnabled)
         
-        self.pushButton.setText(_translate("MainWindow", "PushButton"))
+        self.pushButton.setText(_translate("MainWindow", "Select File"))
+        
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Tab 1"))
         item = self.tableWidget_2.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "New Column"))
@@ -325,4 +350,7 @@ if __name__ == "__main__":
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-    sys.exit(app.exec_())
+    try:
+        sys.exit(app.exec_())
+    except SystemExit:
+        print('Closing Window...')

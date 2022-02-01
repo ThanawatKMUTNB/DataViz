@@ -151,7 +151,6 @@ class ShowGraph(FigureCanvas):
 
         for slice in series.slices():
             slice.setLabel("{:.1f}%".format(100 * slice.percentage()))
-
         chartView = QtChart.QChartView(chart)
         chartView.setRenderHint(QtGui.QPainter.Antialiasing)
         self.setCentralWidget(chartView)
