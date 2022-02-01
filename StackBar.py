@@ -1,83 +1,63 @@
+from audioop import reverse
 from PyQt5.QtWidgets import QApplication, QMainWindow
 import sys
 from PyQt5.QtChart import QChart, QChartView, QBarSet, QPercentBarSeries, QBarCategoryAxis
 from PyQt5.QtGui import QPainter
 from PyQt5.QtCore import Qt
 import pandas as pd
+import csvManager
 
 class Window(QMainWindow):
 
     def __init__(self):
         super().__init__()
- 
+
+        Dimention = 'Region'
+        Measure = ['Profit','Discount','Quantity']
         self.setWindowTitle("PyQt BarChart")
-        self.setGeometry(100,100, 680,500)
+        self.resize(800, 600)
         self.show()
-        self.create_bar()
+        self.create_bar(Dimention,Measure)
  
-    def create_bar(self):
+    def create_bar(self,Dimention,Measure):
         
         df = pd.read_csv('Superstore.csv', encoding='windows-1252')
-        Reg = []
-		
-        for i in df['Region'].values:
-            if i not in Reg:
-                Reg.append(i)
-
-        df.set_index('Region',inplace=True)
-        profit = []
-        disc = []
-        quan = []
-        sale = []
-
-        for i in Reg:
-            profit.append(sum(df.loc[i,'Profit']))
-            disc.append(sum(df.loc[i,'Discount']))
-            quan.append(sum(df.loc[i,'Quantity']))
-            sale.append(sum(df.loc[i,'Sales']))
-
-        tmp = [profit,disc,quan,sale]
-        
-
-        set0 = QBarSet('Profit')
-        set1 = QBarSet('Discount') 
-        set2 = QBarSet('Quantity')
-        set3 = QBarSet('Sales')
-
-        for i in range(len(Reg)):
-            set0.append(tmp[i][0])
-            set1.append(tmp[i][1])
-            set2.append(tmp[i][2])
-            set3.append(tmp[i][3])
-
-        '''print(profit)
-        print(disc)
-        print(quan)
-        print(sale)'''
-        
+        df.set_index(Dimention,inplace=True)
+        ValueDi = csvManager.getValueDimention(Dimention)
+        ValueDi = sorted(ValueDi)
+        ValueDi = ValueDi[::-1]
+        print(ValueDi)
         series = QPercentBarSeries()
-        series.append(set0)
-        series.append(set1)
-        series.append(set2)
-        series.append(set3)
- 
+
+        Meskey = []
+        for i in Measure:
+            Meskey.append(csvManager.getDataForBar([Dimention],[i]))
+        #Meskey = Meskey[::-1]
+        for j in range(len(ValueDi)):
+            set0 = QBarSet(ValueDi[j])
+            for k in range(len(Measure)):
+                set0.append(Meskey[k][j])
+            series.append(set0)
+
+        series.setLabelsVisible()
         chart = QChart()
         chart.addSeries(series)
         chart.setTitle("Percent Example")
         chart.setAnimationOptions(QChart.SeriesAnimations)
 
-        meslist = ['Profit','Discount','Quantity','Sales']
+        #meslist = ['Profit','Discount','Quantity','Sales']
+        
         axis = QBarCategoryAxis()
-        axis.append(meslist)
+        axis.append(Measure)
         chart.createDefaultAxes()
         chart.setAxisX(axis, series)
- 
+
         chart.legend().setVisible(True)
         chart.legend().setAlignment(Qt.AlignBottom)
- 
+
         chartView = QChartView(chart)
         chartView.setRenderHint(QPainter.Antialiasing)
- 
+
         self.setCentralWidget(chartView)
  
 
