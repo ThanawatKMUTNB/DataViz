@@ -11,12 +11,16 @@ from itertools import chain
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        Dimention = 'City'
+        Dimention = 'Row ID'
         Measure = 'Quantity'
 
         n = csvManager.getsizeDimention(Dimention)
         r = False
-        if n > 500:
+        if n > 5000:
+            self.step = 0.001
+        elif n > 1000:
+            self.step = 0.005
+        elif n > 500:
             self.step = 0.01
         elif n > 300:
             self.step = 0.02
@@ -58,6 +62,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         reg2 = csvManager.getAxisYName([Dimention])
         oneList = list(chain.from_iterable(reg2))
+        oneList = map(str,oneList)
         months = tuple(oneList)
 
         min_x, max_x = 0, len(months)+10
@@ -94,7 +99,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if r:
             self._chart.axisY(self.series).setCategories(months) ####################
         #self._chart.axisY(self.series).setVisible(False)
-        self.series.setLabelsVisible()          #error some bar
+        #self.series.setLabelsVisible()          #error some bar
+        self._chart.setTitle(str(Dimention+'\twith\t'+Measure))          
         self._chart_view.setChart(self._chart)
         self.adjust_axes(0, 100)
         self.lims = np.array([min_x, max_x])
@@ -110,7 +116,7 @@ class MainWindow(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot(int)
     def onAxisSliderMoved(self, value):
         r = value / ((1 + self.step) * 100)
-        print(r)
+        #print(r)
         l1 = self.lims[0] + r * np.diff(self.lims)
         l2 = l1 + np.diff(self.lims) * self.step 
         self.adjust_axes(math.floor(l1), math.ceil(l2))

@@ -12,10 +12,15 @@ class Window(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        Dimention = 'Region'
-        Measure = ['Profit','Discount','Quantity']
+        Dimention = 'Sub-Category'
+        Measure = []
+        for M in csvManager.getHead():
+            #print(M)
+            if not csvManager.isDimension(M):
+                Measure.append(M)
+
         self.setWindowTitle("PyQt BarChart")
-        self.resize(800, 600)
+        self.resize(1000, 800)
         self.show()
         self.create_bar(Dimention,Measure)
  
@@ -26,7 +31,7 @@ class Window(QMainWindow):
         ValueDi = csvManager.getValueDimention(Dimention)
         ValueDi = sorted(ValueDi)
         ValueDi = ValueDi[::-1]
-        print(ValueDi)
+        #print(ValueDi)
         series = QPercentBarSeries()
 
         Meskey = []
@@ -42,7 +47,7 @@ class Window(QMainWindow):
         series.setLabelsVisible()
         chart = QChart()
         chart.addSeries(series)
-        chart.setTitle("Percent Example")
+        chart.setTitle("Percent Stack Bar")
         chart.setAnimationOptions(QChart.SeriesAnimations)
 
         #meslist = ['Profit','Discount','Quantity','Sales']

@@ -11,7 +11,7 @@ from itertools import chain
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        Dimention = 'City'
+        Dimention = 'State'
         Measure = 'Quantity'
 
         n = csvManager.getsizeDimention(Dimention)
@@ -26,7 +26,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.step = 0.05
         elif n > 20:
             self.step = 0.08
-        elif n > 8:
+        elif n > 10:
             self.step = 0.1
         else:
             self.step = 1
@@ -55,10 +55,12 @@ class MainWindow(QtWidgets.QMainWindow):
             #all graph
         set0 = QtChart.QBarSet(Measure)
         set0.append(tmp)
+        print(list(set0))
         self.series.append(set0)
 
         reg2 = csvManager.getAxisYName([Dimention])
         oneList = list(chain.from_iterable(reg2))
+        oneList = map(str,oneList)
         months = tuple(oneList)
 
         min_x, max_x = 0, len(months)+10  
@@ -84,7 +86,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if r:
             self._chart.axisX(self.series).setCategories(months) #############
         #self._chart.axisX(self.series).setVisible(False)
+        
         self.series.setLabelsVisible()
+        self._chart.setTitle(str(Dimention+'\twith\t'+Measure))
         self._chart_view.setChart(self._chart)
         self.adjust_axes(0, 100)
         self.lims = np.array([min_x, max_x])
