@@ -2,6 +2,7 @@ from itertools import chain
 from re import S
 import numpy as np
 import pandas as pd
+
 def getHead():
     df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     return list(df.columns)
@@ -10,18 +11,49 @@ def getDataWithPandas():
     df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     return df
 
-def setAllDataByOneDimention(Dimention): #sort each column
-    data = getDataWithPandas()
-    #print(type(data))
-    new = data.sort_values(by=str(Dimention))
-    return new
-
 def getDataWithPandasByHead(head):
     #df = pd.read_csv('SS_20lines.csv', encoding='windows-1252')
     df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     #data = pd.DataFrame(df,columns=[df.columns.tolist()],index=df["Row ID"])
     df = df[head]
     return df
+
+def getAxisYName(dimention):
+    k = setDimentionSort(dimention)
+    head = k[dimention].drop_duplicates()
+    reg2 = head.drop_duplicates()
+    reg2 = reg2[::-1].values.tolist()
+    return reg2
+
+def getDataForBar(Row,Col):
+    k = setDimentionSort(Row+Col)
+    grouped = k.groupby(Row)
+    sumK = grouped.sum()
+    listsumk = sumK.values.tolist()
+    oneList = list(chain.from_iterable(listsumk))
+    return oneList[::-1]
+
+def getsizeDimention(dimention):
+    df = pd.read_csv('Superstore.csv', encoding='windows-1252')
+    tmp = []
+    for i in df[dimention].values:
+        if i not in tmp:
+            tmp.append(i)
+    return len(tmp)
+
+def getValueDimention(dimention):
+    df = pd.read_csv('Superstore.csv', encoding='windows-1252')
+    Val = []
+    for i in df[dimention].values:
+        if i not in Val:
+            Val.append(i)
+    return Val
+
+def setAllDataByOneDimention(Dimention): #sort each column
+    data = getDataWithPandas()
+    #print(type(data))
+    new = data.sort_values(by=str(Dimention))
+    return new
 
 def setDimentionSort(dimention):
     sortedData = getDataWithPandasByHead(dimention)
@@ -51,21 +83,6 @@ def isDimension(header):
     else:
         return 'No header in this file'
 
-def getAxisYName(dimention):
-    k = setDimentionSort(dimention)
-    head = k[dimention].drop_duplicates()
-    reg2 = head.drop_duplicates()
-    reg2 = reg2[::-1].values.tolist()
-    return reg2
-
-def getDataForBar(Row,Col):
-    k = setDimentionSort(Row+Col)
-    grouped = k.groupby(Row)
-    sumK = grouped.sum()
-    listsumk = sumK.values.tolist()
-    oneList = list(chain.from_iterable(listsumk))
-    return oneList[::-1]
-
 def unionFile(oldfilename,newfilename):
     li = []
     df1 = pd.read_csv(oldfilename, encoding='windows-1252')
@@ -81,22 +98,6 @@ def setAvgGraphX(Row,Col):
     k = setDimentionSort(Row+Col)
     k = k.T
     sumK = k.sum(axis=1)
-
-def getsizeDimention(dimention):
-    df = pd.read_csv('Superstore.csv', encoding='windows-1252')
-    tmp = []
-    for i in df[dimention].values:
-        if i not in tmp:
-            tmp.append(i)
-    return len(tmp)
-
-def getValueDimention(dimention):
-    df = pd.read_csv('Superstore.csv', encoding='windows-1252')
-    Val = []
-    for i in df[dimention].values:
-        if i not in Val:
-            Val.append(i)
-    return Val
     
 dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
 '''sortedData = setDimentionSort(dimention,"Postal Code")
