@@ -1,10 +1,23 @@
+from operator import mod
+import os
+import pathlib
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import *
+from PyQt5.QtChart import QChart, QChartView, QBarSet, QPercentBarSeries, QBarCategoryAxis, QLineSeries
 import numpy as np
 import pandas as pd
 import csvManager
+from PyQt5.QtGui import QPainter
+from PyQt5.QtCore import Qt, QPointF
+from PyQt5 import QtCore, QtGui, QtWidgets , QtChart
+from PyQt5.QtChart import QChart
+from PyQt5.QtGui import QPainter
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+
+from PyQt5.QtWidgets import (QApplication, QMainWindow)
+from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 #from qgis.PyQt.QtWidgets import QVBoxLayout
 
 class TableModel(QtCore.QAbstractTableModel):
@@ -13,7 +26,7 @@ class TableModel(QtCore.QAbstractTableModel):
         super(TableModel, self).__init__()
         #self.itemClicked.connect(self.handleItemClick)
         self._data = data
-        
+        #Ui_MainWindow.connectButton()
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
@@ -35,7 +48,18 @@ class TableModel(QtCore.QAbstractTableModel):
             '''if orientation == Qt.Vertical: #y
                 return ''.join(self._data.index[section])'''
 class Ui_MainWindow(object):
-    
+    folderpath = ''
+    fileNameList = []
+    def launchDialog(self):
+        self.folderpath = QFileDialog.getExistingDirectory()
+        filename = os.listdir(self.folderpath)
+        tmp = []
+        for i in filename:
+            if i.endswith(".xls") or i.endswith(".csv") or i.endswith(".xlsx"):
+                tmp.append(i)
+        self.fileNameList = tmp
+        #print(self.fileNameList)
+
     def dataSource(self):
         self.data = csvManager.getDataWithPandas()
 
@@ -81,7 +105,9 @@ class Ui_MainWindow(object):
     def handleSelectionChanged(self, selected, deselected):
         for index in self.table.selectionModel().selectedRows():
             print('Row %d is selected' % index.row())
-            
+    
+    
+
     def setupUi(self, MainWindow):
         
         MainWindow.setObjectName("MainWindow")
@@ -132,16 +158,28 @@ class Ui_MainWindow(object):
             self.DataSource_2.setVerticalHeaderItem(i, item)'''
         
         #self.DataSource_2.setItem(0, 0, item)
+        
+        self.pushButton = QtWidgets.QPushButton(self.tab)
+        self.pushButton.setGeometry(QtCore.QRect(50, 490, 93, 28))
+        self.pushButton.setObjectName("Select File")
+        self.pushButton.clicked.connect(self.launchDialog)
+        
         self.listView = QtWidgets.QListView(self.tab)
         self.listView.setGeometry(QtCore.QRect(10, 10, 171, 271))
         self.listView.setObjectName("listView")
         self.listView_2 = QtWidgets.QListView(self.tab)
         self.listView_2.setGeometry(QtCore.QRect(10, 290, 171, 191))
         self.listView_2.setObjectName("listView_2")
-        self.pushButton = QtWidgets.QPushButton(self.tab)
-        self.pushButton.setGeometry(QtCore.QRect(50, 490, 93, 28))
-        self.pushButton.setObjectName("pushButton")
+        model = QtGui.QStandardItemModel()
+        self.listView.setModel(model)
+        '''for i in self.fileNameList:
+            item = QtGui.QStandardItem(i)
+            model.appendRow(item)
+        self.listView.setGeometry(QtCore.QRect(10, 10, 171, 271))'''
+        
         self.tabWidget.addTab(self.tab, "")
+
+        #Tab2
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.tableWidget_2 = QtWidgets.QTableWidget(self.tab_2)
@@ -213,6 +251,51 @@ class Ui_MainWindow(object):
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(3, item)
         self.tabWidget.addTab(self.tab_2, "")
+
+        #tab3
+        self.tab_3 = QtWidgets.QWidget()
+        self.tab_3.setObjectName("tab_3")
+        """self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")"""
+        self.Linegraph = QtWidgets.QPushButton(self.tab_3)
+        self.Linegraph.setGeometry(QtCore.QRect(20, 430, 93, 28))
+        self.Linegraph.setObjectName("Linegraph")
+        self.Label = QtWidgets.QPushButton(self.tab_3)
+        self.Label.setGeometry(QtCore.QRect(20, 110, 93, 28))
+        self.Label.setObjectName("Label")
+        self.Color = QtWidgets.QPushButton(self.tab_3)
+        self.Color.setGeometry(QtCore.QRect(20, 80, 93, 28))
+        self.Color.setObjectName("Color")
+        self.Size = QtWidgets.QPushButton(self.tab_3)
+        self.Size.setGeometry(QtCore.QRect(20, 170, 93, 28))
+        self.Size.setObjectName("Size")
+        self.Piechart = QtWidgets.QPushButton(self.tab_3)
+        self.Piechart.setGeometry(QtCore.QRect(20, 460, 93, 28))
+        self.Piechart.setObjectName("Piechart")
+        self.Barchart = QtWidgets.QPushButton(self.tab_3)
+        self.Barchart.setGeometry(QtCore.QRect(20, 400, 93, 28))
+        self.Barchart.setObjectName("Barchart")
+        self.stackbar = QtWidgets.QPushButton(self.tab_3)
+        self.stackbar.setGeometry(QtCore.QRect(20, 490, 93, 28))
+        self.stackbar.setObjectName("stackbar")
+        self.Showgraph = QtWidgets.QListView(self.tab_3)
+        self.Showgraph.setGeometry(QtCore.QRect(120, 80, 661, 441))
+        self.Showgraph.setObjectName("Showgraph")
+        self.Tooltips = QtWidgets.QPushButton(self.tab_3)
+        self.Tooltips.setGeometry(QtCore.QRect(20, 140, 93, 28))
+        self.Tooltips.setObjectName("Tooltips")
+        self.Detail = QtWidgets.QPushButton(self.tab_3)
+        self.Detail.setGeometry(QtCore.QRect(20, 200, 93, 28))
+        self.Detail.setObjectName("Detail")
+        MainWindow.setCentralWidget(self.tab_3)
+        self.menubar = QtWidgets.QMenuBar(self.tab_3)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
+        self.menubar.setObjectName("menubar")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(self.tab_3)
+        self.tabWidget.addTab(self.tab_3, "")
+
+
         
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -270,7 +353,8 @@ class Ui_MainWindow(object):
         
         #self.DataSource_2.setSortingEnabled(__sortingEnabled)
         
-        self.pushButton.setText(_translate("MainWindow", "PushButton"))
+        self.pushButton.setText(_translate("MainWindow", "Select File"))
+        
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Tab 1"))
         item = self.tableWidget_2.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "New Column"))
@@ -316,7 +400,218 @@ class Ui_MainWindow(object):
         item = self.tableWidget.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "New Column"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Tab 2"))
+        #Tab3
+        self.Linegraph.setText(_translate("MainWindow", "Line graph"))
+        self.Label.setText(_translate("MainWindow", "Label"))
+        self.Color.setText(_translate("MainWindow", "Color"))
+        self.Size.setText(_translate("MainWindow", "Size"))
+        self.Piechart.setText(_translate("MainWindow", "Pie chart"))
+        self.Barchart.setText(_translate("MainWindow", "Bar chart"))
+        self.stackbar.setText(_translate("MainWindow", "Stack bar"))
+        self.Tooltips.setText(_translate("MainWindow", "Tooltips"))
+        self.Detail.setText(_translate("MainWindow", "Detail"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "Tab 3"))
+        
+        #self.button = self.findChild(QtWidgets.QPushButton, 'Color') # Find the button
+        self.Color.clicked.connect(AnyButton.changeColor) # Remember to pass the definition/method, not the return value!
+        #self.button = self.findChild(QtWidgets.QPushButton, 'Size') 
+        self.Size.clicked.connect(AnyButton.buttonsize)
+        #self.button = self.findChild(QtWidgets.QPushButton, 'Label') 
+        self.Label.clicked.connect(AnyButton.buttonlabel)
+        #self.button = self.findChild(QtWidgets.QPushButton, 'Detail') 
+        self.Detail.clicked.connect(AnyButton.Buttondetail)
+        #self.button = self.findChild(QtWidgets.QPushButton, 'Tooltips') 
+        self.Tooltips.clicked.connect(AnyButton.ButtonTooltips)
+        #self.button = self.findChild(QtWidgets.QPushButton, 'Barchart') 
+        self.Barchart.clicked.connect(lambda checked: ShowGraph.showbarchart(self))
+        #self.button.clicked.connect(ShowGraph.showbarchart)
+        #self.button = self.findChild(QtWidgets.QPushButton, 'Piechart') 
+        self.Piechart.clicked.connect(lambda checked: ShowGraph.showpiechart(self))
+        #.button = self.findChild(QtWidgets.QPushButton, 'Linegraph') 
+        self.Linegraph.clicked.connect(lambda checked: ShowGraph.showlinegraph(self))
+        #self.button = self.findChild(QtWidgets.QPushButton, 'stackbar') 
+        self.stackbar.clicked.connect(lambda checked: ShowGraph.showstackbar(self))
+    
+        
+        
+class AnyButton() :
+        
+    def changeColor() :
+        print("Hello color")
+    def buttonsize() :
+        print("Hello size")
+    def buttonlabel() :
+        print("Hello label")
+    def Buttondetail() :
+        print("Hello detail")
+    def ButtonTooltips() :
+        print("Hello Tooltips")
+   
 
+class ShowGraph(FigureCanvas):
+    def __init__(self):
+        super().__init__()
+ 
+        self.setWindowTitle("PyQt BarChart")
+        #self.setGeometry(100,100, 680,500)
+        self.show()
+        self.create_bar()
+    def showlinegraph(self) :
+        print("Show line")
+        series = QLineSeries(self)
+        series.append(0,6)
+        series.append(2, 4)
+        series.append(3, 8)
+        series.append(7, 4)
+        series.append(10, 5)
+ 
+        series << QPointF(11, 1) << QPointF(13, 3) << QPointF(17, 6) << QPointF(18, 3) << QPointF(20, 2)
+ 
+ 
+        chart =  QChart()
+ 
+        chart.addSeries(series)
+        chart.createDefaultAxes()
+        chart.setAnimationOptions(QChart.SeriesAnimations)
+        chart.setTitle("Line Chart Example")
+ 
+        chart.legend().setVisible(True)
+        chart.legend().setAlignment(Qt.AlignBottom)
+ 
+ 
+        chartview = QChartView(chart)
+        chartview.setRenderHint(QPainter.Antialiasing)
+ 
+        self.setCentralWidget(chartview)
+    def showbarchart(self) :
+        df = pd.read_csv('Superstore.csv', encoding='windows-1252')
+        Reg = []
+		
+        for i in df['Region'].values:
+            if i not in Reg:
+                Reg.append(i)
+
+        df.set_index('Region',inplace=True)
+        profit = []
+        disc = []
+        quan = []
+        sale = []
+
+        for i in Reg:
+            profit.append(sum(df.loc[i,'Profit']))
+            disc.append(sum(df.loc[i,'Discount']))
+            quan.append(sum(df.loc[i,'Quantity']))
+            sale.append(sum(df.loc[i,'Sales']))
+
+        tmp = [profit,disc,quan,sale]
+        
+
+        set0 = QBarSet('Profit')
+        set1 = QBarSet('Discount') 
+        set2 = QBarSet('Quantity')
+        set3 = QBarSet('Sales')
+
+        for i in range(len(Reg)):
+            set0.append(tmp[i][0])
+            set1.append(tmp[i][1])
+            set2.append(tmp[i][2])
+            set3.append(tmp[i][3])
+
+        '''print(profit)
+        print(disc)
+        print(quan)
+        print(sale)'''
+        
+        series = QPercentBarSeries()
+        series.append(set0)
+        series.append(set1)
+        series.append(set2)
+        series.append(set3)
+ 
+        chart = QChart()
+        chart.addSeries(series)
+        chart.setTitle("Percent Example")
+        chart.setAnimationOptions(QChart.SeriesAnimations)
+
+        meslist = ['Profit','Discount','Quantity','Sales']
+        axis = QBarCategoryAxis()
+        axis.append(meslist)
+        chart.createDefaultAxes()
+        chart.setAxisX(axis, series)
+ 
+        chart.legend().setVisible(True)
+        chart.legend().setAlignment(Qt.AlignBottom)
+ 
+        chartView = QChartView(chart)
+        chartView.setRenderHint(QPainter.Antialiasing)
+ 
+        self.setCentralWidget(chartView)
+
+    def showpiechart(self) :
+        print("Show Pie")
+        series = QtChart.QPieSeries()
+        series.append("Jane", 1)
+        series.append("Joe", 2)
+        series.append("Andy", 3)
+        series.append("Barbara", 4)
+        series.append("Axel", 5)
+
+        chart = QtChart.QChart()
+        chart.addSeries(series)
+        chart.setTitle("Simple piechart example")
+        chart.setAnimationOptions(QChart.SeriesAnimations)
+        chart.legend().hide()
+
+        series.setLabelsVisible()
+        #series.setLabelsPosition(QtChart.QPieSlice.LabelInsideHorizontal)
+
+        for slice in series.slices():
+            slice.setLabel("{:.1f}%".format(100 * slice.percentage()))
+
+        chartView = QtChart.QChartView(chart)
+        chartView.setRenderHint(QtGui.QPainter.Antialiasing)
+        self.setCentralWidget(chartView)
+        
+
+    def showstackbar(self) :
+        print("Show stack")
+        set0 = QBarSet("Parwiz")
+        set1 = QBarSet("Bob")
+        set2 = QBarSet("Tom")
+        set3 = QBarSet("Logan")
+        set4 = QBarSet("Karim")
+ 
+        set0 << 1 << 2 << 3 << 4 << 5 << 6  #Jan -> Jun
+        set1 << 5 << 0 << 0 << 4 << 0 << 7
+        set2 << 3 << 5 << 8 << 13 << 8 << 5
+        set3 << 5 << 6 << 7 << 3 << 4 << 5
+        set4 << 9 << 7 << 5 << 3 << 1 << 2
+ 
+        series = QPercentBarSeries()
+        series.append(set0)
+        series.append(set1)
+        series.append(set2)
+        series.append(set3)
+        series.append(set4)
+ 
+        chart = QChart()
+        chart.addSeries(series)
+        chart.setTitle("Percent Example")
+        chart.setAnimationOptions(QChart.SeriesAnimations)
+ 
+        categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
+        axis = QBarCategoryAxis()
+        axis.append(categories)
+        chart.createDefaultAxes()
+        chart.setAxisX(axis, series)
+ 
+        chart.legend().setVisible(True)
+        chart.legend().setAlignment(Qt.AlignBottom)
+ 
+        chartView = QChartView(chart)
+        chartView.setRenderHint(QPainter.Antialiasing)
+ 
+        self.setCentralWidget(chartView)
 
 if __name__ == "__main__":
     import sys
@@ -325,4 +620,7 @@ if __name__ == "__main__":
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-    sys.exit(app.exec_())
+    try:
+        sys.exit(app.exec_())
+    except SystemExit:
+        print('Closing Window...')
