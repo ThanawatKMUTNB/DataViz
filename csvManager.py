@@ -84,12 +84,11 @@ def isDimension(header):
     else:
         return 'No header in this file'
 
-def unionFile(oldfilename,newfilename):
+def unionFile(Listfilename):
     li = []
-    df1 = pd.read_csv(oldfilename, encoding='windows-1252')
-    df2 = pd.read_csv(newfilename, encoding='windows-1252')
-    li.append(df1)
-    li.append(df2)
+    for i in Listfilename:
+        df = pd.read_csv(i, encoding='windows-1252')
+        li.append(df)
     frame = pd.concat(li, axis=0, ignore_index=True)
     frame.sort_values("Row ID", inplace = True)
     frame.drop_duplicates(inplace=True)
@@ -109,6 +108,7 @@ def getsizeDimention(dimention):
     return len(tmp)
     
 dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
+
 '''sortedData = setDimentionSort(dimention,"Postal Code")
 print(sortedData)'''
 

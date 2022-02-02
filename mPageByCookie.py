@@ -48,25 +48,47 @@ class TableModel(QtCore.QAbstractTableModel):
             '''if orientation == Qt.Vertical: #y
                 return ''.join(self._data.index[section])'''
 class Ui_MainWindow(object):
+    dragDropFinished = QtCore.pyqtSignal()
     folderpath = ''
     fileNameList = []
-    selectFile = ""
+    selectFile = []
+    def updateList(self):
+        itemsTextList =  [str(self.FileListChoose.item(i).text()) for i in range(self.FileListChoose.count())]
+        self.selectFile = itemsTextList
+        itemsTextList =  [str(self.FileList.item(i).text()) for i in range(self.FileList.count())]
+        self.fileNameList = itemsTextList
+        self.dataSource()
+        Ui_MainWindow.setupUi(self, MainWindow)
+        
+    def dropEvent(self, event):
+        print('dropEvent')
+        
     def launchDialog(self):
         self.folderpath = QFileDialog.getExistingDirectory()
         filename = os.listdir(self.folderpath)
+        #print(self.folderpath)
+        #print(self.fileNameList)
         tmp = []
         for i in filename:
             if i.endswith(".xls") or i.endswith(".csv") or i.endswith(".xlsx"):
                 tmp.append(i)
         self.fileNameList = tmp
+        #print(self.fileNameList)
+        self.selectFile = self.fileNameList[0]
+        self.fileNameList.remove(self.selectFile)
         Ui_MainWindow.setupUi(self, MainWindow)
-        print(self.folderpath)
 
     def dataSource(self):
-        path = self.folderpath+"/"+self.selectFile
-        #print(path)
-        if self.selectFile in self.fileNameList :
-            self.data = csvManager.getDataWithPandas(path)
+        print(self.selectFile)
+        if type(self.selectFile) != list:
+            self.selectFile = [self.selectFile]
+        if self.selectFile != [] :
+            if len(self.selectFile)>1:
+                self.data = csvManager.unionFile(self.selectFile)
+            else:
+                print(self.selectFile)
+                path = self.folderpath+"/"+self.selectFile[0]
+                self.data = csvManager.getDataWithPandas(path)
 
     def dataSourceSort(self,dimention):
         self.data = csvManager.setAllDataByOneDimention(dimention)
@@ -110,8 +132,6 @@ class Ui_MainWindow(object):
     def handleSelectionChanged(self, selected, deselected):
         for index in self.table.selectionModel().selectedRows():
             print('Row %d is selected' % index.row())
-    
-    
 
     def setupUi(self, MainWindow):
         
@@ -127,44 +147,14 @@ class Ui_MainWindow(object):
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
         
-        '''data = csvManager.getDataWithPandas()
-        dataCol = csvManager.getHead()
-        #print(len(data))
-        self.DataSource_2 = QtWidgets.QTableWidget(self.tab)
-        self.DataSource_2.setGeometry(QtCore.QRect(190, 10, 581, 501))
-        self.DataSource_2.setObjectName("DataSource_2")
-        self.DataSource_2.setColumnCount(len(dataCol))
-        self.DataSource_2.setRowCount(len(data))'''
-        #if self.selectFile != "":
+        
         self.table = QtWidgets.QTableView(self.tab)
         self.table.setGeometry(QtCore.QRect(190, 10, 581, 501))
         Ui_MainWindow.dataSource(self)
-        if self.selectFile != "" : 
+        if self.selectFile != [] : 
             self.model = TableModel(self.data)
-        
-            '''model =  QtGui.QStandardItemModel(len(self.data), len(self.data.columns), self.table)
-            for row in range(len(self.data)):
-                for column in range(len(self.data.columns)):
-                    item = QtGui.QStandardItem('(%d, %d)' % (row, column))
-                    item.setTextAlignment(QtCore.Qt.AlignCenter)
-                    model.setItem(row, column, item)'''
             self.table.setModel(self.model)
-        '''selection = self.table.selectionModel()
-        selection.selectionChanged.connect(self.handleSelectionChanged)'''
-        #layout = QtGui.QVBoxLayout(self)
-        #layout.addWidget(self.table)
-        
-        '''for i,r in zip(range(len(dataCol)),dataCol):
-            #print(i,r)
-            item = QtWidgets.QTableWidgetItem()
-            self.DataSource_2.setHorizontalHeaderItem(i, item)
-            
-        for i,r in zip(range(len(data)),list(data)):
-            #print(i,r)
-            item = QtWidgets.QTableWidgetItem()
-            self.DataSource_2.setVerticalHeaderItem(i, item)'''
-        
-        #self.DataSource_2.setItem(0, 0, item)
+
         
         self.pushButton = QtWidgets.QPushButton(self.tab)
         self.pushButton.setGeometry(QtCore.QRect(50, 490, 93, 28))
@@ -173,27 +163,36 @@ class Ui_MainWindow(object):
         
         self.FileList = QtWidgets.QListWidget(self.tab)
         self.FileList.setGeometry(QtCore.QRect(10, 10, 171, 271))
-        self.FileList.setObjectName("listView")
+        self.FileList.setAcceptDrops(True)
+        self.FileList.setDragEnabled(True)
+        self.FileList.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.FileList.setDefaultDropAction(QtCore.Qt.MoveAction)
+        self.FileList.setProperty("isWrapping", True)
+        self.FileList.setWordWrap(True)
+        self.FileList.setObjectName("FileList")
+        
         for i in range(len(self.fileNameList)):
             item = QtWidgets.QListWidgetItem()
             self.FileList.addItem(item)
-        self.FileList.setDragDropMode(QAbstractItemView.DragDrop)
         
-        '''self.listView = QtWidgets.QListView(self.tab)
-        self.listView.setGeometry(QtCore.QRect(10, 10, 171, 271))
-        self.listView.setObjectName("listView")'''
+        self.FileListChoose = QtWidgets.QListWidget(self.tab)
+        self.FileListChoose.setGeometry(QtCore.QRect(10, 290, 171, 191))
+        self.FileListChoose.setAcceptDrops(True)
+        self.FileListChoose.setDragEnabled(True)
+        self.FileListChoose.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.FileListChoose.setDefaultDropAction(QtCore.Qt.MoveAction)
+        self.FileListChoose.setWordWrap(True)
+        self.FileListChoose.setObjectName("FileListChoose")
+        #print(self.FileListChoose.item)
+        for i in range(len(self.selectFile)):
+            item = QtWidgets.QListWidgetItem()
+            self.FileListChoose.addItem(item)
         
-        self.listView_2 = QtWidgets.QListView(self.tab)
-        self.listView_2.setGeometry(QtCore.QRect(10, 290, 171, 191))
-        self.listView_2.setObjectName("listView_2")
-        model = QtGui.QStandardItemModel()
-        #self.listView.setModel(model)
-        '''for i in self.fileNameList:
-            item = QtGui.QStandardItem(i)
-            model.appendRow(item)
-        self.listView.setGeometry(QtCore.QRect(10, 10, 171, 271))'''
+        print(self.FileListChoose.count())
+        itemsTextList =  [str(self.FileListChoose.item(i).text()) for i in range(self.FileListChoose.count())]
+        print(itemsTextList)
         
-        self.tabWidget.addTab(self.tab, "")
+        self.tabWidget.addTab(self.tab, "Data Source")
 
         #Tab2
         self.tab_2 = QtWidgets.QWidget()
@@ -331,91 +330,32 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        '''data = csvManager.getDataWithPandas()
-        dataCol = csvManager.getHead()
-        #print(dataCol)
-        #print(list(data["Row ID"]))
-        
-        for i,r in zip(range(len(dataCol)),dataCol):
-            #print(i,r)
-            item = self.DataSource_2.horizontalHeaderItem(i) 
-            item.setText(_translate("MainWindow", str(r)))
-            #for j in range(len(data)):
-            
-        for i,r in zip(range(len(list(data))),list(data)):
-            #print(i,r)
-            item = self.DataSource_2.verticalHeaderItem(i)
-            #print(item)
-            #item.setText(_translate("MainWindow", "kkk"))'''
-        
-            
-        '''item = self.DataSource_2.verticalHeaderItem(0)
-        item.setText(_translate("MainWindow", "0"))
-        item = self.DataSource_2.verticalHeaderItem(1)
-        item.setText(_translate("MainWindow", "1"))
-        item = self.DataSource_2.verticalHeaderItem(2)
-        item.setText(_translate("MainWindow", "2"))'''
-        
-        '''item = self.DataSource_2.horizontalHeaderItem(0)
-        item.setText(_translate("MainWindow", "0"))
-        item = self.DataSource_2.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "1"))
-        item = self.DataSource_2.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "2"))'''
-        
-        #__sortingEnabled = self.DataSource_2.isSortingEnabled()
-        #self.DataSource_2.setSortingEnabled(False)
-        
-        #item = self.DataSource_2.item(0, 0)
-        #item.setText(_translate("MainWindow", "kkk"))
-        
-        #self.DataSource_2.setSortingEnabled(__sortingEnabled)
         
         self.pushButton.setText(_translate("MainWindow", "Select File"))
         
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Tab 1"))
-        item = self.tableWidget_2.horizontalHeaderItem(0)
-        item.setText(_translate("MainWindow", "New Column"))
-        item = self.tableWidget_2.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "New Column"))
-        item = self.tableWidget_2.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "New Column"))
-        item = self.tableWidget_2.horizontalHeaderItem(3)
-        item.setText(_translate("MainWindow", "New Column"))
-        self.label_2.setText(_translate("MainWindow", "Column"))
-        item = self.DataSource.verticalHeaderItem(0)
-        item.setText(_translate("MainWindow", "0"))
-        item = self.DataSource.verticalHeaderItem(1)
-        item.setText(_translate("MainWindow", "1"))
-        item = self.DataSource.verticalHeaderItem(2)
-        item.setText(_translate("MainWindow", "2"))
-        item = self.DataSource.horizontalHeaderItem(0)
-        item.setText(_translate("MainWindow", "0"))
-        item = self.DataSource.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "1"))
-        item = self.DataSource.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "2"))
-        self.label.setText(_translate("MainWindow", "Row"))
+        #if self.selectFile in self.fileNameList :
+        self.FileList.setSortingEnabled(True)
+        __sortingEnabled = self.FileList.isSortingEnabled()
+        self.FileList.setSortingEnabled(False)
+        #self.fileNameList = list(dict.fromkeys(self.fileNameList))
+        #print(self.fileNameList)
+        for i,j in zip(range(len(self.fileNameList)),self.fileNameList):
+            item = self.FileList.item(i)
+            item.setText(_translate("MainWindow", str(j)))
+        self.FileList.setSortingEnabled(__sortingEnabled)
+        self.FileList.clicked.connect(self.updateList)
         
-        if self.selectFile in self.fileNameList :
-            __sortingEnabled = self.FileList.isSortingEnabled()
-            self.FileList.setSortingEnabled(False)
-            #self.fileNameList = list(dict.fromkeys(self.fileNameList))
-            for i,j in zip(range(len(self.fileNameList)),self.fileNameList):
-                item = self.FileList.item(i)
-                item.setText(_translate("MainWindow", str(j)))
-            '''item = self.FileList.item(0)
-            item.setText(_translate("MainWindow", "New Item"))
-            item = self.FileList.item(1)
-            item.setText(_translate("MainWindow", "New Item"))
-            item = self.FileList.item(2)
-            item.setText(_translate("MainWindow", "New Item"))
-            item = self.FileList.item(3)
-            item.setText(_translate("MainWindow", "New Item"))
-            item = self.FileList.item(4)
-            item.setText(_translate("MainWindow", "New Item"))'''
-            self.FileList.setSortingEnabled(__sortingEnabled)
+        self.FileListChoose.setSortingEnabled(True)
+        __sortingEnabled = self.FileListChoose.isSortingEnabled()
+        self.FileListChoose.setSortingEnabled(False)
+        for i,j in zip(range(len(set(self.selectFile))),set(self.selectFile)):
+            item = self.FileListChoose.item(i)
+            item.setText(_translate("MainWindow", str(j)))
+        self.FileListChoose.clicked.connect(self.updateList)
+        itemsTextList =  [str(self.FileListChoose.item(i).text()) for i in range(self.FileListChoose.count())]
+        print(itemsTextList)
         
+            
         item = self.tableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "New Column"))
         item = self.tableWidget.horizontalHeaderItem(1)
@@ -456,7 +396,7 @@ class Ui_MainWindow(object):
         self.Linegraph.clicked.connect(lambda checked: ShowGraph.showlinegraph(self))
         #self.button = self.findChild(QtWidgets.QPushButton, 'stackbar') 
         self.stackbar.clicked.connect(lambda checked: ShowGraph.showstackbar(self))
-    
+
         
         
 class AnyButton() :
