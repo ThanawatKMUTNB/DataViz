@@ -21,7 +21,7 @@ from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBa
 #from qgis.PyQt.QtWidgets import QVBoxLayout
 
 class TableModel(QtCore.QAbstractTableModel):
-    data = None
+    data = ""
     def __init__(self, data):
         super(TableModel, self).__init__()
         #self.itemClicked.connect(self.handleItemClick)
@@ -50,6 +50,7 @@ class TableModel(QtCore.QAbstractTableModel):
 class Ui_MainWindow(object):
     folderpath = ''
     fileNameList = []
+    selectFile = ""
     def launchDialog(self):
         self.folderpath = QFileDialog.getExistingDirectory()
         filename = os.listdir(self.folderpath)
@@ -59,10 +60,13 @@ class Ui_MainWindow(object):
                 tmp.append(i)
         self.fileNameList = tmp
         Ui_MainWindow.setupUi(self, MainWindow)
-        #print(self.fileNameList)
+        print(self.folderpath)
 
     def dataSource(self):
-        self.data = csvManager.getDataWithPandas()
+        path = self.folderpath+"/"+self.selectFile
+        #print(path)
+        if self.selectFile in self.fileNameList :
+            self.data = csvManager.getDataWithPandas(path)
 
     def dataSourceSort(self,dimention):
         self.data = csvManager.setAllDataByOneDimention(dimention)
@@ -131,18 +135,20 @@ class Ui_MainWindow(object):
         self.DataSource_2.setObjectName("DataSource_2")
         self.DataSource_2.setColumnCount(len(dataCol))
         self.DataSource_2.setRowCount(len(data))'''
-        
+        #if self.selectFile != "":
         self.table = QtWidgets.QTableView(self.tab)
         self.table.setGeometry(QtCore.QRect(190, 10, 581, 501))
         Ui_MainWindow.dataSource(self)
-        self.model = TableModel(self.data)
-        '''model =  QtGui.QStandardItemModel(len(self.data), len(self.data.columns), self.table)
-        for row in range(len(self.data)):
-            for column in range(len(self.data.columns)):
-                item = QtGui.QStandardItem('(%d, %d)' % (row, column))
-                item.setTextAlignment(QtCore.Qt.AlignCenter)
-                model.setItem(row, column, item)'''
-        self.table.setModel(self.model)
+        if self.selectFile != "" : 
+            self.model = TableModel(self.data)
+        
+            '''model =  QtGui.QStandardItemModel(len(self.data), len(self.data.columns), self.table)
+            for row in range(len(self.data)):
+                for column in range(len(self.data.columns)):
+                    item = QtGui.QStandardItem('(%d, %d)' % (row, column))
+                    item.setTextAlignment(QtCore.Qt.AlignCenter)
+                    model.setItem(row, column, item)'''
+            self.table.setModel(self.model)
         '''selection = self.table.selectionModel()
         selection.selectionChanged.connect(self.handleSelectionChanged)'''
         #layout = QtGui.QVBoxLayout(self)
@@ -164,14 +170,14 @@ class Ui_MainWindow(object):
         self.pushButton.setGeometry(QtCore.QRect(50, 490, 93, 28))
         self.pushButton.setObjectName("Select File")
         self.pushButton.clicked.connect(self.launchDialog)
-        print(self.fileNameList)
+        
         self.FileList = QtWidgets.QListWidget(self.tab)
         self.FileList.setGeometry(QtCore.QRect(10, 10, 171, 271))
         self.FileList.setObjectName("listView")
         for i in range(len(self.fileNameList)):
             item = QtWidgets.QListWidgetItem()
             self.FileList.addItem(item)
-            
+        self.FileList.setDragDropMode(QAbstractItemView.DragDrop)
         
         '''self.listView = QtWidgets.QListView(self.tab)
         self.listView.setGeometry(QtCore.QRect(10, 10, 171, 271))
@@ -235,19 +241,19 @@ class Ui_MainWindow(object):
         self.label.setFont(font)
         self.label.setObjectName("label")
         
-        '''self.FileList = QtWidgets.QListWidget(self.tab_2)
-        self.FileList.setGeometry(QtCore.QRect(10, 10, 181, 501))
-        self.FileList.setObjectName("FileList")
+        self.FileListDimention = QtWidgets.QListWidget(self.tab_2)
+        self.FileListDimention.setGeometry(QtCore.QRect(10, 10, 181, 501))
+        self.FileListDimention.setObjectName("FileList")
         item = QtWidgets.QListWidgetItem()
-        self.FileList.addItem(item)
+        self.FileListDimention.addItem(item)
         item = QtWidgets.QListWidgetItem()
-        self.FileList.addItem(item)
+        self.FileListDimention.addItem(item)
         item = QtWidgets.QListWidgetItem()
-        self.FileList.addItem(item)
+        self.FileListDimention.addItem(item)
         item = QtWidgets.QListWidgetItem()
-        self.FileList.addItem(item)
+        self.FileListDimention.addItem(item)
         item = QtWidgets.QListWidgetItem()
-        self.FileList.addItem(item)'''
+        self.FileListDimention.addItem(item)
         
         self.tableWidget = QtWidgets.QTableWidget(self.tab_2)
         self.tableWidget.setGeometry(QtCore.QRect(270, 10, 511, 31))
@@ -391,22 +397,24 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "2"))
         self.label.setText(_translate("MainWindow", "Row"))
         
-        __sortingEnabled = self.FileList.isSortingEnabled()
-        self.FileList.setSortingEnabled(False)
-        for i,j in zip(range(len(self.fileNameList)),self.fileNameList):
-            item = self.FileList.item(i)
-            item.setText(_translate("MainWindow", str(j)))
-        '''item = self.FileList.item(0)
-        item.setText(_translate("MainWindow", "New Item"))
-        item = self.FileList.item(1)
-        item.setText(_translate("MainWindow", "New Item"))
-        item = self.FileList.item(2)
-        item.setText(_translate("MainWindow", "New Item"))
-        item = self.FileList.item(3)
-        item.setText(_translate("MainWindow", "New Item"))
-        item = self.FileList.item(4)
-        item.setText(_translate("MainWindow", "New Item"))'''
-        self.FileList.setSortingEnabled(__sortingEnabled)
+        if self.selectFile in self.fileNameList :
+            __sortingEnabled = self.FileList.isSortingEnabled()
+            self.FileList.setSortingEnabled(False)
+            #self.fileNameList = list(dict.fromkeys(self.fileNameList))
+            for i,j in zip(range(len(self.fileNameList)),self.fileNameList):
+                item = self.FileList.item(i)
+                item.setText(_translate("MainWindow", str(j)))
+            '''item = self.FileList.item(0)
+            item.setText(_translate("MainWindow", "New Item"))
+            item = self.FileList.item(1)
+            item.setText(_translate("MainWindow", "New Item"))
+            item = self.FileList.item(2)
+            item.setText(_translate("MainWindow", "New Item"))
+            item = self.FileList.item(3)
+            item.setText(_translate("MainWindow", "New Item"))
+            item = self.FileList.item(4)
+            item.setText(_translate("MainWindow", "New Item"))'''
+            self.FileList.setSortingEnabled(__sortingEnabled)
         
         item = self.tableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "New Column"))

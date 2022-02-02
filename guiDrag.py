@@ -1,119 +1,92 @@
-from PyQt5.QtWidgets import QApplication, QHBoxLayout, QWidget, QLabel, QMainWindow, QVBoxLayout
-from PyQt5.QtCore import Qt, QMimeData, pyqtSignal
-from PyQt5.QtGui import QDrag, QPixmap
+import sys
+import os
+import glob
+from PyQt5.QtWidgets import QApplication, QWidget, QListView, QAbstractItemView, QHBoxLayout, QVBoxLayout
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import QStandardItemModel, QIcon, QStandardItem, QKeyEvent
 
-
-class DragItem(QLabel):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.setContentsMargins(25, 5, 25, 5)
-        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.setStyleSheet("border: 1px solid black;")
-        # Store data separately from display label, but use label for default.
-        self.data = self.text()
-
-    def set_data(self, data):
-        self.data = data
-
-    def mouseMoveEvent(self, e):
-
-        if e.buttons() == Qt.LeftButton:
-            drag = QDrag(self)
-            mime = QMimeData()
-            drag.setMimeData(mime)
-
-            pixmap = QPixmap(self.size())
-            self.render(pixmap)
-            drag.setPixmap(pixmap)
-
-            drag.exec_(Qt.MoveAction)
-
-
-class DragWidget(QWidget):
-    """
-    Generic list sorting handler.
-    """
-
-    orderChanged = pyqtSignal(list)
-
-    def __init__(self, *args, orientation=Qt.Orientation.Vertical, **kwargs):
-        super().__init__()
+class ListView_Left(QListView):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.parent = parent
+        self.m_model = QStandardItemModel(self)
+        self.setModel(self.m_model)
         self.setAcceptDrops(True)
+        self.setIconSize(QSize(150, 150))
+        self.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop)
+        self.setResizeMode(QListView.ResizeMode.Adjust)
+        self.setViewMode(QListView.ViewMode.IconMode)
 
-        # Store the orientation for drag checks later.
-        self.orientation = orientation
-
-        if self.orientation == Qt.Orientation.Vertical:
-            self.blayout = QVBoxLayout()
-        else:
-            self.blayout = QHBoxLayout()
-
-        self.setLayout(self.blayout)
-
-    def dragEnterEvent(self, e):
-        e.accept()
-
-    def dropEvent(self, e):
-        pos = e.pos()
-        widget = e.source()
-
-        for n in range(self.blayout.count()):
-            # Get the widget at each index in turn.
-            w = self.blayout.itemAt(n).widget()
-            if self.orientation == Qt.Orientation.Vertical:
-                # Drag drop vertically.
-                drop_here = pos.y() < w.y() + w.size().height() // 2
-            else:
-                # Drag drop horizontally.
-                drop_here = pos.x() < w.x() + w.size().width() // 2
-
-            if drop_here:
-                # We didn't drag past this widget.
-                # insert to the left of it.
-                self.blayout.insertWidget(n-1, widget)
-                self.orderChanged.emit(self.get_item_data())
-                break
-
-        e.accept()
-
-    def add_item(self, item):
-        self.blayout.addWidget(item)
-
-    def get_item_data(self):
-        data = []
-        for n in range(self.blayout.count()):
-            # Get the widget at each index in turn.
-            w = self.blayout.itemAt(n).widget()
-            data.append(w.data)
-        return data
+    def dropEvent(self, event):
+        super().dropEvent(event)
+        self.parent.listViewRight.model().removeRow(self.parent.listViewRight.currentIndex().row())
 
 
-class MainWindow(QMainWindow):
+class ListView_Right(QListView):
+    def __init__(self,  parent=None):
+        super().__init__(parent)
+        self.parent = parent
+        self.m_model = QStandardItemModel(self)
+        self.setModel(self.m_model)
+        self.setAcceptDrops(True)
+        self.setIconSize(QSize(150, 150))
+        self.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop)
+        self.setResizeMode(QListView.ResizeMode.Adjust)
+        self.setViewMode(QListView.ViewMode.IconMode)
+        self.installEventFilter(self)
 
+    def eventFilter(self, source, event):
+        if event.type() == QKeyEvent.Type.KeyPress and event.key() == Qt.Key.Key_Delete:
+            if source == self:
+                row_indx = self.currentIndex().row()
+                self.model().remove().removeRow(row_indx)
+        return super().eventFilter(source, event)
+
+    def dropEvent(self, event):
+        super().dropEvent(event)
+        self.parent.listViewLeft.model().removeRow(self.parent.listViewLeft.currentIndex().row())
+
+
+class MyApp(QWidget):
     def __init__(self):
         super().__init__()
-        self.drag = DragWidget(orientation=Qt.Orientation.Vertical)
-        for n, l in enumerate(['A', 'B', 'C', 'D']):
-            item = DragItem(l)
-            item.set_data(n)  # Store the data.
-            self.drag.add_item(item)
+        self.window_width, self.window_height = 1400, 500
+        self.resize(self.window_width, self.window_height)
 
-        # Print out the changed order.
-        self.drag.orderChanged.connect(print)
+        layout = QHBoxLayout()
+        self.setLayout(layout)
 
-        container = QWidget()
-        layout = QVBoxLayout()
-        layout.addStretch(1)
-        layout.addWidget(self.drag)
-        layout.addStretch(1)
-        container.setLayout(layout)
+        self.listViewLeft = ListView_Left(self)
+        layout.addWidget(self.listViewLeft)
 
-        self.setCentralWidget(container)
+        self.listViewRight = ListView_Right(self)
+        layout.addWidget(self.listViewRight)
+
+        self.loadIcons()
+
+    def loadIcons(self):
+        icon_folder = os.path.join(os.getcwd(), 'icons')
+        for icon in glob.glob(os.path.join(icon_folder, '*.ico')):
+            item = QStandardItem()
+            item.setIcon(QIcon(icon))
+            self.listViewLeft.m_model.appendRow(item)
 
 
-app = QApplication([])
-w = MainWindow()
-w.show()
+if __name__ == '__main__':
+    # don't auto scale when drag app to a different monitor.
+    # QGuiApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
+    
+    app = QApplication(sys.argv)
+    app.setStyleSheet('''
+        QWidget {
+            font-size: 17px;
+        }
+    ''')
+    
+    myApp = MyApp()
+    myApp.show()
 
-app.exec_()
+    try:
+        sys.exit(app.exec())
+    except SystemExit:
+        print('Closing Window...')
