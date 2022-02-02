@@ -66,6 +66,17 @@ def getDataForBar(Row,Col):
     oneList = list(chain.from_iterable(listsumk))
     return oneList[::-1]
 
+def unionFile(oldfilename,newfilename):
+    li = []
+    df1 = pd.read_csv(oldfilename, encoding='windows-1252')
+    df2 = pd.read_csv(newfilename, encoding='windows-1252')
+    li.append(df1)
+    li.append(df2)
+    frame = pd.concat(li, axis=0, ignore_index=True)
+    frame.sort_values("Row ID", inplace = True)
+    frame.drop_duplicates(inplace=True)
+    return frame
+
 def setAvgGraphX(Row,Col):
     k = setDimentionSort(Row+Col)
     k = k.T
