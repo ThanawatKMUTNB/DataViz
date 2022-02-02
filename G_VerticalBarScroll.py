@@ -11,7 +11,7 @@ from itertools import chain
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        Dimention = 'Ship Mode'
+        Dimention = 'State'
         Measure = 'Quantity'
 
         n = csvManager.getsizeDimention(Dimention)
@@ -55,6 +55,7 @@ class MainWindow(QtWidgets.QMainWindow):
             #all graph
         set0 = QtChart.QBarSet(Measure)
         set0.append(tmp)
+        print(list(set0))
         self.series.append(set0)
 
         reg2 = csvManager.getAxisYName([Dimention])
@@ -85,6 +86,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if r:
             self._chart.axisX(self.series).setCategories(months) #############
         #self._chart.axisX(self.series).setVisible(False)
+        
         self.series.setLabelsVisible()
         self._chart.setTitle(str(Dimention+'\twith\t'+Measure))
         self._chart_view.setChart(self._chart)
