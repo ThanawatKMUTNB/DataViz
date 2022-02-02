@@ -58,6 +58,7 @@ class Ui_MainWindow(object):
             if i.endswith(".xls") or i.endswith(".csv") or i.endswith(".xlsx"):
                 tmp.append(i)
         self.fileNameList = tmp
+        Ui_MainWindow.setupUi(self, MainWindow)
         #print(self.fileNameList)
 
     def dataSource(self):
@@ -163,15 +164,24 @@ class Ui_MainWindow(object):
         self.pushButton.setGeometry(QtCore.QRect(50, 490, 93, 28))
         self.pushButton.setObjectName("Select File")
         self.pushButton.clicked.connect(self.launchDialog)
+        print(self.fileNameList)
+        self.FileList = QtWidgets.QListWidget(self.tab)
+        self.FileList.setGeometry(QtCore.QRect(10, 10, 171, 271))
+        self.FileList.setObjectName("listView")
+        for i in range(len(self.fileNameList)):
+            item = QtWidgets.QListWidgetItem()
+            self.FileList.addItem(item)
+            
         
-        self.listView = QtWidgets.QListView(self.tab)
+        '''self.listView = QtWidgets.QListView(self.tab)
         self.listView.setGeometry(QtCore.QRect(10, 10, 171, 271))
-        self.listView.setObjectName("listView")
+        self.listView.setObjectName("listView")'''
+        
         self.listView_2 = QtWidgets.QListView(self.tab)
         self.listView_2.setGeometry(QtCore.QRect(10, 290, 171, 191))
         self.listView_2.setObjectName("listView_2")
         model = QtGui.QStandardItemModel()
-        self.listView.setModel(model)
+        #self.listView.setModel(model)
         '''for i in self.fileNameList:
             item = QtGui.QStandardItem(i)
             model.appendRow(item)
@@ -224,7 +234,8 @@ class Ui_MainWindow(object):
         font.setPointSize(10)
         self.label.setFont(font)
         self.label.setObjectName("label")
-        self.FileList = QtWidgets.QListWidget(self.tab_2)
+        
+        '''self.FileList = QtWidgets.QListWidget(self.tab_2)
         self.FileList.setGeometry(QtCore.QRect(10, 10, 181, 501))
         self.FileList.setObjectName("FileList")
         item = QtWidgets.QListWidgetItem()
@@ -236,7 +247,8 @@ class Ui_MainWindow(object):
         item = QtWidgets.QListWidgetItem()
         self.FileList.addItem(item)
         item = QtWidgets.QListWidgetItem()
-        self.FileList.addItem(item)
+        self.FileList.addItem(item)'''
+        
         self.tableWidget = QtWidgets.QTableWidget(self.tab_2)
         self.tableWidget.setGeometry(QtCore.QRect(270, 10, 511, 31))
         self.tableWidget.setObjectName("tableWidget")
@@ -378,9 +390,13 @@ class Ui_MainWindow(object):
         item = self.DataSource.horizontalHeaderItem(2)
         item.setText(_translate("MainWindow", "2"))
         self.label.setText(_translate("MainWindow", "Row"))
+        
         __sortingEnabled = self.FileList.isSortingEnabled()
         self.FileList.setSortingEnabled(False)
-        item = self.FileList.item(0)
+        for i,j in zip(range(len(self.fileNameList)),self.fileNameList):
+            item = self.FileList.item(i)
+            item.setText(_translate("MainWindow", str(j)))
+        '''item = self.FileList.item(0)
         item.setText(_translate("MainWindow", "New Item"))
         item = self.FileList.item(1)
         item.setText(_translate("MainWindow", "New Item"))
@@ -389,8 +405,9 @@ class Ui_MainWindow(object):
         item = self.FileList.item(3)
         item.setText(_translate("MainWindow", "New Item"))
         item = self.FileList.item(4)
-        item.setText(_translate("MainWindow", "New Item"))
+        item.setText(_translate("MainWindow", "New Item"))'''
         self.FileList.setSortingEnabled(__sortingEnabled)
+        
         item = self.tableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "New Column"))
         item = self.tableWidget.horizontalHeaderItem(1)
