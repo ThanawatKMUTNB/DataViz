@@ -11,10 +11,10 @@ from itertools import chain
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        Dimention = 'Row ID'
+        Dimension = 'Row ID'
         Measure = 'Quantity'
 
-        n = csvManager.getsizeDimention(Dimention)
+        n = csvManager.getsizeDimension(Dimension)
         r = False
         if n > 5000:
             self.step = 0.001
@@ -54,13 +54,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self._chart = QtChart.QChart()
         self.series = QtChart.QHorizontalBarSeries()
 
-        tmp = csvManager.getDataForBar([Dimention],[Measure])
+        tmp = csvManager.getDataForBar([Dimension],[Measure])
 
         set0 = QtChart.QBarSet(Measure)
         set0.append(tmp)
         self.series.append(set0)
 
-        reg2 = csvManager.getAxisYName([Dimention])
+        reg2 = csvManager.getAxisYName([Dimension])
         oneList = list(chain.from_iterable(reg2))
         oneList = map(str,oneList)
         months = tuple(oneList)
@@ -100,7 +100,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self._chart.axisY(self.series).setCategories(months) ####################
         #self._chart.axisY(self.series).setVisible(False)
         #self.series.setLabelsVisible()          #error some bar
-        self._chart.setTitle(str(Dimention+'\twith\t'+Measure))          
+        self._chart.setTitle(str(Dimension+'\twith\t'+Measure))          
         self._chart_view.setChart(self._chart)
         self.adjust_axes(0, 100)
         self.lims = np.array([min_x, max_x])

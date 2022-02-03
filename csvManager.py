@@ -20,49 +20,49 @@ def getDataWithPandasByHead(head):
     df = df[head]
     return df
 
-def getAxisYName(dimention):
-    k = setDimentionSort(dimention)
-    head = k[dimention].drop_duplicates()
+def getAxisYName(Dimension):
+    k = setDimensionSort(Dimension)
+    head = k[Dimension].drop_duplicates()
     reg2 = head.drop_duplicates()
     reg2 = reg2[::-1].values.tolist()
     return reg2
 
 def getDataForBar(Row,Col):
-    k = setDimentionSort(Row+Col)
+    k = setDimensionSort(Row+Col)
     grouped = k.groupby(Row)
     sumK = grouped.sum()
     listsumk = sumK.values.tolist()
     oneList = list(chain.from_iterable(listsumk))
     return oneList[::-1]
 
-def getsizeDimention(dimention):
+def getsizeDimension(Dimension):
     df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     tmp = []
-    for i in df[dimention].values:
+    for i in df[Dimension].values:
         if i not in tmp:
             tmp.append(i)
     return len(tmp)
 
-def getValueDimention(dimention):
+def getValueDimension(Dimension):
     df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     Val = []
-    for i in df[dimention].values:
+    for i in df[Dimension].values:
         if i not in Val:
             Val.append(i)
     return Val
 
-def setAllDataByOneDimention(Dimention): #sort each column
+def setAllDataByOneDimension(Dimension): #sort each column
     data = getDataWithPandas()
     #print(type(data))
-    new = data.sort_values(by=str(Dimention))
+    new = data.sort_values(by=str(Dimension))
     return new
 
-def setDimentionSort(dimention):
-    sortedData = getDataWithPandasByHead(dimention)
+def setDimensionSort(Dimension):
+    sortedData = getDataWithPandasByHead(Dimension)
     #print(sortedData)
     #print(oneList)
-    new = sortedData.sort_values(by=dimention)
-    new.set_index([dimention[0]])
+    new = sortedData.sort_values(by=Dimension)
+    new.set_index([Dimension[0]])
     #new[''] = pd.Series("abc", index=new.index)
     pd.MultiIndex.from_frame(new)
     return new
@@ -95,32 +95,32 @@ def unionFile(Listfilename):
     return frame
 
 def setAvgGraphX(Row,Col):
-    k = setDimentionSort(Row+Col)
+    k = setDimensionSort(Row+Col)
     k = k.T
     sumK = k.sum(axis=1)
     
-def getsizeDimention(dimention):
+def getsizeDimension(Dimension):
     df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     tmp = []
-    for i in df[dimention].values:
+    for i in df[Dimension].values:
         if i not in tmp:
             tmp.append(i)
     return len(tmp)
     
-dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
+Dimension = ["Country/Region","City","State","Postal Code","Region","Product ID"]
 
-'''sortedData = setDimentionSort(dimention,"Postal Code")
+'''sortedData = setDimensionSort(Dimension,"Postal Code")
 print(sortedData)'''
 
-#dd = setAllDataByOneDimention("Sales")
+#dd = setAllDataByOneDimension("Sales")
 #print(dd)
 
 #dd = setRowAndColumn(["City","State"],["Row ID","Product ID"])
 #print(dd)
 
 def setRowAndColumn(Row,Col):
-    sortedDataByRow = setDimentionSort(Row)
-    sortedDataByCol = setDimentionSort(Col)
+    sortedDataByRow = setDimensionSort(Row)
+    sortedDataByCol = setDimensionSort(Col)
     #print(sortedDataByCol)
     df = pd.DataFrame(sortedDataByRow).drop_duplicates()
     dfCol = pd.DataFrame(sortedDataByCol).drop_duplicates()
@@ -131,10 +131,10 @@ def setRowAndColumn(Row,Col):
     
     s = pd.DataFrame(" ",index = oneList,columns=oneListCol)
     #print(s.loc["East","Same Day"])
-    sameDimention = list(set(Row) & set(Col))
-    #print(dfCol[sameDimention])
-    #print(sameDimention)
-    valueSameDimen = setDimentionSort(sameDimention).drop_duplicates().values.tolist()
+    sameDimension = list(set(Row) & set(Col))
+    #print(dfCol[sameDimension])
+    #print(sameDimension)
+    valueSameDimen = setDimensionSort(sameDimension).drop_duplicates().values.tolist()
     #print(valueSameDimen)
     #print(s)
     for i in valueSameDimen:
