@@ -8,11 +8,11 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
     df = pd.read_csv('Superstore.csv', encoding='windows-1252')
-    Dimention = 'Sub-Category'
+    Dimension = 'Sub-Category'
     Measure = 'Profit'
 
-    M = csvManager.getValueDimention(Dimention)
-    df.set_index(Dimention,inplace=True)
+    M = csvManager.getValueDimension(Dimension)
+    df.set_index(Dimension,inplace=True)
     profit = []
     for i in M:
         profit.append(sum(df.loc[i,Measure]))
@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     chart = QtChart.QChart()
     chart.addSeries(series)
-    chart.setTitle(str(Dimention+'\twith\t'+Measure))
+    chart.setTitle(str(Dimension+'\twith\t'+Measure))
     chart.setAnimationOptions(QChart.SeriesAnimations)
     chart.legend().hide()
 

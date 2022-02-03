@@ -12,7 +12,7 @@ class Window(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        Dimention = 'Sub-Category'
+        Dimension = 'Region'
         Measure = []
         for M in csvManager.getHead():
             #print(M)
@@ -22,13 +22,13 @@ class Window(QMainWindow):
         self.setWindowTitle("PyQt BarChart")
         self.resize(1000, 800)
         self.show()
-        self.create_bar(Dimention,Measure)
+        self.create_bar(Dimension,Measure)
  
-    def create_bar(self,Dimention,Measure):
+    def create_bar(self,Dimension,Measure):
         
         df = pd.read_csv('Superstore.csv', encoding='windows-1252')
-        df.set_index(Dimention,inplace=True)
-        ValueDi = csvManager.getValueDimention(Dimention)
+        df.set_index(Dimension,inplace=True)
+        ValueDi = csvManager.getValueDimension(Dimension)
         ValueDi = sorted(ValueDi)
         ValueDi = ValueDi[::-1]
         #print(ValueDi)
@@ -36,7 +36,7 @@ class Window(QMainWindow):
 
         Meskey = []
         for i in Measure:
-            Meskey.append(csvManager.getDataForBar([Dimention],[i]))
+            Meskey.append(csvManager.getDataForBar([Dimension],[i]))
         #Meskey = Meskey[::-1]
         for j in range(len(ValueDi)):
             set0 = QBarSet(ValueDi[j])

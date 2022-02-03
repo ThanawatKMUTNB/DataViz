@@ -8,13 +8,13 @@ import pandas as pd
 import csvManager
 
 class MainWindow(QMainWindow):
-	def __init__(self,Dimention,Measure):
+	def __init__(self,Dimension,Measure):
 		super().__init__()
 		self.resize(800, 600)
 
 		df = pd.read_csv('Superstore.csv', encoding='windows-1252')
-		Reg = csvManager.getAxisYName([Dimention])
-		tmp = csvManager.getDataForBar([Dimention],[Measure])
+		Reg = csvManager.getAxisYName([Dimension])
+		tmp = csvManager.getDataForBar([Dimension],[Measure])
 		#print(df)
 		set0 = QBarSet(Measure)
 		set0.append(reversed(tmp))

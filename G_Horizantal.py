@@ -9,28 +9,28 @@ import csvManager
 
 class MainWindow(QMainWindow):
         
-	def __init__(self,Dimention,Measure):
+	def __init__(self,Dimension,Measure):
 		super().__init__()
 		self.resize(800, 600)
 
 		series = QHorizontalBarSeries()
 		#colList = ['Discount','Profit','Sales']
 		#for col in colList:
-		tmp = csvManager.getDataForBar([Dimention],[Measure])
+		tmp = csvManager.getDataForBar([Dimension],[Measure])
 		set0 = QBarSet(Measure)
 		set0.append(tmp)
 		series.append(set0)
 
 		chart = QChart()
 		chart.addSeries(series)
-		s = str(Dimention+' '+Measure)
+		s = str(Dimension+' '+Measure)
 		chart.setTitle(s)
 
 		chart.setAnimationOptions(QChart.SeriesAnimations)
 
 		series.setLabelsVisible()
 
-		reg2 = csvManager.getAxisYName([Dimention])
+		reg2 = csvManager.getAxisYName([Dimension])
 
 		oneList = list(chain.from_iterable(reg2))
 		months = tuple(oneList)
