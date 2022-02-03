@@ -150,8 +150,9 @@ def setRowAndColumn(Row,Col):
     #print(sameDimention)
     valueSameDimen = setDimentionSort(sameDimention).drop_duplicates().values.tolist()
     #print(valueSameDimen)
-    #print(s)
+    #print(valueSameDimen)
     for i in valueSameDimen:
+        #print(valueSameDimen)
         #print(tuple(i))
         #print(s.loc[tuple(i),tuple(i)])
         s.loc[tuple(i),tuple(i)] = "abc"
