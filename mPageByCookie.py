@@ -1,3 +1,4 @@
+from email import header
 from operator import mod
 import os
 import pathlib
@@ -47,11 +48,31 @@ class TableModel(QtCore.QAbstractTableModel):
 
             '''if orientation == Qt.Vertical: #y
                 return ''.join(self._data.index[section])'''
+                
 class Ui_MainWindow(object):
-    dragDropFinished = QtCore.pyqtSignal()
+    #dragDropFinished = QtCore.pyqtSignal()
     folderpath = ''
     fileNameList = []
     selectFile = []
+    colHeader = []
+    Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
+    path = ""
+    RowChoose = []
+    ColChoose = []
+    #DimenForChoose = []
+                
+    def DropDup(self):
+        itemsTextList =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
+        self.RowChoose = itemsTextList
+        itemsTextList =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
+        self.ColChoose = itemsTextList
+        itemsTextList =  [str(self.FileListDimention.item(i).text()) for i in range(self.FileListDimention.count())]
+        itemsTextList = list(dict.fromkeys(itemsTextList))
+        self.colHeader = itemsTextList
+        print(self.RowChoose,self.ColChoose)
+        print(self.selectFile)
+        Ui_MainWindow.retranslateUi(self, MainWindow)
+        
     def updateList(self):
         itemsTextList =  [str(self.FileListChoose.item(i).text()) for i in range(self.FileListChoose.count())]
         self.selectFile = itemsTextList
@@ -66,8 +87,6 @@ class Ui_MainWindow(object):
     def launchDialog(self):
         self.folderpath = QFileDialog.getExistingDirectory()
         filename = os.listdir(self.folderpath)
-        #print(self.folderpath)
-        #print(self.fileNameList)
         tmp = []
         for i in filename:
             if i.endswith(".xls") or i.endswith(".csv") or i.endswith(".xlsx"):
@@ -76,19 +95,23 @@ class Ui_MainWindow(object):
         #print(self.fileNameList)
         self.selectFile = self.fileNameList[0]
         self.fileNameList.remove(self.selectFile)
+        self.path = self.folderpath+"/"+self.selectFile
+        self.colHeader = csvManager.getHead(self.path)
+        for i in self.Measure:
+            if i in self.colHeader:
+                self.colHeader.remove(i)
         Ui_MainWindow.setupUi(self, MainWindow)
 
     def dataSource(self):
-        print(self.selectFile)
+        #print(self.selectFile)
         if type(self.selectFile) != list:
             self.selectFile = [self.selectFile]
         if self.selectFile != [] :
             if len(self.selectFile)>1:
                 self.data = csvManager.unionFile(self.selectFile)
             else:
-                print(self.selectFile)
-                path = self.folderpath+"/"+self.selectFile[0]
-                self.data = csvManager.getDataWithPandas(path)
+                self.path = self.folderpath+"/"+self.selectFile[0]
+                self.data = csvManager.getDataWithPandas(self.path)
 
     def dataSourceSort(self,dimention):
         self.data = csvManager.setAllDataByOneDimention(dimention)
@@ -107,7 +130,6 @@ class Ui_MainWindow(object):
         tmp = tmp.sort_values(by=Col)
         tmp = tmp.drop_duplicates().values
         res = list(map(list, zip(*tmp)))
-        print(res)
         newDf = []
         for i in res:
             newDf.append(Row+i)
@@ -122,12 +144,18 @@ class Ui_MainWindow(object):
             self.data.insert(0,j,i)
         
     def sheetPageRowAndCol(self,Row,Col):
-        if len(set(Col)) == 0: MainWindow.sheetPageRow(self,Row)
-        elif len(set(Row)) == 0: MainWindow.sheetPageCol(self,Col)
+        print("Start",Row,Col)
+        if len(set(self.ColChoose)) == 0: 
+            print("Row")
+            self.sheetPageRow(self,Row)
+        elif len(set(self.RowChoose)) == 0:
+            print("Col") 
+            self.sheetPageCol(self,Col)
         else : 
+            print("Row and Col")
             self.data = csvManager.setRowAndColumn(Row,Col)
-            MainWindow.sheetPageAddRow(self,Row)
-            MainWindow.sheetPageAddCol(self,Row,Col)
+            #self.sheetPageAddRow(self,Row)
+            #self.sheetPageAddCol(self,Row,Col)
     
     def handleSelectionChanged(self, selected, deselected):
         for index in self.table.selectionModel().selectedRows():
@@ -150,7 +178,7 @@ class Ui_MainWindow(object):
         
         self.table = QtWidgets.QTableView(self.tab)
         self.table.setGeometry(QtCore.QRect(190, 10, 581, 501))
-        Ui_MainWindow.dataSource(self)
+        self.dataSource()
         if self.selectFile != [] : 
             self.model = TableModel(self.data)
             self.table.setModel(self.model)
@@ -170,7 +198,6 @@ class Ui_MainWindow(object):
         self.FileList.setProperty("isWrapping", True)
         self.FileList.setWordWrap(True)
         self.FileList.setObjectName("FileList")
-        
         for i in range(len(self.fileNameList)):
             item = QtWidgets.QListWidgetItem()
             self.FileList.addItem(item)
@@ -187,87 +214,90 @@ class Ui_MainWindow(object):
         for i in range(len(self.selectFile)):
             item = QtWidgets.QListWidgetItem()
             self.FileListChoose.addItem(item)
-        
-        print(self.FileListChoose.count())
-        itemsTextList =  [str(self.FileListChoose.item(i).text()) for i in range(self.FileListChoose.count())]
-        print(itemsTextList)
-        
         self.tabWidget.addTab(self.tab, "Data Source")
 
         #Tab2
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
-        self.tableWidget_2 = QtWidgets.QTableWidget(self.tab_2)
-        self.tableWidget_2.setGeometry(QtCore.QRect(270, 50, 511, 31))
-        self.tableWidget_2.setObjectName("tableWidget_2")
-        self.tableWidget_2.setColumnCount(4)
-        self.tableWidget_2.setRowCount(0)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(2, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget_2.setHorizontalHeaderItem(3, item)
-        self.label_2 = QtWidgets.QLabel(self.tab_2)
-        self.label_2.setGeometry(QtCore.QRect(200, 50, 61, 31))
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.label_2.setFont(font)
-        self.label_2.setObjectName("label_2")
-        self.DataSource = QtWidgets.QTableWidget(self.tab_2)
-        self.DataSource.setGeometry(QtCore.QRect(200, 90, 581, 421))
-        self.DataSource.setObjectName("DataSource")
-        self.DataSource.setColumnCount(3)
-        self.DataSource.setRowCount(3)
-        item = QtWidgets.QTableWidgetItem()
-        self.DataSource.setVerticalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.DataSource.setVerticalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.DataSource.setVerticalHeaderItem(2, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.DataSource.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.DataSource.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.DataSource.setHorizontalHeaderItem(2, item)
-        self.label = QtWidgets.QLabel(self.tab_2)
-        self.label.setGeometry(QtCore.QRect(200, 10, 61, 31))
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.label.setFont(font)
-        self.label.setObjectName("label")
         
         self.FileListDimention = QtWidgets.QListWidget(self.tab_2)
-        self.FileListDimention.setGeometry(QtCore.QRect(10, 10, 181, 501))
+        self.FileListDimention.setGeometry(QtCore.QRect(10, 10, 181, 330))
+        self.FileListDimention.setAcceptDrops(True)
+        self.FileListDimention.setDragEnabled(True)
+        self.FileListDimention.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.FileListDimention.setDefaultDropAction(QtCore.Qt.CopyAction)
+        self.FileListDimention.setWordWrap(True)
         self.FileListDimention.setObjectName("FileList")
-        item = QtWidgets.QListWidgetItem()
-        self.FileListDimention.addItem(item)
-        item = QtWidgets.QListWidgetItem()
-        self.FileListDimention.addItem(item)
-        item = QtWidgets.QListWidgetItem()
-        self.FileListDimention.addItem(item)
-        item = QtWidgets.QListWidgetItem()
-        self.FileListDimention.addItem(item)
-        item = QtWidgets.QListWidgetItem()
-        self.FileListDimention.addItem(item)
+        for i in range(len(self.colHeader)):
+            item = QtWidgets.QListWidgetItem()
+            self.FileListDimention.addItem(item)
+        self.FileListDimention.clicked.connect(self.DropDup)
+            
+        self.FileListMes = QtWidgets.QListWidget(self.tab_2)
+        self.FileListMes.setGeometry(QtCore.QRect(10, 350, 181, 160))
+        self.FileListMes.setAcceptDrops(True)
+        self.FileListMes.setDragEnabled(True)
+        self.FileListMes.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.FileListMes.setDragDropOverwriteMode(True)
+        self.FileListMes.setDefaultDropAction(QtCore.Qt.LinkAction)
+        self.FileListMes.setWordWrap(True)
+        self.FileListMes.setObjectName("FileListMes")
+        for i in range(len(self.Measure)):
+            item = QtWidgets.QListWidgetItem()
+            self.FileListMes.addItem(item)
+        self.FileListDimention.clicked.connect(self.DropDup)
         
-        self.tableWidget = QtWidgets.QTableWidget(self.tab_2)
-        self.tableWidget.setGeometry(QtCore.QRect(270, 10, 511, 31))
-        self.tableWidget.setObjectName("tableWidget")
-        self.tableWidget.setColumnCount(4)
-        self.tableWidget.setRowCount(0)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(2, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(3, item)
-        self.tabWidget.addTab(self.tab_2, "")
+        self.ColLabel = QtWidgets.QLabel(self.tab_2)
+        self.ColLabel.setGeometry(QtCore.QRect(200, 75, 61, 31))
+        self.ColLabel.setObjectName("ColLabel")
+        
+        self.RowList = QtWidgets.QListWidget(self.tab_2)
+        self.RowList.setGeometry(QtCore.QRect(260, 10, 521, 50))
+        self.RowList.setAcceptDrops(True)
+        self.RowList.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.RowList.setAutoFillBackground(True)
+        self.RowList.setDragEnabled(True)
+        self.RowList.setDragDropOverwriteMode(True)
+        self.RowList.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.RowList.setDefaultDropAction(QtCore.Qt.MoveAction)
+        self.RowList.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.RowList.setFlow(QtWidgets.QListView.LeftToRight)
+        self.RowList.setObjectName("RowList")
+        self.RowList.clicked.connect(self.DropDup)
+        self.RowLabel = QtWidgets.QLabel(self.tab_2)
+        self.RowLabel.setGeometry(QtCore.QRect(200, 20, 61, 31))
+        self.RowLabel.setObjectName("RowLabel")
+        
+        self.ColList = QtWidgets.QListWidget(self.tab_2)
+        self.ColList.setGeometry(QtCore.QRect(261, 65, 521, 50))
+        self.ColList.setAcceptDrops(True)
+        self.ColList.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.ColList.setAutoFillBackground(True)
+        self.ColList.setDragEnabled(True)
+        self.ColList.setDragDropOverwriteMode(True)
+        self.ColList.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.ColList.setDefaultDropAction(QtCore.Qt.MoveAction)
+        self.ColList.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.ColList.setFlow(QtWidgets.QListView.LeftToRight)
+        self.ColList.setObjectName("ColList")
+        self.ColList.clicked.connect(self.DropDup)
+        
+        self.DataSource = QtWidgets.QTableWidget(self.tab_2)
+        self.DataSource.setGeometry(QtCore.QRect(200, 120, 581, 391))
+        self.DataSource.setObjectName("DataSource")
+        '''self.ColChoose = ["ll"]
+        print(self.RowChoose != [] or self.ColChoose != [])
+        if self.RowChoose != [] or self.ColChoose != [] :
+            self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
+            self.DataSource = QtWidgets.QTableWidget(self.tab_2)
+            self.DataSource.setGeometry(QtCore.QRect(200, 120, 581, 391))
+            self.DataSource.setObjectName("DataSource")
+            if self.selectFile != [] : 
+                self.model = TableModel(self.data)
+                self.DataSource.setModel(self.model)'''
+        
+        
+        self.tabWidget.addTab(self.tab_2, "Sheet")
 
         #tab3
         self.tab_3 = QtWidgets.QWidget()
@@ -352,19 +382,37 @@ class Ui_MainWindow(object):
             item = self.FileListChoose.item(i)
             item.setText(_translate("MainWindow", str(j)))
         self.FileListChoose.clicked.connect(self.updateList)
-        itemsTextList =  [str(self.FileListChoose.item(i).text()) for i in range(self.FileListChoose.count())]
-        print(itemsTextList)
         
-            
-        item = self.tableWidget.horizontalHeaderItem(0)
-        item.setText(_translate("MainWindow", "New Column"))
-        item = self.tableWidget.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "New Column"))
-        item = self.tableWidget.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "New Column"))
-        item = self.tableWidget.horizontalHeaderItem(3)
-        item.setText(_translate("MainWindow", "New Column"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Tab 2"))
+        #tab 2
+        self.FileList.setSortingEnabled(True)
+        __sortingEnabled = self.FileListDimention.isSortingEnabled()
+        self.FileList.setSortingEnabled(False)
+        for i,j in zip(range(len(self.colHeader)),self.colHeader):
+            item = self.FileListDimention.item(i)
+            item.setText(_translate("MainWindow", str(j)))
+        self.FileListDimention.setSortingEnabled(__sortingEnabled)
+        
+        self.FileListMes.setSortingEnabled(True)
+        __sortingEnabled = self.FileListMes.isSortingEnabled()
+        self.FileListMes.setSortingEnabled(False)
+        for i,j in zip(range(len(self.Measure)),self.Measure):
+            item = self.FileListMes.item(i)
+            item.setText(_translate("MainWindow", str(j)))
+        self.FileListMes.setSortingEnabled(__sortingEnabled)
+        
+        self.ColLabel.setText(_translate("MainWindow", "Column"))
+        self.RowLabel.setText(_translate("MainWindow", "Row"))
+        
+        if self.RowChoose != [] and self.ColChoose != [] :
+            if self.folderpath != '' :
+                self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
+                self.DataSource = QtWidgets.QTableWidget(self.tab_2)
+                self.DataSource.setGeometry(QtCore.QRect(200, 120, 581, 391))
+                self.DataSource.setObjectName("DataSource")
+                if self.selectFile != [] : 
+                    self.model = TableModel(self.data)
+                    self.DataSource.setModel(self.model)
+
         #Tab3
         self.Linegraph.setText(_translate("MainWindow", "Line graph"))
         self.Label.setText(_translate("MainWindow", "Label"))
