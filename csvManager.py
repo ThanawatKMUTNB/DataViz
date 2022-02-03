@@ -2,9 +2,12 @@ from itertools import chain
 from re import S
 import numpy as np
 import pandas as pd
+import mPageByCookie
+def setPath(directory):
+    path = directory
 
-def getHead():
-    df = pd.read_csv('SS_20lines.csv', encoding='windows-1252')
+def getHead(path):
+    df = pd.read_csv(path, encoding='windows-1252')
     #df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     return list(df.columns)
 
@@ -66,7 +69,16 @@ def setDimentionSort(dimention):
     #new[''] = pd.Series("abc", index=new.index)
     pd.MultiIndex.from_frame(new)
     return new
-    
+
+def getMeasure(path):
+    df = pd.read_csv(path, encoding='windows-1252')
+    Dimen = []
+    Meas = []
+    for head in df.columns:
+        if (df.dtypes[head] == 'int64' or df.dtypes[head] == 'float64') and head != 'Row ID' and head != 'Postal Code':
+            Meas.append(head)
+    return Meas
+
 def isDimension(header):
     df = pd.read_csv('Superstore.csv', encoding='windows-1252')
     Dimen = []
@@ -86,7 +98,9 @@ def isDimension(header):
 
 def unionFile(Listfilename):
     li = []
+    print(Listfilename)
     for i in Listfilename:
+        print(i)
         df = pd.read_csv(i, encoding='windows-1252')
         li.append(df)
     frame = pd.concat(li, axis=0, ignore_index=True)

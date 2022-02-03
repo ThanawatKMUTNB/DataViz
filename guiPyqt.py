@@ -84,7 +84,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
         dimention = ["Country/Region","City","State","Postal Code","Region","Product ID"]
         Row = ["Region","Ship Mode","Segment"]
-        Col = ["Region","Ship Mode"]
+        Col = ["Region","Ship Mode","Segment"]
         self.table = QtWidgets.QTableView()
         
         #data = csvManager.setRowAndColumn(["City","State"],["Row ID"])
