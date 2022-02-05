@@ -1,7 +1,6 @@
 from email import header
 from operator import mod
 import os
-import pathlib
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
@@ -20,6 +19,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5.QtWidgets import (QApplication, QMainWindow)
 from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 #from qgis.PyQt.QtWidgets import QVBoxLayout
+cm = csvManager.csvManager()
 class TableModel2(QtCore.QAbstractTableModel):
     data = ""
     def __init__(self, data):
@@ -133,8 +133,11 @@ class Ui_MainWindow(object):
         #print(tmp)
         self.fileNameList = tmp
         self.path = self.folderpath+"/"+self.selectFile
-        
-        self.colHeader = csvManager.getHead(self.path)
+        cm.path = self.folderpath
+        cm.selectFile = self.selectFile
+        cm.setPath()
+        print(cm.df)
+        self.colHeader = cm.getHead()
         for i in self.Measure:
             if i in self.colHeader:
                 self.colHeader.remove(i)
@@ -145,7 +148,7 @@ class Ui_MainWindow(object):
         self.RowList = itemsTextList
         itemsTextList =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
         self.ColList = itemsTextList
-        #print(self.dataSheet)
+        print(self.RowList,self.ColList)
         self.sheetPageRowAndCol(self.RowList,self.ColList)
         self.df_rows = 20
         self.df_cols = 1
@@ -167,26 +170,26 @@ class Ui_MainWindow(object):
             self.selectFile = [self.selectFile]
         if self.selectFile != [] :
             if len(self.selectFile)>1:
-                self.data = csvManager.unionFile(self.selectFile)
+                self.data = cm.unionFile(self.selectFile)
             else:
                 self.path = self.folderpath+"/"+self.selectFile[0]
-                self.data = csvManager.getDataWithPandas(self.path)
+                self.data = cm.getDataWithPandas()
 
     def dataSourceSort(self,dimension):
-        self.data = csvManager.setAllDataByOneDimension(dimension)
+        self.data = cm.setAllDataByOneDimension(dimension)
         
     def sheetPageRow(self):
         #print(self.RowList)
-        self.dataSheet = csvManager.setDimensionSort(self.RowList)
+        self.dataSheet = cm.setDimensionSort(self.RowList)
         self.dataSheet[" "] = "abc"
                 
     def sheetPageCol(self):
-        tmp = csvManager.setDimensionSort(self.ColList)
+        tmp = cm.setDimensionSort(self.ColList)
         tmp[" "] = "abc"
         self.dataSheet = tmp.T
         
     '''def sheetPageAddCol(self,Row,Col):
-        tmp = csvManager.getDataWithPandasByHead(Col)
+        tmp = cm.getDataWithPandasByHead(Col)
         tmp = tmp.sort_values(by=Col)
         tmp = tmp.drop_duplicates().values
         res = list(map(list, zip(*tmp)))
@@ -213,7 +216,7 @@ class Ui_MainWindow(object):
             self.sheetPageCol()
         else : 
             print("Row and Col")
-            self.dataSheet = csvManager.setRowAndColumn(Row,Col)
+            self.dataSheet = cm.setRowAndColumn(Row,Col)
     
     def handleSelectionChanged(self, selected, deselected):
         for index in self.table.selectionModel().selectedRows():
