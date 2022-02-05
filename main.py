@@ -20,33 +20,6 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow)
 from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 #from qgis.PyQt.QtWidgets import QVBoxLayout
 cm = csvManager.csvManager()
-class TableModel2(QtCore.QAbstractTableModel):
-    data = ""
-    def __init__(self, data):
-        super(TableModel, self).__init__()
-        #self.itemClicked.connect(self.handleItemClick)
-        self._data = data
-        #Ui_MainWindow.connectButton()
-
-    def data(self, index, role):
-        if role == Qt.DisplayRole:
-            value = self._data.iloc[index.row(), index.column()]
-            return str(value)
-
-    def rowCount(self, index):
-        return self._data.shape[0]
-
-    def columnCount(self, index):
-        return self._data.shape[1]
-
-    def headerData(self, section, orientation, role): #show Header on column
-        # section is the index of the column/row.
-        if role == Qt.DisplayRole:
-            if orientation == Qt.Horizontal: #x
-                return self._data.columns[section]
-
-            '''if orientation == Qt.Vertical: #y
-                return ''.join(self._data.index[section])'''
 class TableModel(QtCore.QAbstractTableModel):
     data = ""
     def __init__(self, data):
@@ -85,7 +58,7 @@ class Ui_MainWindow(object):
     path = ""
     RowChoose = []
     ColChoose = []
-    dataSheet = None
+    dataSheet = ""
     #DimenForChoose = []
                 
     def DropDup(self):
@@ -136,24 +109,21 @@ class Ui_MainWindow(object):
         cm.path = self.folderpath
         cm.selectFile = self.selectFile
         cm.setPath()
-        print(cm.df)
+        #print(cm.df)
         self.colHeader = cm.getHead()
         for i in self.Measure:
             if i in self.colHeader:
                 self.colHeader.remove(i)
         Ui_MainWindow.setupUi(self, MainWindow)
-
-    def plot(self):
-        itemsTextList =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
-        self.RowList = itemsTextList
-        itemsTextList =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
-        self.ColList = itemsTextList
-        print(self.RowList,self.ColList)
-        self.sheetPageRowAndCol(self.RowList,self.ColList)
-        self.df_rows = 20
-        self.df_cols = 1
-        print(self.dataSheet)
-        print(len(self.dataSheet))
+        
+    def creatSheet(self):
+        '''self.sheetTable = QtWidgets.QTableWidget(self.tab_2)
+        self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))'''
+        while (self.sheetTable.rowCount() > 0):
+            self.sheetTable.removeRow(0)
+        
+        self.df_rows = len(self.dataSheet)
+        self.df_cols = len(self.dataSheet.columns)
         self.df = self.dataSheet
         self.sheetTable.setRowCount(self.df_rows)
         self.sheetTable.setColumnCount(self.df_cols)
@@ -163,7 +133,19 @@ class Ui_MainWindow(object):
                 #print(x)
                 self.sheetTable.setItem(i, j, QTableWidgetItem(x))
 
-        #Ui_MainWindow.setupUi(self, MainWindow)
+    def plot(self):
+        tmp = []
+        tmp =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
+        print("TMP",tmp)
+        self.RowList = tmp
+        tmp = [] 
+        tmp =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
+        self.ColList = tmp
+        print(len(self.RowList),len(self.ColList))
+        if len(set(self.ColList)) > 0 or len(set(self.RowList)) > 0:
+            self.sheetPageRowAndCol(self.RowList,self.ColList)
+            self.creatSheet()
+            #self.setupUi(MainWindow)
         
     def dataSource(self):
         if type(self.selectFile) != list:
@@ -208,10 +190,10 @@ class Ui_MainWindow(object):
         
     def sheetPageRowAndCol(self,Row,Col):
         print("Start",Row,Col)
-        if len(set(self.ColChoose)) == 0: 
+        if len(set(Col)) == 0 : 
             print("Row")
             self.sheetPageRow()
-        elif len(set(self.RowChoose)) == 0:
+        elif len(set(Row)) == 0:
             print("Col") 
             self.sheetPageCol()
         else : 
@@ -401,11 +383,10 @@ class Ui_MainWindow(object):
         
         self.sheetTable = QtWidgets.QTableWidget(self.tab_2)
         self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))
-        #print("data sheet ----- \n",self.dataSheet.item())
-        '''if self.dataSheet != None:
-            self.sheetTable = QtWidgets.QTableWidget(self.dataSheet,self.tab_2)
-            self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))
-        '''
+        #print(self.dataSheet != "")
+        if type(self.dataSheet) != str:
+            self.creatSheet()
+        
         self.plotButton = QtWidgets.QPushButton(self.tab_2)
         self.plotButton.setGeometry(QtCore.QRect(730, 470, 41, 31))
         self.plotButton.setObjectName("plotButton")

@@ -59,10 +59,11 @@ class csvManager:
     def setDimensionSort(self,Dimension):
         sortedData = self.getDataWithPandasByHead(Dimension)
         #print(sortedData)
-        #print(oneList)
+        print(Dimension)
         new = sortedData.sort_values(by=Dimension)
-        new.set_index([Dimension[0]])
+        #new.set_index([Dimension[0]])
         #new[''] = pd.Series("abc", index=new.index)
+        #print("---------",new)
         pd.MultiIndex.from_frame(new)
         return new
 
