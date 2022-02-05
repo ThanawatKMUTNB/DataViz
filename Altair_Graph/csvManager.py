@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 #import mPageByCookie
 
+
 def setPath(directory):
     path = directory
 

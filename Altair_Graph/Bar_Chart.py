@@ -1,5 +1,10 @@
 from PyQt5 import QtCore, QtWidgets, QtWebEngineWidgets
 from io import StringIO
+import altair as alt
+from altair import pipe, limit_rows, to_values
+t = lambda data: pipe(data, limit_rows(max_rows=10000), to_values)
+alt.data_transformers.register('custom', t)
+alt.data_transformers.enable('custom')
 
 
 class WebEngineView(QtWebEngineWidgets.QWebEngineView):
@@ -38,24 +43,36 @@ class WebEngineView(QtWebEngineWidgets.QWebEngineView):
 
 if __name__ == "__main__":
     import sys
-    import altair as alt
+    import pandas as pd
     from vega_datasets import data
 
     app = QtWidgets.QApplication(sys.argv)
     w = QtWidgets.QMainWindow()
 
-    cars = data.cars()
-
-    chart = (
-        alt.Chart(cars)
-        .mark_bar()
-        .encode(x=alt.X("Miles_per_Gallon", bin=True), y="count()",)
-        .properties(title="A bar chart")
-        .configure_title(anchor="start")
+    Di1 = 'Region'
+    Di2 = 'State'
+    Measure = 'Quantity'
+    '''df = pd.read_csv('Superstore.csv', encoding='windows-1252')
+    ValDi1 = list(chain.from_iterable(csvManager.getAxisYName([Di1])))
+    ValDi2 =  list(chain.from_iterable(csvManager.getAxisYName([Di2])))
+    ValMes = csvManager.getDataForBar([Di2],[Measure])'''
+    #print(ValDi1,ValDi2,ValMes)
+    f1 = 'SS_20lines.csv'
+    f2 = 'SS_100lines.csv'
+    f3 = 'Superstore.csv'
+    df = pd.read_csv(f2, encoding='windows-1252')
+    c = alt.Chart(df).mark_bar().encode(
+        x=str(Di2+':N'),
+        y=str(Measure+':Q'),
+        color=str(Di1+':N')
+    ).facet(
+        column=str(Di1+':N')
+    ).resolve_scale(
+        x = 'independent'
     )
 
     view = WebEngineView()
-    view.updateChart(chart)
+    view.updateChart(c)
     w.setCentralWidget(view)
     w.resize(640, 480)
     w.show()
