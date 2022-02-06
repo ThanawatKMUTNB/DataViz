@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtWidgets, QtWebEngineWidgets
 from io import StringIO
 import altair as alt
+
 from altair import pipe, limit_rows, to_values
 t = lambda data: pipe(data, limit_rows(max_rows=10000), to_values)
 alt.data_transformers.register('custom', t)
@@ -60,7 +61,7 @@ if __name__ == "__main__":
     f1 = 'SS_20lines.csv'
     f2 = 'SS_100lines.csv'
     f3 = 'Superstore.csv'
-    df = pd.read_csv(f2, encoding='windows-1252')
+    df = pd.read_csv(f3, encoding='windows-1252')
     c = alt.Chart(df).mark_bar().encode(
         x=str(Di2+':N'),
         y=str(Measure+':Q'),
