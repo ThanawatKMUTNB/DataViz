@@ -53,15 +53,10 @@ if __name__ == "__main__":
     Di1 = 'Region'
     Di2 = 'State'
     Measure = 'Quantity'
-    '''df = pd.read_csv('Superstore.csv', encoding='windows-1252')
-    ValDi1 = list(chain.from_iterable(csvManager.getAxisYName([Di1])))
-    ValDi2 =  list(chain.from_iterable(csvManager.getAxisYName([Di2])))
-    ValMes = csvManager.getDataForBar([Di2],[Measure])'''
-    #print(ValDi1,ValDi2,ValMes)
     f1 = 'SS_20lines.csv'
     f2 = 'SS_100lines.csv'
     f3 = 'Superstore.csv'
-    df = pd.read_csv(f3, encoding='windows-1252')
+    df = pd.read_csv(f2, encoding='windows-1252')
     c = alt.Chart(df).mark_bar().encode(
         x=str(Di2+':N'),
         y=str(Measure+':Q'),
@@ -75,6 +70,6 @@ if __name__ == "__main__":
     view = WebEngineView()
     view.updateChart(c)
     w.setCentralWidget(view)
-    w.resize(640, 480)
+    #w.resize(640, 480)
     w.show()
     sys.exit(app.exec_())
