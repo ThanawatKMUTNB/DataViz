@@ -1,92 +1,50 @@
 import sys
-import os
-import glob
-from PyQt5.QtWidgets import QApplication, QWidget, QListView, QAbstractItemView, QHBoxLayout, QVBoxLayout
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QStandardItemModel, QIcon, QStandardItem, QKeyEvent
+import numpy as np
+import pandas as pd
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QIcon, QColor
+from PyQt5.QtCore import pyqtSlot, Qt, QTimer
 
-class ListView_Left(QListView):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.parent = parent
-        self.m_model = QStandardItemModel(self)
-        self.setModel(self.m_model)
-        self.setAcceptDrops(True)
-        self.setIconSize(QSize(150, 150))
-        self.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop)
-        self.setResizeMode(QListView.ResizeMode.Adjust)
-        self.setViewMode(QListView.ViewMode.IconMode)
-
-    def dropEvent(self, event):
-        super().dropEvent(event)
-        self.parent.listViewRight.model().removeRow(self.parent.listViewRight.currentIndex().row())
-
-
-class ListView_Right(QListView):
-    def __init__(self,  parent=None):
-        super().__init__(parent)
-        self.parent = parent
-        self.m_model = QStandardItemModel(self)
-        self.setModel(self.m_model)
-        self.setAcceptDrops(True)
-        self.setIconSize(QSize(150, 150))
-        self.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop)
-        self.setResizeMode(QListView.ResizeMode.Adjust)
-        self.setViewMode(QListView.ViewMode.IconMode)
-        self.installEventFilter(self)
-
-    def eventFilter(self, source, event):
-        if event.type() == QKeyEvent.Type.KeyPress and event.key() == Qt.Key.Key_Delete:
-            if source == self:
-                row_indx = self.currentIndex().row()
-                self.model().remove().removeRow(row_indx)
-        return super().eventFilter(source, event)
-
-    def dropEvent(self, event):
-        super().dropEvent(event)
-        self.parent.listViewLeft.model().removeRow(self.parent.listViewLeft.currentIndex().row())
-
-
-class MyApp(QWidget):
+class App(QWidget):
     def __init__(self):
         super().__init__()
-        self.window_width, self.window_height = 1400, 500
-        self.resize(self.window_width, self.window_height)
+        self.initUI()
 
-        layout = QHBoxLayout()
-        self.setLayout(layout)
+    def initUI(self):
+        self.setGeometry(700, 100, 350, 380)
+        self.createTable()
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.tableWidget)
+        self.button = QPushButton('Print DataFrame', self)
+        self.layout.addWidget(self.button)
+        self.setLayout(self.layout)
+        self.button.clicked.connect(self.print_my_df)
+        self.tableWidget.doubleClicked.connect(self.on_click_table)
+        self.show()
 
-        self.listViewLeft = ListView_Left(self)
-        layout.addWidget(self.listViewLeft)
+    def createTable(self):
+        self.tableWidget = QTableWidget()
+        self.df_rows = 10
+        self.df_cols = 3
+        self.df = pd.DataFrame(np.random.randn(self.df_rows, self.df_cols))
+        self.tableWidget.setRowCount(self.df_rows)
+        self.tableWidget.setColumnCount(self.df_cols)
+        for i in range(self.df_rows):
+            for j in range(self.df_cols):
+                x = format(self.df.iloc[i, j])
+                self.tableWidget.setItem(i, j, QTableWidgetItem(x))
 
-        self.listViewRight = ListView_Right(self)
-        layout.addWidget(self.listViewRight)
+    @pyqtSlot()
+    def print_my_df(self):
+        print(self.df)
 
-        self.loadIcons()
-
-    def loadIcons(self):
-        icon_folder = os.path.join(os.getcwd(), 'icons')
-        for icon in glob.glob(os.path.join(icon_folder, '*.ico')):
-            item = QStandardItem()
-            item.setIcon(QIcon(icon))
-            self.listViewLeft.m_model.appendRow(item)
-
+    @pyqtSlot()
+    def on_click_table(self):
+        for currentQTableWidgetItem in self.tableWidget.selectedItems():
+            print((currentQTableWidgetItem.row(), currentQTableWidgetItem.column()))
+            self.print_my_df()
 
 if __name__ == '__main__':
-    # don't auto scale when drag app to a different monitor.
-    # QGuiApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
-    
     app = QApplication(sys.argv)
-    app.setStyleSheet('''
-        QWidget {
-            font-size: 17px;
-        }
-    ''')
-    
-    myApp = MyApp()
-    myApp.show()
-
-    try:
-        sys.exit(app.exec())
-    except SystemExit:
-        print('Closing Window...')
+    ex = App()
+    sys.exit(app.exec_())

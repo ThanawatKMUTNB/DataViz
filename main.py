@@ -1,7 +1,6 @@
 from email import header
 from operator import mod
 import os
-import pathlib
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
@@ -20,7 +19,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt5.QtWidgets import (QApplication, QMainWindow)
 from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 #from qgis.PyQt.QtWidgets import QVBoxLayout
-
+cm = csvManager.csvManager()
 class TableModel(QtCore.QAbstractTableModel):
     data = ""
     def __init__(self, data):
@@ -59,6 +58,7 @@ class Ui_MainWindow(object):
     path = ""
     RowChoose = []
     ColChoose = []
+    dataSheet = ""
     #DimenForChoose = []
                 
     def DropDup(self):
@@ -85,48 +85,93 @@ class Ui_MainWindow(object):
         print('dropEvent')
         
     def launchDialog(self):
-        self.folderpath = QFileDialog.getExistingDirectory()
+        file_filter = 'Excel File (*.xlsx *.csv *.xls)'
+        response = QFileDialog.getOpenFileName(
+            #parent=self,
+            caption='Select a data file',
+            directory=os.getcwd(),
+            filter=file_filter,
+            initialFilter='Excel File (*.xlsx *.xls *.csv)' #defult filter
+        )
+        self.selectFile = response
+        self.folderpath = os.getcwd()
         filename = os.listdir(self.folderpath)
         tmp = []
         for i in filename:
             if i.endswith(".xls") or i.endswith(".csv") or i.endswith(".xlsx"):
                 tmp.append(i)
+        self.selectFile = list(self.selectFile)
+        self.selectFile = self.selectFile[0].split("/")[-1]
+        tmp.remove(self.selectFile)
+        #print(tmp)
         self.fileNameList = tmp
-        #print(self.fileNameList)
-        self.selectFile = self.fileNameList[0]
-        self.fileNameList.remove(self.selectFile)
         self.path = self.folderpath+"/"+self.selectFile
-        self.colHeader = csvManager.getHead(self.path)
+        cm.path = self.folderpath
+        cm.selectFile = self.selectFile
+        cm.setPath()
+        #print(cm.df)
+        self.colHeader = cm.getHead()
         for i in self.Measure:
             if i in self.colHeader:
                 self.colHeader.remove(i)
         Ui_MainWindow.setupUi(self, MainWindow)
+        
+    def creatSheet(self):
+        '''self.sheetTable = QtWidgets.QTableWidget(self.tab_2)
+        self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))'''
+        while (self.sheetTable.rowCount() > 0):
+            self.sheetTable.removeRow(0)
+        
+        self.df_rows = len(self.dataSheet)
+        self.df_cols = len(self.dataSheet.columns)
+        self.df = self.dataSheet
+        self.sheetTable.setRowCount(self.df_rows)
+        self.sheetTable.setColumnCount(self.df_cols)
+        for i in range(self.df_rows):
+            for j in range(self.df_cols):
+                x = format(self.df.iloc[i, j])
+                #print(x)
+                self.sheetTable.setItem(i, j, QTableWidgetItem(x))
 
+    def plot(self):
+        tmp = []
+        tmp =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
+        print("TMP",tmp)
+        self.RowList = tmp
+        tmp = [] 
+        tmp =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
+        self.ColList = tmp
+        print(len(self.RowList),len(self.ColList))
+        if len(set(self.ColList)) > 0 or len(set(self.RowList)) > 0:
+            self.sheetPageRowAndCol(self.RowList,self.ColList)
+            self.creatSheet()
+            #self.setupUi(MainWindow)
+        
     def dataSource(self):
-        #print(self.selectFile)
         if type(self.selectFile) != list:
             self.selectFile = [self.selectFile]
         if self.selectFile != [] :
             if len(self.selectFile)>1:
-                self.data = csvManager.unionFile(self.selectFile)
+                self.data = cm.unionFile(self.selectFile)
             else:
                 self.path = self.folderpath+"/"+self.selectFile[0]
-                self.data = csvManager.getDataWithPandas(self.path)
+                self.data = cm.getDataWithPandas()
 
     def dataSourceSort(self,dimension):
-        self.data = csvManager.setAllDataByOneDimension(dimension)
+        self.data = cm.setAllDataByOneDimension(dimension)
         
-    def sheetPageRow(self,dimension):
-        self.data = csvManager.setDimensionSort(dimension)
-        self.data[" "] = "abc"
+    def sheetPageRow(self):
+        #print(self.RowList)
+        self.dataSheet = cm.setDimensionSort(self.RowList)
+        self.dataSheet[" "] = "abc"
                 
-    def sheetPageCol(self,dimension):
-        tmp = csvManager.setDimensionSort(dimension)
+    def sheetPageCol(self):
+        tmp = cm.setDimensionSort(self.ColList)
         tmp[" "] = "abc"
-        self.data = tmp.T
+        self.dataSheet = tmp.T
         
-    def sheetPageAddCol(self,Row,Col):
-        tmp = csvManager.getDataWithPandasByHead(Col)
+    '''def sheetPageAddCol(self,Row,Col):
+        tmp = cm.getDataWithPandasByHead(Col)
         tmp = tmp.sort_values(by=Col)
         tmp = tmp.drop_duplicates().values
         res = list(map(list, zip(*tmp)))
@@ -141,27 +186,26 @@ class Ui_MainWindow(object):
         print(len(lists))
         subRow = np.array(lists).T.tolist()
         for i,j in zip(reversed(subRow),Row):
-            self.data.insert(0,j,i)
+            self.data.insert(0,j,i)'''
         
     def sheetPageRowAndCol(self,Row,Col):
         print("Start",Row,Col)
-        if len(set(self.ColChoose)) == 0: 
+        if len(set(Col)) == 0 : 
             print("Row")
-            self.sheetPageRow(self,Row)
-        elif len(set(self.RowChoose)) == 0:
+            self.sheetPageRow()
+        elif len(set(Row)) == 0:
             print("Col") 
-            self.sheetPageCol(self,Col)
+            self.sheetPageCol()
         else : 
             print("Row and Col")
-            self.data = csvManager.setRowAndColumn(Row,Col)
-            #self.sheetPageAddRow(self,Row)
-            #self.sheetPageAddCol(self,Row,Col)
+            self.dataSheet = cm.setRowAndColumn(Row,Col)
     
     def handleSelectionChanged(self, selected, deselected):
         for index in self.table.selectionModel().selectedRows():
             print('Row %d is selected' % index.row())
 
     def setupUi(self, MainWindow):
+        
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
         
@@ -174,22 +218,39 @@ class Ui_MainWindow(object):
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
         
-        
         self.table = QtWidgets.QTableView(self.tab)
-        self.table.setGeometry(QtCore.QRect(190, 10, 581, 501))
+        self.table.setGeometry(QtCore.QRect(190, 10, 591, 471))
         self.dataSource()
         if self.selectFile != [] : 
             self.model = TableModel(self.data)
             self.table.setModel(self.model)
 
+        self.selectFileLabel = QtWidgets.QLabel(self.tab)
+        self.selectFileLabel.setGeometry(QtCore.QRect(10, 11, 131, 20))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.selectFileLabel.setFont(font)
+        self.selectFileLabel.setObjectName("selectFileLabel")
         
-        self.pushButton = QtWidgets.QPushButton(self.tab)
-        self.pushButton.setGeometry(QtCore.QRect(50, 490, 93, 28))
-        self.pushButton.setObjectName("Select File")
-        self.pushButton.clicked.connect(self.launchDialog)
+        self.usedFile = QtWidgets.QLabel(self.tab)
+        self.usedFile.setGeometry(QtCore.QRect(10, 280, 121, 21))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.usedFile.setFont(font)
+        self.usedFile.setObjectName("usedFile")
+        
+        self.selectFileButton = QtWidgets.QPushButton(self.tab)
+        self.selectFileButton.setGeometry(QtCore.QRect(142, 10, 41, 28))
+        self.selectFileButton.setObjectName("selectFileButton")
+        self.selectFileButton.clicked.connect(self.launchDialog)
+        
+        self.usedFileButton = QtWidgets.QPushButton(self.tab)
+        self.usedFileButton.setGeometry(QtCore.QRect(142, 275, 41, 28))
+        self.usedFileButton.setObjectName("selectFileButton")
+        self.usedFileButton.clicked.connect(self.updateList)
         
         self.FileList = QtWidgets.QListWidget(self.tab)
-        self.FileList.setGeometry(QtCore.QRect(10, 10, 171, 271))
+        self.FileList.setGeometry(QtCore.QRect(10, 50, 171, 221))
         self.FileList.setAcceptDrops(True)
         self.FileList.setDragEnabled(True)
         self.FileList.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
@@ -197,12 +258,14 @@ class Ui_MainWindow(object):
         self.FileList.setProperty("isWrapping", True)
         self.FileList.setWordWrap(True)
         self.FileList.setObjectName("FileList")
-        for i in range(len(self.fileNameList)):
-            item = QtWidgets.QListWidgetItem()
-            self.FileList.addItem(item)
+        
+        if self.fileNameList != []:
+            for i in range(len(self.fileNameList)):
+                item = QtWidgets.QListWidgetItem()
+                self.FileList.addItem(item)
         
         self.FileListChoose = QtWidgets.QListWidget(self.tab)
-        self.FileListChoose.setGeometry(QtCore.QRect(10, 290, 171, 191))
+        self.FileListChoose.setGeometry(QtCore.QRect(10, 310, 171, 171))
         self.FileListChoose.setAcceptDrops(True)
         self.FileListChoose.setDragEnabled(True)
         self.FileListChoose.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
@@ -214,16 +277,38 @@ class Ui_MainWindow(object):
             item = QtWidgets.QListWidgetItem()
             self.FileListChoose.addItem(item)
         self.tabWidget.addTab(self.tab, "Data Source")
+        
+        self.saveButton = QtWidgets.QPushButton(self.tab)
+        self.saveButton.setGeometry(QtCore.QRect(600, 490, 93, 28))
+        self.saveButton.setObjectName("saveButton")
+        
+        self.loadButton = QtWidgets.QPushButton(self.tab)
+        self.loadButton.setGeometry(QtCore.QRect(700, 490, 83, 28))
+        self.loadButton.setObjectName("loadButton")
 
         #Tab2
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         
+        self.ColLabel = QtWidgets.QLabel(self.tab_2)
+        self.ColLabel.setGeometry(QtCore.QRect(200, 55, 61, 21))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.ColLabel.setFont(font)
+        self.ColLabel.setObjectName("ColLabel")
+        
+        self.DimensionValuesLabel = QtWidgets.QLabel(self.tab_2)
+        self.DimensionValuesLabel.setGeometry(QtCore.QRect(13, 16, 161, 21))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.DimensionValuesLabel.setFont(font)
+        self.DimensionValuesLabel.setObjectName("DimensionValuesLabel")
+        
         self.FileListDimension = QtWidgets.QListWidget(self.tab_2)
-        self.FileListDimension.setGeometry(QtCore.QRect(10, 10, 181, 330))
+        self.FileListDimension.setGeometry(QtCore.QRect(10, 40, 181, 291))
         self.FileListDimension.setAcceptDrops(True)
         self.FileListDimension.setDragEnabled(True)
-        self.FileListDimension.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.FileListDimension.setDragDropMode(QtWidgets.QAbstractItemView.DragOnly)
         self.FileListDimension.setDefaultDropAction(QtCore.Qt.CopyAction)
         self.FileListDimension.setWordWrap(True)
         self.FileListDimension.setObjectName("FileList")
@@ -231,14 +316,21 @@ class Ui_MainWindow(object):
             item = QtWidgets.QListWidgetItem()
             self.FileListDimension.addItem(item)
         self.FileListDimension.clicked.connect(self.DropDup)
-            
+        
+        self.MeasureValuesLabel = QtWidgets.QLabel(self.tab_2)
+        self.MeasureValuesLabel.setGeometry(QtCore.QRect(10, 337, 161, 21))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.MeasureValuesLabel.setFont(font)
+        self.MeasureValuesLabel.setObjectName("MeasureValuesLabel")
+        
         self.FileListMes = QtWidgets.QListWidget(self.tab_2)
-        self.FileListMes.setGeometry(QtCore.QRect(10, 350, 181, 160))
+        self.FileListMes.setGeometry(QtCore.QRect(10, 360, 181, 151))
         self.FileListMes.setAcceptDrops(True)
         self.FileListMes.setDragEnabled(True)
-        self.FileListMes.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.FileListMes.setDragDropMode(QtWidgets.QAbstractItemView.DragOnly)
         self.FileListMes.setDragDropOverwriteMode(True)
-        self.FileListMes.setDefaultDropAction(QtCore.Qt.LinkAction)
+        self.FileListMes.setDefaultDropAction(QtCore.Qt.CopyAction)
         self.FileListMes.setWordWrap(True)
         self.FileListMes.setObjectName("FileListMes")
         for i in range(len(self.Measure)):
@@ -246,12 +338,8 @@ class Ui_MainWindow(object):
             self.FileListMes.addItem(item)
         self.FileListDimension.clicked.connect(self.DropDup)
         
-        self.ColLabel = QtWidgets.QLabel(self.tab_2)
-        self.ColLabel.setGeometry(QtCore.QRect(200, 75, 61, 31))
-        self.ColLabel.setObjectName("ColLabel")
-        
         self.RowList = QtWidgets.QListWidget(self.tab_2)
-        self.RowList.setGeometry(QtCore.QRect(260, 10, 521, 50))
+        self.RowList.setGeometry(QtCore.QRect(260, 10, 491, 31))
         self.RowList.setAcceptDrops(True)
         self.RowList.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.RowList.setAutoFillBackground(True)
@@ -263,12 +351,24 @@ class Ui_MainWindow(object):
         self.RowList.setFlow(QtWidgets.QListView.LeftToRight)
         self.RowList.setObjectName("RowList")
         self.RowList.clicked.connect(self.DropDup)
+        
         self.RowLabel = QtWidgets.QLabel(self.tab_2)
-        self.RowLabel.setGeometry(QtCore.QRect(200, 20, 61, 31))
+        self.RowLabel.setGeometry(QtCore.QRect(200, 10, 61, 31))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.RowLabel.setFont(font)
         self.RowLabel.setObjectName("RowLabel")
         
+        self.ColDell = QtWidgets.QPushButton(self.tab_2)
+        self.ColDell.setGeometry(QtCore.QRect(750, 50, 31, 31))
+        self.ColDell.setObjectName("ColDell")
+        
+        self.RowDell = QtWidgets.QPushButton(self.tab_2)
+        self.RowDell.setGeometry(QtCore.QRect(750, 10, 31, 31))
+        self.RowDell.setObjectName("RowDell")
+        
         self.ColList = QtWidgets.QListWidget(self.tab_2)
-        self.ColList.setGeometry(QtCore.QRect(261, 65, 521, 50))
+        self.ColList.setGeometry(QtCore.QRect(260, 50, 491, 31))
         self.ColList.setAcceptDrops(True)
         self.ColList.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.ColList.setAutoFillBackground(True)
@@ -281,67 +381,18 @@ class Ui_MainWindow(object):
         self.ColList.setObjectName("ColList")
         self.ColList.clicked.connect(self.DropDup)
         
-        self.DataSource = QtWidgets.QTableWidget(self.tab_2)
-        self.DataSource.setGeometry(QtCore.QRect(200, 120, 581, 391))
-        self.DataSource.setObjectName("DataSource")
-        '''self.ColChoose = ["ll"]
-        print(self.RowChoose != [] or self.ColChoose != [])
-        if self.RowChoose != [] or self.ColChoose != [] :
-            self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
-            self.DataSource = QtWidgets.QTableWidget(self.tab_2)
-            self.DataSource.setGeometry(QtCore.QRect(200, 120, 581, 391))
-            self.DataSource.setObjectName("DataSource")
-            if self.selectFile != [] : 
-                self.model = TableModel(self.data)
-                self.DataSource.setModel(self.model)'''
+        self.sheetTable = QtWidgets.QTableWidget(self.tab_2)
+        self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))
+        #print(self.dataSheet != "")
+        if type(self.dataSheet) != str:
+            self.creatSheet()
         
-        
+        self.plotButton = QtWidgets.QPushButton(self.tab_2)
+        self.plotButton.setGeometry(QtCore.QRect(730, 470, 41, 31))
+        self.plotButton.setObjectName("plotButton")
+        self.plotButton.clicked.connect(self.plot)
+            
         self.tabWidget.addTab(self.tab_2, "Sheet")
-
-        #tab3
-        self.tab_3 = QtWidgets.QWidget()
-        self.tab_3.setObjectName("tab_3")
-        """self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")"""
-        self.Linegraph = QtWidgets.QPushButton(self.tab_3)
-        self.Linegraph.setGeometry(QtCore.QRect(20, 430, 93, 28))
-        self.Linegraph.setObjectName("Linegraph")
-        self.Label = QtWidgets.QPushButton(self.tab_3)
-        self.Label.setGeometry(QtCore.QRect(20, 110, 93, 28))
-        self.Label.setObjectName("Label")
-        self.Color = QtWidgets.QPushButton(self.tab_3)
-        self.Color.setGeometry(QtCore.QRect(20, 80, 93, 28))
-        self.Color.setObjectName("Color")
-        self.Size = QtWidgets.QPushButton(self.tab_3)
-        self.Size.setGeometry(QtCore.QRect(20, 170, 93, 28))
-        self.Size.setObjectName("Size")
-        self.Piechart = QtWidgets.QPushButton(self.tab_3)
-        self.Piechart.setGeometry(QtCore.QRect(20, 460, 93, 28))
-        self.Piechart.setObjectName("Piechart")
-        self.Barchart = QtWidgets.QPushButton(self.tab_3)
-        self.Barchart.setGeometry(QtCore.QRect(20, 400, 93, 28))
-        self.Barchart.setObjectName("Barchart")
-        self.stackbar = QtWidgets.QPushButton(self.tab_3)
-        self.stackbar.setGeometry(QtCore.QRect(20, 490, 93, 28))
-        self.stackbar.setObjectName("stackbar")
-        self.Showgraph = QtWidgets.QListView(self.tab_3)
-        self.Showgraph.setGeometry(QtCore.QRect(120, 80, 661, 441))
-        self.Showgraph.setObjectName("Showgraph")
-        self.Tooltips = QtWidgets.QPushButton(self.tab_3)
-        self.Tooltips.setGeometry(QtCore.QRect(20, 140, 93, 28))
-        self.Tooltips.setObjectName("Tooltips")
-        self.Detail = QtWidgets.QPushButton(self.tab_3)
-        self.Detail.setGeometry(QtCore.QRect(20, 200, 93, 28))
-        self.Detail.setObjectName("Detail")
-        MainWindow.setCentralWidget(self.tab_3)
-        self.menubar = QtWidgets.QMenuBar(self.tab_3)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
-        self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(self.tab_3)
-        self.tabWidget.addTab(self.tab_3, "")
-
-
         
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -359,20 +410,26 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        fileSelectName = "Choose File"
+        if self.selectFile != []: fileSelectName = self.selectFile[0]
+        #print(fileSelectName)
         
-        self.pushButton.setText(_translate("MainWindow", "Select File"))
+        self.selectFileLabel.setText(_translate("MainWindow", fileSelectName))
+        self.usedFile.setText(_translate("MainWindow", "Used File"))
+        
+        self.usedFileButton.setText(_translate("MainWindow", "Use"))
+        self.selectFileButton.setText(_translate("MainWindow", "File"))
         
         #if self.selectFile in self.fileNameList :
         self.FileList.setSortingEnabled(True)
         __sortingEnabled = self.FileList.isSortingEnabled()
         self.FileList.setSortingEnabled(False)
-        #self.fileNameList = list(dict.fromkeys(self.fileNameList))
-        #print(self.fileNameList)
+        
         for i,j in zip(range(len(self.fileNameList)),self.fileNameList):
+            #print(i,j)
             item = self.FileList.item(i)
             item.setText(_translate("MainWindow", str(j)))
         self.FileList.setSortingEnabled(__sortingEnabled)
-        self.FileList.clicked.connect(self.updateList)
         
         self.FileListChoose.setSortingEnabled(True)
         __sortingEnabled = self.FileListChoose.isSortingEnabled()
@@ -380,9 +437,13 @@ class Ui_MainWindow(object):
         for i,j in zip(range(len(set(self.selectFile))),set(self.selectFile)):
             item = self.FileListChoose.item(i)
             item.setText(_translate("MainWindow", str(j)))
-        self.FileListChoose.clicked.connect(self.updateList)
+        
+        self.saveButton.setText(_translate("MainWindow", "Save"))
+        self.loadButton.setText(_translate("MainWindow", "Load"))
         
         #tab 2
+        self.DimensionValuesLabel.setText(_translate("MainWindow", "Dimension"))
+        
         self.FileList.setSortingEnabled(True)
         __sortingEnabled = self.FileListDimension.isSortingEnabled()
         self.FileList.setSortingEnabled(False)
@@ -390,6 +451,8 @@ class Ui_MainWindow(object):
             item = self.FileListDimension.item(i)
             item.setText(_translate("MainWindow", str(j)))
         self.FileListDimension.setSortingEnabled(__sortingEnabled)
+        
+        self.MeasureValuesLabel.setText(_translate("MainWindow", "Measure Values"))
         
         self.FileListMes.setSortingEnabled(True)
         __sortingEnabled = self.FileListMes.isSortingEnabled()
@@ -402,6 +465,9 @@ class Ui_MainWindow(object):
         self.ColLabel.setText(_translate("MainWindow", "Column"))
         self.RowLabel.setText(_translate("MainWindow", "Row"))
         
+        self.ColDell.setText(_translate("MainWindow", "DEL"))
+        self.RowDell.setText(_translate("MainWindow", "DEL"))
+        
         if self.RowChoose != [] and self.ColChoose != [] :
             if self.folderpath != '' :
                 self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
@@ -411,219 +477,8 @@ class Ui_MainWindow(object):
                 if self.selectFile != [] : 
                     self.model = TableModel(self.data)
                     self.DataSource.setModel(self.model)
-
-        #Tab3
-        self.Linegraph.setText(_translate("MainWindow", "Line graph"))
-        self.Label.setText(_translate("MainWindow", "Label"))
-        self.Color.setText(_translate("MainWindow", "Color"))
-        self.Size.setText(_translate("MainWindow", "Size"))
-        self.Piechart.setText(_translate("MainWindow", "Pie chart"))
-        self.Barchart.setText(_translate("MainWindow", "Bar chart"))
-        self.stackbar.setText(_translate("MainWindow", "Stack bar"))
-        self.Tooltips.setText(_translate("MainWindow", "Tooltips"))
-        self.Detail.setText(_translate("MainWindow", "Detail"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "Tab 3"))
-        
-        #self.button = self.findChild(QtWidgets.QPushButton, 'Color') # Find the button
-        self.Color.clicked.connect(AnyButton.changeColor) # Remember to pass the definition/method, not the return value!
-        #self.button = self.findChild(QtWidgets.QPushButton, 'Size') 
-        self.Size.clicked.connect(AnyButton.buttonsize)
-        #self.button = self.findChild(QtWidgets.QPushButton, 'Label') 
-        self.Label.clicked.connect(AnyButton.buttonlabel)
-        #self.button = self.findChild(QtWidgets.QPushButton, 'Detail') 
-        self.Detail.clicked.connect(AnyButton.Buttondetail)
-        #self.button = self.findChild(QtWidgets.QPushButton, 'Tooltips') 
-        self.Tooltips.clicked.connect(AnyButton.ButtonTooltips)
-        #self.button = self.findChild(QtWidgets.QPushButton, 'Barchart') 
-        self.Barchart.clicked.connect(lambda checked: ShowGraph.showbarchart(self))
-        #self.button.clicked.connect(ShowGraph.showbarchart)
-        #self.button = self.findChild(QtWidgets.QPushButton, 'Piechart') 
-        self.Piechart.clicked.connect(lambda checked: ShowGraph.showpiechart(self))
-        #.button = self.findChild(QtWidgets.QPushButton, 'Linegraph') 
-        self.Linegraph.clicked.connect(lambda checked: ShowGraph.showlinegraph(self))
-        #self.button = self.findChild(QtWidgets.QPushButton, 'stackbar') 
-        self.stackbar.clicked.connect(lambda checked: ShowGraph.showstackbar(self))
-
-        
-        
-class AnyButton() :
-        
-    def changeColor() :
-        print("Hello color")
-    def buttonsize() :
-        print("Hello size")
-    def buttonlabel() :
-        print("Hello label")
-    def Buttondetail() :
-        print("Hello detail")
-    def ButtonTooltips() :
-        print("Hello Tooltips")
-   
-
-class ShowGraph(FigureCanvas):
-    def __init__(self):
-        super().__init__()
- 
-        self.setWindowTitle("PyQt BarChart")
-        #self.setGeometry(100,100, 680,500)
-        self.show()
-        self.create_bar()
-    def showlinegraph(self) :
-        print("Show line")
-        series = QLineSeries(self)
-        series.append(0,6)
-        series.append(2, 4)
-        series.append(3, 8)
-        series.append(7, 4)
-        series.append(10, 5)
- 
-        series << QPointF(11, 1) << QPointF(13, 3) << QPointF(17, 6) << QPointF(18, 3) << QPointF(20, 2)
- 
- 
-        chart =  QChart()
- 
-        chart.addSeries(series)
-        chart.createDefaultAxes()
-        chart.setAnimationOptions(QChart.SeriesAnimations)
-        chart.setTitle("Line Chart Example")
- 
-        chart.legend().setVisible(True)
-        chart.legend().setAlignment(Qt.AlignBottom)
- 
- 
-        chartview = QChartView(chart)
-        chartview.setRenderHint(QPainter.Antialiasing)
- 
-        self.setCentralWidget(chartview)
-    def showbarchart(self) :
-        df = pd.read_csv('Superstore.csv', encoding='windows-1252')
-        Reg = []
-		
-        for i in df['Region'].values:
-            if i not in Reg:
-                Reg.append(i)
-
-        df.set_index('Region',inplace=True)
-        profit = []
-        disc = []
-        quan = []
-        sale = []
-
-        for i in Reg:
-            profit.append(sum(df.loc[i,'Profit']))
-            disc.append(sum(df.loc[i,'Discount']))
-            quan.append(sum(df.loc[i,'Quantity']))
-            sale.append(sum(df.loc[i,'Sales']))
-
-        tmp = [profit,disc,quan,sale]
-        
-
-        set0 = QBarSet('Profit')
-        set1 = QBarSet('Discount') 
-        set2 = QBarSet('Quantity')
-        set3 = QBarSet('Sales')
-
-        for i in range(len(Reg)):
-            set0.append(tmp[i][0])
-            set1.append(tmp[i][1])
-            set2.append(tmp[i][2])
-            set3.append(tmp[i][3])
-
-        '''print(profit)
-        print(disc)
-        print(quan)
-        print(sale)'''
-        
-        series = QPercentBarSeries()
-        series.append(set0)
-        series.append(set1)
-        series.append(set2)
-        series.append(set3)
- 
-        chart = QChart()
-        chart.addSeries(series)
-        chart.setTitle("Percent Example")
-        chart.setAnimationOptions(QChart.SeriesAnimations)
-
-        meslist = ['Profit','Discount','Quantity','Sales']
-        axis = QBarCategoryAxis()
-        axis.append(meslist)
-        chart.createDefaultAxes()
-        chart.setAxisX(axis, series)
- 
-        chart.legend().setVisible(True)
-        chart.legend().setAlignment(Qt.AlignBottom)
- 
-        chartView = QChartView(chart)
-        chartView.setRenderHint(QPainter.Antialiasing)
- 
-        self.setCentralWidget(chartView)
-
-    def showpiechart(self) :
-        print("Show Pie")
-        series = QtChart.QPieSeries()
-        series.append("Jane", 1)
-        series.append("Joe", 2)
-        series.append("Andy", 3)
-        series.append("Barbara", 4)
-        series.append("Axel", 5)
-
-        chart = QtChart.QChart()
-        chart.addSeries(series)
-        chart.setTitle("Simple piechart example")
-        chart.setAnimationOptions(QChart.SeriesAnimations)
-        chart.legend().hide()
-
-        series.setLabelsVisible()
-        #series.setLabelsPosition(QtChart.QPieSlice.LabelInsideHorizontal)
-
-        for slice in series.slices():
-            slice.setLabel("{:.1f}%".format(100 * slice.percentage()))
-
-        chartView = QtChart.QChartView(chart)
-        chartView.setRenderHint(QtGui.QPainter.Antialiasing)
-        self.setCentralWidget(chartView)
-        
-
-    def showstackbar(self) :
-        print("Show stack")
-        set0 = QBarSet("Parwiz")
-        set1 = QBarSet("Bob")
-        set2 = QBarSet("Tom")
-        set3 = QBarSet("Logan")
-        set4 = QBarSet("Karim")
- 
-        set0 << 1 << 2 << 3 << 4 << 5 << 6  #Jan -> Jun
-        set1 << 5 << 0 << 0 << 4 << 0 << 7
-        set2 << 3 << 5 << 8 << 13 << 8 << 5
-        set3 << 5 << 6 << 7 << 3 << 4 << 5
-        set4 << 9 << 7 << 5 << 3 << 1 << 2
- 
-        series = QPercentBarSeries()
-        series.append(set0)
-        series.append(set1)
-        series.append(set2)
-        series.append(set3)
-        series.append(set4)
- 
-        chart = QChart()
-        chart.addSeries(series)
-        chart.setTitle("Percent Example")
-        chart.setAnimationOptions(QChart.SeriesAnimations)
- 
-        categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
-        axis = QBarCategoryAxis()
-        axis.append(categories)
-        chart.createDefaultAxes()
-        chart.setAxisX(axis, series)
- 
-        chart.legend().setVisible(True)
-        chart.legend().setAlignment(Qt.AlignBottom)
- 
-        chartView = QChartView(chart)
-        chartView.setRenderHint(QPainter.Antialiasing)
- 
-        self.setCentralWidget(chartView)
+                    
+        self.plotButton.setText(_translate("MainWindow", "PLOT"))
 
 if __name__ == "__main__":
     import sys
