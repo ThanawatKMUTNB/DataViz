@@ -22,7 +22,13 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow)
 from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 #from qgis.PyQt.QtWidgets import QVBoxLayout
 cm = csvManager.csvManager()
-
+class RowListWidget(QListWidget):
+    def __init__(self):
+        super(RowListWidget,self).__init__()
+        self.setAcceptDrops(True)
+        
+    def clicked(self, item):
+        QMessageBox.information(self, "ListWidget", "ListWidget: " + item.text())
 class TableModel2(QtCore.QAbstractTableModel):
     data = ""
     def __init__(self, data):
@@ -131,9 +137,6 @@ class Ui_MainWindow(object):
         self.dataSource()
         Ui_MainWindow.setupUi(self, MainWindow)
         
-    def dropEvent(self, event):
-        print('dropEvent')
-        
     def launchDialog(self):
         file_filter = 'Excel File (*.xlsx *.csv *.xls)'
         response = QFileDialog.getOpenFileName(
@@ -166,33 +169,15 @@ class Ui_MainWindow(object):
                 self.colHeader.remove(i)
         Ui_MainWindow.setupUi(self, MainWindow)
         
-    def creatSheet(self):
-        '''self.sheetTable = QtWidgets.QTableWidget(self.tab_2)
-        self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))'''
-        
-        self.df_rows = len(self.dataSheet)
-        self.df_cols = len(self.dataSheet.columns)
-        self.df = self.dataSheet
-        self.sheetTableW.setRowCount(self.df_rows)
-        self.sheetTableW.setColumnCount(self.df_cols)
-        for i in range(self.df_rows):
-            for j in range(self.df_cols):
-                x = format(self.df.iloc[i, j])
-                if x == "abc":
-                    x= self.VerticalBar()
-                #print(self.df.iloc[i, j],i,j)
-                self.sheetTableW.setItem(i, j, QTableWidgetItem(x))
-    
-    def RowDelect(self):
+    def RowDelect(self,item):
         if len(self.RowChoose) != 0:
-            self.RowChoose.remove(self.RowChoose[-1])
-            #self.sheetTable.removeRow(self.sheetTable.rowCount()-1)
-            self.retranslateUi(MainWindow)
+            row = self.RowList.currentRow()
+            self.RowList.takeItem(row)
             
-    def ColDelect(self):
+    def ColDelect(self,item):
         if len(self.ColChoose) != 0:
-            self.ColChoose.remove(self.ColChoose[-1])
-            self.retranslateUi(MainWindow)
+            Col = self.ColList.currentRow()
+            self.ColList.takeItem(Col)
             
     def plot(self):
         tmp = []
@@ -435,6 +420,8 @@ class Ui_MainWindow(object):
         self.FileListDimension.clicked.connect(self.DropDup)
         
         self.RowList = QtWidgets.QListWidget(self.tab_2)
+        #self.RowListW = RowListWidget()
+        #self.RowListW.setGeometry(QtCore.QRect(260, 10, 491, 31))
         self.RowList.setGeometry(QtCore.QRect(260, 10, 491, 31))
         self.RowList.setAcceptDrops(True)
         self.RowList.setLayoutDirection(QtCore.Qt.LeftToRight)
@@ -449,6 +436,8 @@ class Ui_MainWindow(object):
         for i in range(len(self.RowChoose)):
             item = QtWidgets.QListWidgetItem()
             self.RowList.addItem(item)
+            #self.RowList.setModel(self.RowListW)
+        self.RowList.itemDoubleClicked.connect(self.RowDelect)
         #self.RowList.clicked.connect(self.DropDup)
         
         self.RowLabel = QtWidgets.QLabel(self.tab_2)
@@ -458,7 +447,7 @@ class Ui_MainWindow(object):
         self.RowLabel.setFont(font)
         self.RowLabel.setObjectName("RowLabel")
         
-        self.ColDell = QtWidgets.QPushButton(self.tab_2)
+        '''self.ColDell = QtWidgets.QPushButton(self.tab_2)
         self.ColDell.setGeometry(QtCore.QRect(750, 50, 31, 31))
         self.ColDell.setObjectName("ColDell")
         self.ColDell.clicked.connect(self.ColDelect)
@@ -466,7 +455,7 @@ class Ui_MainWindow(object):
         self.RowDell = QtWidgets.QPushButton(self.tab_2)
         self.RowDell.setGeometry(QtCore.QRect(750, 10, 31, 31))
         self.RowDell.setObjectName("RowDell")
-        self.RowDell.clicked.connect(self.RowDelect)
+        self.RowDell.clicked.connect(self.RowDelect)'''
         
         self.ColList = QtWidgets.QListWidget(self.tab_2)
         self.ColList.setGeometry(QtCore.QRect(260, 50, 491, 31))
@@ -483,6 +472,7 @@ class Ui_MainWindow(object):
         for i in range(len(self.ColChoose)):
             item = QtWidgets.QListWidgetItem()
             self.ColList.addItem(item)
+        self.ColList.itemDoubleClicked.connect(self.ColDelect)
         
         self.sheetTable = QtWidgets.QTableView(self.tab_2)
         self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))
@@ -498,14 +488,6 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab_2, "Sheet")
         
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
-        self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
-
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -576,8 +558,8 @@ class Ui_MainWindow(object):
         self.ColLabel.setText(_translate("MainWindow", "Column"))
         self.RowLabel.setText(_translate("MainWindow", "Row"))
         
-        self.ColDell.setText(_translate("MainWindow", "DEL"))
-        self.RowDell.setText(_translate("MainWindow", "DEL"))
+        #self.ColDell.setText(_translate("MainWindow", "DEL"))
+        #self.RowDell.setText(_translate("MainWindow", "DEL"))
                     
         self.plotButton.setText(_translate("MainWindow", "PLOT"))
 
