@@ -14,6 +14,7 @@ class csvManager:
         if fileExtension[-1] == "csv":
             self.df = pd.read_csv(self.path+"/"+self.selectFile, encoding='windows-1252')
         else:
+            print(fileExtension[-1])
             self.df = pd.read_excel('Superstore(xlsx).xlsx', engine = "openpyxl")
     
     def getHead(self):
@@ -122,6 +123,9 @@ class csvManager:
         return len(tmp)
 
     def setRowAndColumn(self,Row,Col):
+        #self.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
+        
+        self.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
         sortedDataByRow = self.setDimensionSort(Row)
         sortedDataByCol = self.setDimensionSort(Col)
         print(sortedDataByCol)
@@ -134,11 +138,25 @@ class csvManager:
         oneListCol = list(chain.from_iterable(np.array([dfCol.T])))
         
         s = pd.DataFrame(" ",index = oneList,columns=oneListCol)
-        '''sameDimension = list(set(Row) & set(Col))
-        print(sameDimension)
-        valueSameDimen = self.setDimensionSort(sameDimension).drop_duplicates().values.tolist()
-        for i in valueSameDimen:
-            s.loc[tuple(i),tuple(i)] = "abc"'''
-        print(s)
+        #sameDimension = list(set(Row) & set(Col))
+        #print(sameDimension)
+        #valueSameDimen = self.setDimensionSort(sameDimension).drop_duplicates().values.tolist()
+        #print(self.df)
+        indexDF = self.df.index
+        #print(indexDF)
+        for i in s.columns:
+            k = self.df[Col[0]]==list(i)[0]
+            l = indexDF[k]
+            #print("---LLL",l.tolist())
+            print("---LLL",list(i)[0])
+            for j in l.tolist() :
+                #print(self.df.loc[j,["City"]].values)
+                s.loc[tuple(self.df.loc[j,Row].values),i] = "abc"
+            #print("--- si \n",self.df["Ship Mode"]=="Standard Class")
+            #s.loc[tuple(i),tuple(i)] = "abc"
+        #s.display
+        print("-->s\n",s)
         return s
 
+ex = csvManager()
+ex.setRowAndColumn(["City"],["Ship Mode"])

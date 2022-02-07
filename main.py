@@ -42,13 +42,13 @@ class TableModel2(QtCore.QAbstractTableModel):
     def columnCount(self, index):
         return self._data.shape[1]
 
-    def headerData(self, section, orientation, role): #show Header on column
+    '''def headerData(self, section, orientation, role): #show Header on column
         # section is the index of the column/row.
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal: #x
                 return self._data.columns[section]
 
-            '''if orientation == Qt.Vertical: #y
+            if orientation == Qt.Vertical: #y
                 return ''.join(self._data.index[section])'''
                 
 class TableModel(QtCore.QAbstractTableModel):
@@ -227,7 +227,12 @@ class Ui_MainWindow(object):
     
     MeasureChoose = ""
     def sheetPageRowAndCol(self,Row,Col):
-        print("Start",Row,Col)
+        print("Start",Row,Col,len(set(Row)),len(set(Col))) 
+        while (Row.count('')):
+            Row.remove('')
+        while (Col.count('')):
+            Col.remove('')
+        print("Start",Row,Col,len(set(Row)),len(set(Col)))
         if len(set(Col)) == 0 : 
             print("Row")
             self.sheetPageRow()
