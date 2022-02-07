@@ -1,123 +1,47 @@
-import sys
-from PyQt5.QtWidgets import *
+import altair as alt
+from vega_datasets import data
 
 
-class MyApp(QDialog):
+source = data.cars()
 
-    def __init__(self):
-        super().__init__()
+# Brush for selection
+brush = alt.selection(type='single', encodings=['x'])
 
-        self.initUI()
+# Histogram base
+hist_base = alt.Chart(source).mark_bar(color='grey').encode(
+    x=alt.X('Horsepower:Q', bin=True),
+    y='count()',
+).add_selection(brush)
 
-    def initUI(self):
+# Histogram selection
+hist_selection = alt.Chart(source).mark_bar().encode(
+    x=alt.X('Horsepower:Q', bin=True),
+    y='count()',
+).transform_filter(brush)
 
-        tabs = QTabWidget()
-        tabs.addTab(FirstTab(), 'First')
-        tabs.addTab(SecondTab(), 'Second')
-        tabs.addTab(ThirdTab(), 'Third')
+# Base chart for data tables
+ranked_text = alt.Chart(source).mark_text(align='right').encode(
+    y=alt.Y('row_number:O',axis=None)
+).transform_window(
+    row_number='row_number()'
+).transform_filter(
+    brush
+).transform_window(
+    rank='rank(row_number)'
+).transform_filter(
+    alt.datum.rank<16
+)
 
-        buttonbox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        buttonbox.accepted.connect(self.accept)
-        buttonbox.rejected.connect(self.reject)
+# Data Tables
+horsepower = ranked_text.encode(text='Horsepower:N').properties(title=alt.TitleParams(text='Horsepower', align='right'))
+mpg = ranked_text.encode(text='Miles_per_Gallon:N').properties(title=alt.TitleParams(text='MPG', align='right'))
+origin = ranked_text.encode(text='Origin:N').properties(title=alt.TitleParams(text='Origin', align='right'))
+text = alt.hconcat(horsepower, mpg, origin) # Combine data tables
 
-        vbox = QVBoxLayout()
-        vbox.addWidget(tabs)
-        vbox.addWidget(buttonbox)
-
-        self.setLayout(vbox)
-
-        self.setWindowTitle('QTabWidget')
-        self.setGeometry(300, 300, 400, 300)
-        self.show()
-
-
-class FirstTab(QWidget):
-
-    def __init__(self):
-        super().__init__()
-
-        self.initUI()
-
-    def initUI(self):
-
-        name = QLabel('Name:')
-        nameedit = QLineEdit()
-        age = QLabel('Age:')
-        ageedit = QLineEdit()
-        nation = QLabel('Nation:')
-        nationedit = QLineEdit()
-
-        vbox = QVBoxLayout()
-        vbox.addWidget(name)
-        vbox.addWidget(nameedit)
-        vbox.addWidget(age)
-        vbox.addWidget(ageedit)
-        vbox.addWidget(nation)
-        vbox.addWidget(nationedit)
-        vbox.addStretch()
-
-        self.setLayout(vbox)
-
-
-class SecondTab(QWidget):
-
-    def __init__(self):
-        super().__init__()
-
-        self.initUI()
-
-    def initUI(self):
-
-        lan_group = QGroupBox('Select Your Language')
-        combo = QComboBox()
-        list = ['Korean', 'English', 'Chinese']
-        combo.addItems(list)
-
-        vbox1 = QVBoxLayout()
-        vbox1.addWidget(combo)
-        lan_group.setLayout(vbox1)
-
-        learn_group = QGroupBox('Select What You Want To Learn')
-        korean = QCheckBox('Korean')
-        english = QCheckBox('English')
-        chinese = QCheckBox('Chinese')
-
-        vbox2 = QVBoxLayout()
-        vbox2.addWidget(korean)
-        vbox2.addWidget(english)
-        vbox2.addWidget(chinese)
-        learn_group.setLayout(vbox2)
-
-        vbox = QVBoxLayout()
-        vbox.addWidget(lan_group)
-        vbox.addWidget(learn_group)
-        self.setLayout(vbox)
-
-
-class ThirdTab(QWidget):
-
-    def __init__(self):
-        super().__init__()
-
-        self.initUI()
-
-    def initUI(self):
-
-        lbl = QLabel('Terms and Conditions')
-        text_browser = QTextBrowser()
-        text_browser.setText('This is the terms and conditions')
-        checkbox = QCheckBox('Check the terms and conditions.')
-
-        vbox = QVBoxLayout()
-        vbox.addWidget(lbl)
-        vbox.addWidget(text_browser)
-        vbox.addWidget(checkbox)
-
-        self.setLayout(vbox)
-
-
-if __name__ == '__main__':
-
-    app = QApplication(sys.argv)
-    ex = MyApp()
-    sys.exit(app.exec_())
+# Build chart
+alt.hconcat(
+    hist_base+hist_selection,
+    text
+).resolve_legend(
+    color="independent"
+).configure_view(strokeWidth=0)

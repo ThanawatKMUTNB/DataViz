@@ -28,8 +28,6 @@ class csvManager:
         return self.df
 
     def getDataWithPandasByHead(self,head):
-        #print(self.df[head])
-        print(head)
         return self.df[head]
 
     def getAxisYName(self,Dimension):
@@ -112,8 +110,9 @@ class csvManager:
         frame = pd.concat(li, axis=0, ignore_index=True)
         frame.sort_values("Row ID", inplace = True)
         frame.drop_duplicates(inplace=True)
-        return frame
-
+        self.df = frame
+        return self.df
+        
     def setAvgGraphX(self,Row,Col):
         k = self.setDimensionSort(Row+Col)
         k = k.T

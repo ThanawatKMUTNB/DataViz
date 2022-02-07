@@ -9,11 +9,12 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtChart import QChart, QChartView, QBarSet, QPercentBarSeries, QBarCategoryAxis, QLineSeries
 import numpy as np
 import pandas as pd
-from Altair_Graph.Bar_Chart import Measure, WebEngineView
+from io import StringIO
+from Altair_Graph.Bar_Chart import WebEngineView
 import csvManager
 from PyQt5.QtGui import QPainter
 from PyQt5.QtCore import Qt, QPointF
-from PyQt5 import QtCore, QtGui, QtWidgets , QtChart
+from PyQt5 import QtCore, QtGui, QtWidgets , QtChart ,QtWebEngineWidgets
 from PyQt5.QtChart import QChart
 from PyQt5.QtGui import QPainter
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -22,13 +23,39 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow)
 from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 #from qgis.PyQt.QtWidgets import QVBoxLayout
 cm = csvManager.csvManager()
-class RowListWidget(QListWidget):
-    def __init__(self):
-        super(RowListWidget,self).__init__()
-        self.setAcceptDrops(True)
+class WebEngineView(QtWebEngineWidgets.QWebEngineView):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.page().profile().downloadRequested.connect(self.onDownloadRequested)
+        self.windows = []
+
+    @QtCore.pyqtSlot(QtWebEngineWidgets.QWebEngineDownloadItem)
+    def onDownloadRequested(self, download):
+        if (
+            download.state()
+            == QtWebEngineWidgets.QWebEngineDownloadItem.DownloadRequested
+        ):
+            path, _ = QtWidgets.QFileDialog.getSaveFileName(
+                self, self.tr("Save as"), download.path()
+            )
+            if path:
+                download.setPath(path)
+                download.accept()
+
+    def createWindow(self, type_):
+        if type_ == QtWebEngineWidgets.QWebEnginePage.WebBrowserTab:
+            window = QtWidgets.QMainWindow(self)
+            view = QtWebEngineWidgets.QWebEngineView(window)
+            window.resize(640, 480)
+            window.setCentralWidget(view)
+            window.show()
+            return view
+
+    def updateChart(self, chart, **kwargs):
+        output = StringIO()
+        chart.save(output, "html", **kwargs)
+        self.setHtml(output.getvalue())
         
-    def clicked(self, item):
-        QMessageBox.information(self, "ListWidget", "ListWidget: " + item.text())
 class TableModel2(QtCore.QAbstractTableModel):
     data = ""
     def __init__(self, data):
@@ -187,7 +214,6 @@ class Ui_MainWindow(object):
         tmp =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
         self.ColChoose = tmp
         if self.ColChoose != [] or self.RowChoose != [] :
-            
             self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
             self.model = TableModel2(self.dataSheet)
             self.sheetTable.setModel(self.model)
@@ -198,7 +224,7 @@ class Ui_MainWindow(object):
         #Ui_MainWindow.setupUi(self, MainWindow)
         
     def dataSource(self):
-        print(self.selectFile)
+        #print(self.selectFile)
         if type(self.selectFile) != list:
             self.selectFile = [self.selectFile]
         if self.selectFile != [] :
@@ -230,7 +256,7 @@ class Ui_MainWindow(object):
     
     MeasureChoose = ""
     def sheetPageRowAndCol(self,Row,Col):
-        print("Start",Row,Col,len(set(Row)),len(set(Col))) 
+        print("Start",Row,Col,len(set(Row)),len(set(Col)))
         while (Row.count('')):
             Row.remove('')
         while (Col.count('')):
@@ -242,12 +268,14 @@ class Ui_MainWindow(object):
             if Row[-1] in self.Measure:
                 self.MeasureChoose = Row[-1]
                 self.VerBar()
+                self.plotChart()
         elif len(set(Row)) == 0:
             print("Col") 
             self.sheetPageCol()
             if Col[-1] in self.Measure:
                 self.MeasureChoose = Col[-1]
                 self.HonBar()
+                self.plotChart()
         else : 
             print("Row and Col")
             self.dataSheet = cm.setRowAndColumn(Row,Col)
@@ -261,11 +289,12 @@ class Ui_MainWindow(object):
         y=str(Measure+':Q')
         ).facet(row=str(Di1+':N')
         )
-
-        view = WebEngineView(self.tab_2)
+        self.Chart = c
+    
+        '''view = WebEngineView(self.tab_2)
         view.setGeometry(QtCore.QRect(200, 90, 581, 421))
         view.updateChart(c)
-        view.show()
+        view.show()'''
     
     def HonBar(self):
         Measure = self.MeasureChoose
@@ -276,13 +305,19 @@ class Ui_MainWindow(object):
         x=str(Measure+':Q')
         ).facet(column=str(Di1+':N')
         ).resolve_scale(y = 'independent')
+        self.Chart = c
 
-        view = WebEngineView(self.tab_2)
+        '''view = WebEngineView(self.tab_2)
         view.setGeometry(QtCore.QRect(200, 90, 581, 401))
         view.updateChart(c)
-        view.show()
+        view.show()'''
         #MainWindow.setCentralWidget(view)
         #w.resize(640, 480)
+    def plotChart(self):
+        view = WebEngineView(self.tab_2)
+        view.setGeometry(QtCore.QRect(200, 90, 581, 401))
+        view.updateChart(self.Chart)
+        view.show()
 
     def plotLineChart(self):
         self.data['Order Date'] = pd.to_datetime(self.data['Order Date'],format='%d/%m/%Y')
@@ -299,7 +334,7 @@ class Ui_MainWindow(object):
         if row in self.Measure:
             rowN = str(fil22+'('+row+'):Q')
         else:
-            rowN = str(fil11+'('+row+'):Q')
+            rowN = str(fil11+'('+row+'):T')
 
         chart = alt.Chart(self.data).mark_line(point=True).encode(
         alt.X(colN),
