@@ -19,6 +19,8 @@ class csvManager:
         return self.df
 
     def getDataWithPandasByHead(self,head):
+        #print(self.df[head])
+        print(head)
         return self.df[head]
 
     def getAxisYName(self,Dimension):
@@ -118,7 +120,8 @@ class csvManager:
     def setRowAndColumn(self,Row,Col):
         sortedDataByRow = self.setDimensionSort(Row)
         sortedDataByCol = self.setDimensionSort(Col)
-        #print(sortedDataByCol)
+        print(sortedDataByCol)
+        print(sortedDataByRow)
         df = pd.DataFrame(sortedDataByRow).drop_duplicates()
         dfCol = pd.DataFrame(sortedDataByCol).drop_duplicates()
         #print(dfCol)
@@ -127,9 +130,11 @@ class csvManager:
         oneListCol = list(chain.from_iterable(np.array([dfCol.T])))
         
         s = pd.DataFrame(" ",index = oneList,columns=oneListCol)
-        sameDimension = list(set(Row) & set(Col))
+        '''sameDimension = list(set(Row) & set(Col))
+        print(sameDimension)
         valueSameDimen = self.setDimensionSort(sameDimension).drop_duplicates().values.tolist()
         for i in valueSameDimen:
-            s.loc[tuple(i),tuple(i)] = "abc"
+            s.loc[tuple(i),tuple(i)] = "abc"'''
+        print(s)
         return s
 

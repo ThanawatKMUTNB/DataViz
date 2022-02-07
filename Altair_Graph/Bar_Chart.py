@@ -41,6 +41,32 @@ class WebEngineView(QtWebEngineWidgets.QWebEngineView):
         chart.save(output, "html", **kwargs)
         self.setHtml(output.getvalue())
 
+def VerticalBar(df):
+    c = alt.Chart(df).mark_bar().encode(
+        x=str(Di2+':N'),
+        y=str(Measure+':Q')
+        #color=str(Di1+':N')
+    ).facet(column=str(Di1+':N')
+    ).resolve_scale(x = 'independent')
+
+    view = WebEngineView()
+    view.updateChart(c)
+    w.setCentralWidget(view)
+    #w.resize(640, 480)
+    w.show()
+    
+def HoriBar(df):
+    c = alt.Chart(df).mark_bar().encode(
+        y=str(Di1+':O'),
+        x=str(Measure)
+    ).facet(row=str(Di2+':N')
+    ).resolve_scale(y = 'independent')
+
+    view = WebEngineView()
+    view.updateChart(c)
+    w.setCentralWidget(view)
+    #w.resize(640, 480)
+    w.show()
 
 if __name__ == "__main__":
     import sys
@@ -50,26 +76,13 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     w = QtWidgets.QMainWindow()
 
-    Di1 = 'Region'
-    Di2 = 'State'
+    Di1 = "State"
+    Di2 = 'Region'
     Measure = 'Quantity'
     f1 = 'SS_20lines.csv'
     f2 = 'SS_100lines.csv'
     f3 = 'Superstore.csv'
     df = pd.read_csv(f2, encoding='windows-1252')
-    c = alt.Chart(df).mark_bar().encode(
-        x=str(Di2+':N'),
-        y=str(Measure+':Q'),
-        color=str(Di1+':N')
-    ).facet(
-        column=str(Di1+':N')
-    ).resolve_scale(
-        x = 'independent'
-    )
-
-    view = WebEngineView()
-    view.updateChart(c)
-    w.setCentralWidget(view)
-    #w.resize(640, 480)
-    w.show()
+    HoriBar(df)
+    
     sys.exit(app.exec_())

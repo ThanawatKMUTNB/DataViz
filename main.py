@@ -1,4 +1,5 @@
 from email import header
+from msilib.schema import Class
 from operator import mod
 import os
 import sys
@@ -8,6 +9,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtChart import QChart, QChartView, QBarSet, QPercentBarSeries, QBarCategoryAxis, QLineSeries
 import numpy as np
 import pandas as pd
+from Altair_Graph.Bar_Chart import WebEngineView
 import csvManager
 from PyQt5.QtGui import QPainter
 from PyQt5.QtCore import Qt, QPointF
@@ -15,15 +17,16 @@ from PyQt5 import QtCore, QtGui, QtWidgets , QtChart
 from PyQt5.QtChart import QChart
 from PyQt5.QtGui import QPainter
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-
+import altair as alt
 from PyQt5.QtWidgets import (QApplication, QMainWindow)
 from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 #from qgis.PyQt.QtWidgets import QVBoxLayout
 cm = csvManager.csvManager()
-class TableModel(QtCore.QAbstractTableModel):
+
+class TableModel2(QtCore.QAbstractTableModel):
     data = ""
     def __init__(self, data):
-        super(TableModel, self).__init__()
+        super(TableModel2, self).__init__()
         #self.itemClicked.connect(self.handleItemClick)
         self._data = data
         #Ui_MainWindow.connectButton()
@@ -48,18 +51,53 @@ class TableModel(QtCore.QAbstractTableModel):
             '''if orientation == Qt.Vertical: #y
                 return ''.join(self._data.index[section])'''
                 
+class TableModel(QtCore.QAbstractTableModel):
+    def __init__(self, data):
+        super(TableModel, self).__init__()
+        #self.itemClicked.connect(self.handleItemClick)
+        self._data = data
+        
+    def data(self, index, role): 
+        if role == Qt.DisplayRole:
+            #print(">", len(self._data))
+            value = self._data.iloc[index.row(), index.column()]
+            #print("----",value)
+            return str(value)
+
+    def rowCount(self, index):
+        return self._data.shape[0]
+
+    def columnCount(self, index):
+        return self._data.shape[1]
+
+    def headerData(self, section, orientation, role): #show Header on column
+        # section is the index of the column/row.
+        if role == Qt.DisplayRole:
+            if orientation == Qt.Horizontal: #x
+                return self._data.columns[section]
+
+            '''if orientation == Qt.Vertical: #y
+                return ''.join(self._data.index[section])'''
+                
+'''class ColLis(object):
+    def __init__(self, *args):
+        super(ClassName, self).__init__(*args))'''
+        
 class Ui_MainWindow(object):
-    #dragDropFinished = QtCore.pyqtSignal()
-    folderpath = ''
-    fileNameList = []
-    selectFile = []
-    colHeader = []
-    Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
-    path = ""
-    RowChoose = []
-    ColChoose = []
-    dataSheet = ""
-    #DimenForChoose = []
+    def __init__(self,MainWindow):
+        super().__init__()
+        #dragDropFinished = QtCore.pyqtSignal()
+        self.folderpath = ''
+        self.fileNameList = []
+        self.selectFile = []
+        self.colHeader = []
+        self.Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
+        self.path = ""
+        self.RowChoose = []
+        self.ColChoose = []
+        self.dataSheet = ""
+        #DimenForChoose = []
+        self.setupUi(MainWindow)
                 
     def DropDup(self):
         itemsTextList =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
@@ -69,8 +107,8 @@ class Ui_MainWindow(object):
         itemsTextList =  [str(self.FileListDimension.item(i).text()) for i in range(self.FileListDimension.count())]
         itemsTextList = list(dict.fromkeys(itemsTextList))
         self.colHeader = itemsTextList
-        print(self.RowChoose,self.ColChoose)
-        print(self.selectFile)
+        '''print(self.RowChoose,self.ColChoose)
+        print(self.selectFile)'''
         Ui_MainWindow.retranslateUi(self, MainWindow)
         
     def updateList(self):
@@ -119,33 +157,48 @@ class Ui_MainWindow(object):
     def creatSheet(self):
         '''self.sheetTable = QtWidgets.QTableWidget(self.tab_2)
         self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))'''
-        while (self.sheetTable.rowCount() > 0):
-            self.sheetTable.removeRow(0)
         
         self.df_rows = len(self.dataSheet)
         self.df_cols = len(self.dataSheet.columns)
         self.df = self.dataSheet
-        self.sheetTable.setRowCount(self.df_rows)
-        self.sheetTable.setColumnCount(self.df_cols)
+        self.sheetTableW.setRowCount(self.df_rows)
+        self.sheetTableW.setColumnCount(self.df_cols)
         for i in range(self.df_rows):
             for j in range(self.df_cols):
                 x = format(self.df.iloc[i, j])
-                #print(x)
-                self.sheetTable.setItem(i, j, QTableWidgetItem(x))
-
+                if x == "abc":
+                    x= self.VerticalBar()
+                #print(self.df.iloc[i, j],i,j)
+                self.sheetTableW.setItem(i, j, QTableWidgetItem(x))
+    
+    def RowDelect(self):
+        if len(self.RowChoose) != 0:
+            self.RowChoose.remove(self.RowChoose[-1])
+            #self.sheetTable.removeRow(self.sheetTable.rowCount()-1)
+            self.retranslateUi(MainWindow)
+            
+    def ColDelect(self):
+        if len(self.ColChoose) != 0:
+            self.ColChoose.remove(self.ColChoose[-1])
+            self.retranslateUi(MainWindow)
+            
     def plot(self):
         tmp = []
         tmp =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
-        print("TMP",tmp)
-        self.RowList = tmp
+        self.RowChoose = tmp
         tmp = [] 
         tmp =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
-        self.ColList = tmp
-        print(len(self.RowList),len(self.ColList))
-        if len(set(self.ColList)) > 0 or len(set(self.RowList)) > 0:
-            self.sheetPageRowAndCol(self.RowList,self.ColList)
-            self.creatSheet()
-            #self.setupUi(MainWindow)
+        self.ColChoose = tmp
+        if self.ColChoose != [] or self.RowChoose != [] :
+            
+            self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
+            self.model = TableModel2(self.dataSheet)
+            self.sheetTable.setModel(self.model)
+            #self.creatSheet()
+            '''self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
+            self.creatSheet()'''
+        #print(self.dataSheet)
+        #Ui_MainWindow.setupUi(self, MainWindow)
         
     def dataSource(self):
         if type(self.selectFile) != list:
@@ -161,49 +214,68 @@ class Ui_MainWindow(object):
         self.data = cm.setAllDataByOneDimension(dimension)
         
     def sheetPageRow(self):
-        #print(self.RowList)
-        self.dataSheet = cm.setDimensionSort(self.RowList)
-        self.dataSheet[" "] = "abc"
+        self.dataSheet = cm.setDimensionSort(self.RowChoose)
+        if self.RowChoose[-1] not in self.Measure :
+            self.dataSheet[" "] = "abc"
+        else:
+            self.dataSheet[" "] = "abc"
                 
     def sheetPageCol(self):
-        tmp = cm.setDimensionSort(self.ColList)
+        tmp = cm.setDimensionSort(self.ColChoose)
         tmp[" "] = "abc"
         self.dataSheet = tmp.T
-        
-    '''def sheetPageAddCol(self,Row,Col):
-        tmp = cm.getDataWithPandasByHead(Col)
-        tmp = tmp.sort_values(by=Col)
-        tmp = tmp.drop_duplicates().values
-        res = list(map(list, zip(*tmp)))
-        newDf = []
-        for i in res:
-            newDf.append(Row+i)
-        self.data.columns = tuple(newDf[-1])
-        df = pd.DataFrame(newDf)
-        
-    def sheetPageAddRow(self,Row):
-        lists = [list(x) for x in self.data.index]
-        print(len(lists))
-        subRow = np.array(lists).T.tolist()
-        for i,j in zip(reversed(subRow),Row):
-            self.data.insert(0,j,i)'''
-        
+    
+    MeasureChoose = ""
     def sheetPageRowAndCol(self,Row,Col):
         print("Start",Row,Col)
         if len(set(Col)) == 0 : 
             print("Row")
             self.sheetPageRow()
+            if Row[-1] in self.Measure:
+                self.MeasureChoose = Row[-1]
+                self.VerBar()
         elif len(set(Row)) == 0:
             print("Col") 
             self.sheetPageCol()
+            if Col[-1] in self.Measure:
+                self.MeasureChoose = Col[-1]
+                self.HonBar()
         else : 
             print("Row and Col")
             self.dataSheet = cm.setRowAndColumn(Row,Col)
     
-    def handleSelectionChanged(self, selected, deselected):
-        for index in self.table.selectionModel().selectedRows():
-            print('Row %d is selected' % index.row())
+    def VerBar(self):
+        Measure = self.MeasureChoose
+        Di1 = self.RowChoose[0]
+        Di2 = 'State'
+        c = alt.Chart(self.data).mark_bar().encode(
+        x=str(Di1+':N'),
+        y=str(Measure+':Q')
+        ).facet(row=str(Di1+':N')
+        )
 
+        view = WebEngineView(self.tab_2)
+        view.setGeometry(QtCore.QRect(200, 90, 581, 421))
+        view.updateChart(c)
+        view.show()
+    
+    def HonBar(self):
+        Measure = self.MeasureChoose
+        Di1 = self.ColChoose[0]
+        Di2 = 'State'
+        c = alt.Chart(self.data).mark_bar().encode(
+        y=str(Di1+':N'),
+        x=str(Measure+':Q')
+        ).facet(column=str(Di1+':N')
+        ).resolve_scale(y = 'independent')
+
+        view = WebEngineView(self.tab_2)
+        view.setGeometry(QtCore.QRect(200, 90, 581, 401))
+        view.updateChart(c)
+        view.show()
+        #MainWindow.setCentralWidget(view)
+        #w.resize(640, 480)
+    
     def setupUi(self, MainWindow):
         
         MainWindow.setObjectName("MainWindow")
@@ -262,6 +334,7 @@ class Ui_MainWindow(object):
         if self.fileNameList != []:
             for i in range(len(self.fileNameList)):
                 item = QtWidgets.QListWidgetItem()
+                #print(self.fileNameList)
                 self.FileList.addItem(item)
         
         self.FileListChoose = QtWidgets.QListWidget(self.tab)
@@ -350,7 +423,10 @@ class Ui_MainWindow(object):
         self.RowList.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.RowList.setFlow(QtWidgets.QListView.LeftToRight)
         self.RowList.setObjectName("RowList")
-        self.RowList.clicked.connect(self.DropDup)
+        for i in range(len(self.RowChoose)):
+            item = QtWidgets.QListWidgetItem()
+            self.RowList.addItem(item)
+        #self.RowList.clicked.connect(self.DropDup)
         
         self.RowLabel = QtWidgets.QLabel(self.tab_2)
         self.RowLabel.setGeometry(QtCore.QRect(200, 10, 61, 31))
@@ -362,10 +438,12 @@ class Ui_MainWindow(object):
         self.ColDell = QtWidgets.QPushButton(self.tab_2)
         self.ColDell.setGeometry(QtCore.QRect(750, 50, 31, 31))
         self.ColDell.setObjectName("ColDell")
+        self.ColDell.clicked.connect(self.ColDelect)
         
         self.RowDell = QtWidgets.QPushButton(self.tab_2)
         self.RowDell.setGeometry(QtCore.QRect(750, 10, 31, 31))
         self.RowDell.setObjectName("RowDell")
+        self.RowDell.clicked.connect(self.RowDelect)
         
         self.ColList = QtWidgets.QListWidget(self.tab_2)
         self.ColList.setGeometry(QtCore.QRect(260, 50, 491, 31))
@@ -379,16 +457,18 @@ class Ui_MainWindow(object):
         self.ColList.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.ColList.setFlow(QtWidgets.QListView.LeftToRight)
         self.ColList.setObjectName("ColList")
-        self.ColList.clicked.connect(self.DropDup)
+        for i in range(len(self.ColChoose)):
+            item = QtWidgets.QListWidgetItem()
+            self.ColList.addItem(item)
         
-        self.sheetTable = QtWidgets.QTableWidget(self.tab_2)
+        self.sheetTable = QtWidgets.QTableView(self.tab_2)
         self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))
-        #print(self.dataSheet != "")
-        if type(self.dataSheet) != str:
-            self.creatSheet()
         
+        '''self.sheetTableW = QtWidgets.QTableWidget(self.tab_2)
+        self.sheetTableW.setGeometry(QtCore.QRect(200, 90, 581, 421))
+        '''
         self.plotButton = QtWidgets.QPushButton(self.tab_2)
-        self.plotButton.setGeometry(QtCore.QRect(730, 470, 41, 31))
+        self.plotButton.setGeometry(QtCore.QRect(730, 510, 41, 31))
         self.plotButton.setObjectName("plotButton")
         self.plotButton.clicked.connect(self.plot)
             
@@ -462,21 +542,19 @@ class Ui_MainWindow(object):
             item.setText(_translate("MainWindow", str(j)))
         self.FileListMes.setSortingEnabled(__sortingEnabled)
         
+        for i,j in zip(range(len(self.ColChoose)),self.ColChoose):
+            item = self.ColList.item(i)
+            item.setText(_translate("MainWindow", str(j)))
+        
+        for i,j in zip(range(len(self.RowChoose)),self.RowChoose):
+            item = self.RowList.item(i)
+            item.setText(_translate("MainWindow", str(j)))
+        
         self.ColLabel.setText(_translate("MainWindow", "Column"))
         self.RowLabel.setText(_translate("MainWindow", "Row"))
         
         self.ColDell.setText(_translate("MainWindow", "DEL"))
         self.RowDell.setText(_translate("MainWindow", "DEL"))
-        
-        if self.RowChoose != [] and self.ColChoose != [] :
-            if self.folderpath != '' :
-                self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
-                self.DataSource = QtWidgets.QTableWidget(self.tab_2)
-                self.DataSource.setGeometry(QtCore.QRect(200, 120, 581, 391))
-                self.DataSource.setObjectName("DataSource")
-                if self.selectFile != [] : 
-                    self.model = TableModel(self.data)
-                    self.DataSource.setModel(self.model)
                     
         self.plotButton.setText(_translate("MainWindow", "PLOT"))
 
@@ -484,8 +562,8 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
+    ui = Ui_MainWindow(MainWindow)
+    #ui.setupUi(MainWindow)
     MainWindow.show()
     try:
         sys.exit(app.exec_())
