@@ -353,13 +353,31 @@ class Ui_MainWindow(object):
                     x=str(col[-1]+':N'),
                     y=str(fil+'('+row[0]+'):Q')
                 ).resolve_scale(x = 'independent')
+<<<<<<< HEAD
                 self.Chart = classmethod
+=======
+                return chart
+>>>>>>> 8b35bdb116c04cf70cff80a93a5fdf91c993c351
             elif c in self.Measure:
                 chart = alt.Chart(self.data).mark_bar().encode(
                     y=str(row[-1]+':N'),
                     x=str(fil+'('+col[0]+'):Q')
                 ).resolve_scale(y = 'independent')
+<<<<<<< HEAD
                 self.Chart = c
+=======
+                return chart
+    
+    def exam(self):
+        c = alt.Chart(self.data).mark_bar().encode(
+            x=str('State:N'),
+            y=('median(Quantity):Q'),
+            color=str('Region:N')
+        ).facet(column=str('Region:N')
+        ).resolve_scale(x = 'independent')
+        self.Chart = c
+        self.plotChart()
+>>>>>>> 8b35bdb116c04cf70cff80a93a5fdf91c993c351
     
     def plotBar2Chart(self):
         col = self.ColChoose
@@ -374,9 +392,13 @@ class Ui_MainWindow(object):
                     color=str(col[0]+':N')
                 ).facet(column=str(col[0]+':N')
                 ).resolve_scale(x = 'independent')
+<<<<<<< HEAD
                 self.Chart = c
                 self.plotChart()
                 break
+=======
+                return chart
+>>>>>>> 8b35bdb116c04cf70cff80a93a5fdf91c993c351
             elif c in self.Measure:
                 chart = alt.Chart(self.data).mark_bar().encode(
                     y=str(row[-1]+':N'),
