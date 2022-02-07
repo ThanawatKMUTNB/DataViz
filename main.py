@@ -277,16 +277,17 @@ class Ui_MainWindow(object):
             self.sheetPageRow()
             if Row[-1] in self.Measure:
                 self.MeasureChoose = Row[-1]
-                self.exam()
+                self.plotLineChart()
         elif len(set(Row)) == 0:
             print("Col") 
             self.sheetPageCol()
             if Col[-1] in self.Measure:
                 self.MeasureChoose = Col[-1]
-                self.exam()
+                self.plotLineChart()
         else : 
             print("Row and Col")
             self.dataSheet = cm.setRowAndColumn(Row,Col)
+            self.plotLineChart()
     
     def VerBar(self):
         Measure = self.MeasureChoose
@@ -348,7 +349,9 @@ class Ui_MainWindow(object):
         alt.X(colN),
         alt.Y(rowN)
         )
-        return chart
+        self.Chart = chart
+        self.plotChart()
+
     def plotBarChart(self):
         col = ["Region","Segment"]
         row = ["Sale"]
