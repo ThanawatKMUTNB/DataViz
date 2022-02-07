@@ -17,7 +17,7 @@ class csvManager:
         if fileExtension[-1] == "csv":
             df = pd.read_csv(path, encoding='windows-1252')
         else:
-            print(fileExtension[-1])
+            #print(fileExtension[-1])
             df = pd.read_excel(path, engine = "openpyxl")
         return df
     
@@ -28,6 +28,7 @@ class csvManager:
         return self.df
 
     def getDataWithPandasByHead(self,head):
+        print(head)
         return self.df[head]
 
     def getAxisYName(self,Dimension):
@@ -68,7 +69,7 @@ class csvManager:
     def setDimensionSort(self,Dimension):
         sortedData = self.getDataWithPandasByHead(Dimension)
         #print(sortedData)
-        print(Dimension)
+        #print(Dimension)
         new = sortedData.sort_values(by=Dimension)
         #new.set_index([Dimension[0]])
         #new[''] = pd.Series("abc", index=new.index)
@@ -127,39 +128,12 @@ class csvManager:
 
     def setRowAndColumn(self,Row,Col):
         #self.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
-        
-        #self.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
-        sortedDataByRow = self.setDimensionSort(Row)
-        sortedDataByCol = self.setDimensionSort(Col)
-        print(sortedDataByCol)
-        print(sortedDataByRow)
-        df = pd.DataFrame(sortedDataByRow).drop_duplicates()
-        dfCol = pd.DataFrame(sortedDataByCol).drop_duplicates()
-        #print(dfCol)
-        
-        oneList = list(chain.from_iterable(np.array([df.T])))
-        oneListCol = list(chain.from_iterable(np.array([dfCol.T])))
-        
-        s = pd.DataFrame(" ",index = oneList,columns=oneListCol)
-        #sameDimension = list(set(Row) & set(Col))
-        #print(sameDimension)
-        #valueSameDimen = self.setDimensionSort(sameDimension).drop_duplicates().values.tolist()
-        #print(self.df)
-        indexDF = self.df.index
-        #print(indexDF)
-        for i in s.columns:
-            k = self.df[Col[0]]==list(i)[0]
-            l = indexDF[k]
-            #print("---LLL",l.tolist())
-            print("---LLL",list(i)[0])
-            for j in l.tolist() :
-                #print(self.df.loc[j,["City"]].values)
-                s.loc[self.df.loc[j,Row].values,i] = "abc"
-            #print("--- si \n",self.df["Ship Mode"]=="Standard Class")
-            #s.loc[tuple(i),tuple(i)] = "abc"
-        #s.display
-        print("-->s\n",s)
-        return s
+        baseList = self.setDimensionSort(list(set(Row+Col))).drop_duplicates()
+        baseList[" "] = "abc"
+        k = pd.pivot(baseList, values=[" "], index=Row,columns=Col)
+        k = k.replace(np.nan, '', regex=True)
+        print(k)
+        return k
 
 #ex = csvManager()
-#ex.setRowAndColumn(["City"],["Ship Mode"])
+#ex.setRowAndColumn(["Segment","Region"],["Ship Mode","City"])

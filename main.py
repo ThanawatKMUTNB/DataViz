@@ -89,14 +89,14 @@ class TableModel2(QtCore.QAbstractTableModel):
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal: #x
                 if type(self._data.columns[section]) == tuple:
-                    colN =str(list(self._data.columns[section])[0])
-                else: colN = self._data.columns[section]
+                    colN =str(list(self._data.columns[section])[-1])
+                else: colN = str(self._data.columns[section])
                 return colN
                 
             if orientation == Qt.Vertical: #y
                 if type(self._data.index[section]) == tuple:
-                    indexN = str(list(self._data.index[section])[0])
-                else: indexN = self._data.index[section]
+                    indexN = str(list(self._data.index[section])[-1])
+                else: indexN = str(self._data.index[section])
                 return indexN
                 
 class TableModel(QtCore.QAbstractTableModel):
@@ -227,11 +227,9 @@ class Ui_MainWindow(object):
             self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
             self.model = TableModel2(self.dataSheet)
             self.sheetTable.setModel(self.model)
-            #self.creatSheet()
-            '''self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
-            self.creatSheet()'''
-        #print(self.dataSheet)
-        #Ui_MainWindow.setupUi(self, MainWindow)
+        if self.ColChoose == [] and self.RowChoose == [] :
+            self.sheetTable.reset()
+            self.sheetTable.setModel(None)
         
     def dataSource(self):
         #print(self.selectFile)
@@ -254,6 +252,8 @@ class Ui_MainWindow(object):
         
     def sheetPageRow(self):
         self.dataSheet = cm.setDimensionSort(self.RowChoose)
+        self.dataSheet=self.dataSheet.drop_duplicates()
+        print()
         if self.RowChoose[-1] not in self.Measure :
             self.dataSheet[" "] = "abc"
         else:
@@ -261,6 +261,7 @@ class Ui_MainWindow(object):
                 
     def sheetPageCol(self):
         tmp = cm.setDimensionSort(self.ColChoose)
+        tmp = tmp.drop_duplicates()
         tmp[" "] = "abc"
         self.dataSheet = tmp.T
     
@@ -277,17 +278,17 @@ class Ui_MainWindow(object):
             self.sheetPageRow()
             if Row[-1] in self.Measure:
                 self.MeasureChoose = Row[-1]
-                self.plotLineChart()
+                self.plotBarChart()
         elif len(set(Row)) == 0:
             print("Col") 
             self.sheetPageCol()
             if Col[-1] in self.Measure:
                 self.MeasureChoose = Col[-1]
-                self.plotLineChart()
+                self.plotBarChart()
         else : 
             print("Row and Col")
             self.dataSheet = cm.setRowAndColumn(Row,Col)
-            self.plotLineChart()
+            #self.plotLineChart()
     
     def VerBar(self):
         Measure = self.MeasureChoose
@@ -363,12 +364,14 @@ class Ui_MainWindow(object):
                     y=str(fil+'('+row[0]+'):Q')
                 ).resolve_scale(x = 'independent')
                 self.Chart = chart
+                self.plotChart()
             elif c in self.Measure:
                 chart = alt.Chart(self.data).mark_bar().encode(
                     y=str(row[-1]+':N'),
                     x=str(fil+'('+col[0]+'):Q')
                 ).resolve_scale(y = 'independent')
                 self.Chart = chart
+                self.plotChart()
     
     def exam(self):
         c = alt.Chart(self.data).mark_bar().encode(
