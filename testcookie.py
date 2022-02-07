@@ -1,51 +1,47 @@
-from PySide2.QtCore import QDateTime, Qt
-from PySide2.QtGui import QPainter
-from PySide2.QtWidgets import (QWidget, QHeaderView, QHBoxLayout, QTableView,
-                               QSizePolicy)
-from PySide2.QtCharts import QtCharts
-
-from table_model import CustomTableModel
+import altair as alt
+from vega_datasets import data
 
 
-class Widget(QWidget):
-    def __init__(self, data):
-        QWidget.__init__(self)
+source = data.cars()
 
-        # Getting the Model
-        self.model = CustomTableModel(data)
+# Brush for selection
+brush = alt.selection(type='single', encodings=['x'])
 
-        # Creating a QTableView
-        self.table_view = QTableView()
-        self.table_view.setModel(self.model)
+# Histogram base
+hist_base = alt.Chart(source).mark_bar(color='grey').encode(
+    x=alt.X('Horsepower:Q', bin=True),
+    y='count()',
+).add_selection(brush)
 
-        # QTableView Headers
-        self.horizontal_header = self.table_view.horizontalHeader()
-        self.vertical_header = self.table_view.verticalHeader()
-        self.horizontal_header.setSectionResizeMode(QHeaderView.ResizeToContents)
-        self.vertical_header.setSectionResizeMode(QHeaderView.ResizeToContents)
-        self.horizontal_header.setStretchLastSection(True)
+# Histogram selection
+hist_selection = alt.Chart(source).mark_bar().encode(
+    x=alt.X('Horsepower:Q', bin=True),
+    y='count()',
+).transform_filter(brush)
 
-        # Creating QChart
-        self.chart = QtCharts.QChart()
-        self.chart.setAnimationOptions(QtCharts.QChart.AllAnimations)
+# Base chart for data tables
+ranked_text = alt.Chart(source).mark_text(align='right').encode(
+    y=alt.Y('row_number:O',axis=None)
+).transform_window(
+    row_number='row_number()'
+).transform_filter(
+    brush
+).transform_window(
+    rank='rank(row_number)'
+).transform_filter(
+    alt.datum.rank<16
+)
 
-        # Creating QChartView
-        self.chart_view = QtCharts.QChartView(self.chart)
-        self.chart_view.setRenderHint(QPainter.Antialiasing)
+# Data Tables
+horsepower = ranked_text.encode(text='Horsepower:N').properties(title=alt.TitleParams(text='Horsepower', align='right'))
+mpg = ranked_text.encode(text='Miles_per_Gallon:N').properties(title=alt.TitleParams(text='MPG', align='right'))
+origin = ranked_text.encode(text='Origin:N').properties(title=alt.TitleParams(text='Origin', align='right'))
+text = alt.hconcat(horsepower, mpg, origin) # Combine data tables
 
-        # QWidget Layout
-        self.main_layout = QHBoxLayout()
-        size = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-
-        ## Left layout
-        size.setHorizontalStretch(1)
-        self.table_view.setSizePolicy(size)
-        self.main_layout.addWidget(self.table_view)
-
-        ## Right Layout
-        size.setHorizontalStretch(4)
-        self.chart_view.setSizePolicy(size)
-        self.main_layout.addWidget(self.chart_view)
-
-        # Set the layout to the QWidget
-        self.setLayout(self.main_layout)
+# Build chart
+alt.hconcat(
+    hist_base+hist_selection,
+    text
+).resolve_legend(
+    color="independent"
+).configure_view(strokeWidth=0)

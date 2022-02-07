@@ -9,11 +9,12 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtChart import QChart, QChartView, QBarSet, QPercentBarSeries, QBarCategoryAxis, QLineSeries
 import numpy as np
 import pandas as pd
-from Altair_Graph.Bar_Chart import Measure, WebEngineView
+from io import StringIO
+from Altair_Graph.Bar_Chart import WebEngineView
 import csvManager
 from PyQt5.QtGui import QPainter
 from PyQt5.QtCore import Qt, QPointF
-from PyQt5 import QtCore, QtGui, QtWidgets , QtChart
+from PyQt5 import QtCore, QtGui, QtWidgets , QtChart ,QtWebEngineWidgets
 from PyQt5.QtChart import QChart
 from PyQt5.QtGui import QPainter
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -22,7 +23,39 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow)
 from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 #from qgis.PyQt.QtWidgets import QVBoxLayout
 cm = csvManager.csvManager()
+class WebEngineView(QtWebEngineWidgets.QWebEngineView):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.page().profile().downloadRequested.connect(self.onDownloadRequested)
+        self.windows = []
 
+    @QtCore.pyqtSlot(QtWebEngineWidgets.QWebEngineDownloadItem)
+    def onDownloadRequested(self, download):
+        if (
+            download.state()
+            == QtWebEngineWidgets.QWebEngineDownloadItem.DownloadRequested
+        ):
+            path, _ = QtWidgets.QFileDialog.getSaveFileName(
+                self, self.tr("Save as"), download.path()
+            )
+            if path:
+                download.setPath(path)
+                download.accept()
+
+    def createWindow(self, type_):
+        if type_ == QtWebEngineWidgets.QWebEnginePage.WebBrowserTab:
+            window = QtWidgets.QMainWindow(self)
+            view = QtWebEngineWidgets.QWebEngineView(window)
+            window.resize(640, 480)
+            window.setCentralWidget(view)
+            window.show()
+            return view
+
+    def updateChart(self, chart, **kwargs):
+        output = StringIO()
+        chart.save(output, "html", **kwargs)
+        self.setHtml(output.getvalue())
+        
 class TableModel2(QtCore.QAbstractTableModel):
     data = ""
     def __init__(self, data):
@@ -42,14 +75,20 @@ class TableModel2(QtCore.QAbstractTableModel):
     def columnCount(self, index):
         return self._data.shape[1]
 
-    '''def headerData(self, section, orientation, role): #show Header on column
+    def headerData(self, section, orientation, role): #show Header on column
         # section is the index of the column/row.
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal: #x
-                return self._data.columns[section]
-
+                if type(self._data.columns[section]) == tuple:
+                    colN =str(list(self._data.columns[section])[0])
+                else: colN = self._data.columns[section]
+                return colN
+                
             if orientation == Qt.Vertical: #y
-                return ''.join(self._data.index[section])'''
+                if type(self._data.index[section]) == tuple:
+                    indexN = str(list(self._data.index[section])[0])
+                else: indexN = self._data.index[section]
+                return indexN
                 
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data):
@@ -112,15 +151,18 @@ class Ui_MainWindow(object):
         Ui_MainWindow.retranslateUi(self, MainWindow)
         
     def updateList(self):
+        #self.__init__(MainWindow)
         itemsTextList =  [str(self.FileListChoose.item(i).text()) for i in range(self.FileListChoose.count())]
         self.selectFile = itemsTextList
         itemsTextList =  [str(self.FileList.item(i).text()) for i in range(self.FileList.count())]
         self.fileNameList = itemsTextList
+        self.RowChoose = []
+        self.ColChoose = []
+        if self.selectFile != []:
+            self.colHeader = cm.getHead()
+        else: self.colHeader = []
         self.dataSource()
         Ui_MainWindow.setupUi(self, MainWindow)
-        
-    def dropEvent(self, event):
-        print('dropEvent')
         
     def launchDialog(self):
         file_filter = 'Excel File (*.xlsx *.csv *.xls)'
@@ -154,33 +196,15 @@ class Ui_MainWindow(object):
                 self.colHeader.remove(i)
         Ui_MainWindow.setupUi(self, MainWindow)
         
-    def creatSheet(self):
-        '''self.sheetTable = QtWidgets.QTableWidget(self.tab_2)
-        self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))'''
-        
-        self.df_rows = len(self.dataSheet)
-        self.df_cols = len(self.dataSheet.columns)
-        self.df = self.dataSheet
-        self.sheetTableW.setRowCount(self.df_rows)
-        self.sheetTableW.setColumnCount(self.df_cols)
-        for i in range(self.df_rows):
-            for j in range(self.df_cols):
-                x = format(self.df.iloc[i, j])
-                if x == "abc":
-                    x= self.VerticalBar()
-                #print(self.df.iloc[i, j],i,j)
-                self.sheetTableW.setItem(i, j, QTableWidgetItem(x))
-    
-    def RowDelect(self):
+    def RowDelect(self,item):
         if len(self.RowChoose) != 0:
-            self.RowChoose.remove(self.RowChoose[-1])
-            #self.sheetTable.removeRow(self.sheetTable.rowCount()-1)
-            self.retranslateUi(MainWindow)
+            row = self.RowList.currentRow()
+            self.RowList.takeItem(row)
             
-    def ColDelect(self):
+    def ColDelect(self,item):
         if len(self.ColChoose) != 0:
-            self.ColChoose.remove(self.ColChoose[-1])
-            self.retranslateUi(MainWindow)
+            Col = self.ColList.currentRow()
+            self.ColList.takeItem(Col)
             
     def plot(self):
         tmp = []
@@ -190,7 +214,6 @@ class Ui_MainWindow(object):
         tmp =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
         self.ColChoose = tmp
         if self.ColChoose != [] or self.RowChoose != [] :
-            
             self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
             self.model = TableModel2(self.dataSheet)
             self.sheetTable.setModel(self.model)
@@ -201,14 +224,20 @@ class Ui_MainWindow(object):
         #Ui_MainWindow.setupUi(self, MainWindow)
         
     def dataSource(self):
+        #print(self.selectFile)
         if type(self.selectFile) != list:
             self.selectFile = [self.selectFile]
         if self.selectFile != [] :
             if len(self.selectFile)>1:
+                print("Union")
                 self.data = cm.unionFile(self.selectFile)
             else:
-                self.path = self.folderpath+"/"+self.selectFile[0]
+                print("Not Union")
+                cm.path =self.folderpath
+                cm.selectFile = self.selectFile[0] 
+                cm.setPath()
                 self.data = cm.getDataWithPandas()
+            #print(self.data)
 
     def dataSourceSort(self,dimension):
         self.data = cm.setAllDataByOneDimension(dimension)
@@ -227,7 +256,7 @@ class Ui_MainWindow(object):
     
     MeasureChoose = ""
     def sheetPageRowAndCol(self,Row,Col):
-        print("Start",Row,Col,len(set(Row)),len(set(Col))) 
+        print("Start",Row,Col,len(set(Row)),len(set(Col)))
         while (Row.count('')):
             Row.remove('')
         while (Col.count('')):
@@ -239,12 +268,14 @@ class Ui_MainWindow(object):
             if Row[-1] in self.Measure:
                 self.MeasureChoose = Row[-1]
                 self.VerBar()
+                self.plotChart()
         elif len(set(Row)) == 0:
             print("Col") 
             self.sheetPageCol()
             if Col[-1] in self.Measure:
                 self.MeasureChoose = Col[-1]
                 self.HonBar()
+                self.plotChart()
         else : 
             print("Row and Col")
             self.dataSheet = cm.setRowAndColumn(Row,Col)
@@ -258,11 +289,12 @@ class Ui_MainWindow(object):
         y=str(Measure+':Q')
         ).facet(row=str(Di1+':N')
         )
-
-        view = WebEngineView(self.tab_2)
+        self.Chart = c
+    
+        '''view = WebEngineView(self.tab_2)
         view.setGeometry(QtCore.QRect(200, 90, 581, 421))
         view.updateChart(c)
-        view.show()
+        view.show()'''
     
     def HonBar(self):
         Measure = self.MeasureChoose
@@ -273,13 +305,19 @@ class Ui_MainWindow(object):
         x=str(Measure+':Q')
         ).facet(column=str(Di1+':N')
         ).resolve_scale(y = 'independent')
+        self.Chart = c
 
-        view = WebEngineView(self.tab_2)
+        '''view = WebEngineView(self.tab_2)
         view.setGeometry(QtCore.QRect(200, 90, 581, 401))
         view.updateChart(c)
-        view.show()
+        view.show()'''
         #MainWindow.setCentralWidget(view)
         #w.resize(640, 480)
+    def plotChart(self):
+        view = WebEngineView(self.tab_2)
+        view.setGeometry(QtCore.QRect(200, 90, 581, 401))
+        view.updateChart(self.Chart)
+        view.show()
 
     def plotLineChart(self):
         self.data['Order Date'] = pd.to_datetime(self.data['Order Date'],format='%d/%m/%Y')
@@ -480,6 +518,8 @@ class Ui_MainWindow(object):
         self.FileListDimension.clicked.connect(self.DropDup)
         
         self.RowList = QtWidgets.QListWidget(self.tab_2)
+        #self.RowListW = RowListWidget()
+        #self.RowListW.setGeometry(QtCore.QRect(260, 10, 491, 31))
         self.RowList.setGeometry(QtCore.QRect(260, 10, 491, 31))
         self.RowList.setAcceptDrops(True)
         self.RowList.setLayoutDirection(QtCore.Qt.LeftToRight)
@@ -494,6 +534,8 @@ class Ui_MainWindow(object):
         for i in range(len(self.RowChoose)):
             item = QtWidgets.QListWidgetItem()
             self.RowList.addItem(item)
+            #self.RowList.setModel(self.RowListW)
+        self.RowList.itemDoubleClicked.connect(self.RowDelect)
         #self.RowList.clicked.connect(self.DropDup)
         
         self.RowLabel = QtWidgets.QLabel(self.tab_2)
@@ -503,7 +545,7 @@ class Ui_MainWindow(object):
         self.RowLabel.setFont(font)
         self.RowLabel.setObjectName("RowLabel")
         
-        self.ColDell = QtWidgets.QPushButton(self.tab_2)
+        '''self.ColDell = QtWidgets.QPushButton(self.tab_2)
         self.ColDell.setGeometry(QtCore.QRect(750, 50, 31, 31))
         self.ColDell.setObjectName("ColDell")
         self.ColDell.clicked.connect(self.ColDelect)
@@ -511,7 +553,7 @@ class Ui_MainWindow(object):
         self.RowDell = QtWidgets.QPushButton(self.tab_2)
         self.RowDell.setGeometry(QtCore.QRect(750, 10, 31, 31))
         self.RowDell.setObjectName("RowDell")
-        self.RowDell.clicked.connect(self.RowDelect)
+        self.RowDell.clicked.connect(self.RowDelect)'''
         
         self.ColList = QtWidgets.QListWidget(self.tab_2)
         self.ColList.setGeometry(QtCore.QRect(260, 50, 491, 31))
@@ -528,6 +570,7 @@ class Ui_MainWindow(object):
         for i in range(len(self.ColChoose)):
             item = QtWidgets.QListWidgetItem()
             self.ColList.addItem(item)
+        self.ColList.itemDoubleClicked.connect(self.ColDelect)
         
         self.sheetTable = QtWidgets.QTableView(self.tab_2)
         self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))
@@ -543,14 +586,6 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab_2, "Sheet")
         
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
-        self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
-
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -621,8 +656,8 @@ class Ui_MainWindow(object):
         self.ColLabel.setText(_translate("MainWindow", "Column"))
         self.RowLabel.setText(_translate("MainWindow", "Row"))
         
-        self.ColDell.setText(_translate("MainWindow", "DEL"))
-        self.RowDell.setText(_translate("MainWindow", "DEL"))
+        #self.ColDell.setText(_translate("MainWindow", "DEL"))
+        #self.RowDell.setText(_translate("MainWindow", "DEL"))
                     
         self.plotButton.setText(_translate("MainWindow", "PLOT"))
 
