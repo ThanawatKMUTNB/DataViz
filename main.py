@@ -300,7 +300,7 @@ class Ui_MainWindow(object):
 
         chart = alt.Chart(self.data).mark_line(point=True).encode(
         alt.X(colN),
-        alt.Y(str(rowN)#,
+        alt.Y(rowN)#,
         #tooltip = str(fil22+'('+Measua+'):Q') 
         )
         return chart
