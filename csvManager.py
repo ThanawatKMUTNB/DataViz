@@ -10,12 +10,16 @@ class csvManager:
         self.df = ""
     
     def setPath(self):
-        fileExtension = self.selectFile.split(".")
+        self.df = self.readFile(self.path+"/"+self.selectFile)
+        
+    def readFile(self,path):
+        fileExtension = path.split(".")
         if fileExtension[-1] == "csv":
-            self.df = pd.read_csv(self.path+"/"+self.selectFile, encoding='windows-1252')
+            df = pd.read_csv(path, encoding='windows-1252')
         else:
             print(fileExtension[-1])
-            self.df = pd.read_excel('Superstore(xlsx).xlsx', engine = "openpyxl")
+            df = pd.read_excel(path, engine = "openpyxl")
+        return df
     
     def getHead(self):
        return list(self.df.columns)
@@ -103,7 +107,7 @@ class csvManager:
         #print(Listfilename)
         for i in Listfilename:
             #print(i)
-            df = pd.read_csv(self.path+"/"+i, encoding='windows-1252')
+            df = self.readFile(self.path+"/"+i)
             li.append(df)
         frame = pd.concat(li, axis=0, ignore_index=True)
         frame.sort_values("Row ID", inplace = True)
@@ -125,7 +129,7 @@ class csvManager:
     def setRowAndColumn(self,Row,Col):
         #self.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
         
-        self.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
+        #self.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
         sortedDataByRow = self.setDimensionSort(Row)
         sortedDataByCol = self.setDimensionSort(Col)
         print(sortedDataByCol)
@@ -151,12 +155,12 @@ class csvManager:
             print("---LLL",list(i)[0])
             for j in l.tolist() :
                 #print(self.df.loc[j,["City"]].values)
-                s.loc[tuple(self.df.loc[j,Row].values),i] = "abc"
+                s.loc[self.df.loc[j,Row].values,i] = "abc"
             #print("--- si \n",self.df["Ship Mode"]=="Standard Class")
             #s.loc[tuple(i),tuple(i)] = "abc"
         #s.display
         print("-->s\n",s)
         return s
 
-ex = csvManager()
-ex.setRowAndColumn(["City"],["Ship Mode"])
+#ex = csvManager()
+#ex.setRowAndColumn(["City"],["Ship Mode"])

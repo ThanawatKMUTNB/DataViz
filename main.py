@@ -42,14 +42,20 @@ class TableModel2(QtCore.QAbstractTableModel):
     def columnCount(self, index):
         return self._data.shape[1]
 
-    '''def headerData(self, section, orientation, role): #show Header on column
+    def headerData(self, section, orientation, role): #show Header on column
         # section is the index of the column/row.
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal: #x
-                return self._data.columns[section]
-
+                if type(self._data.columns[section]) == tuple:
+                    colN =str(list(self._data.columns[section])[0])
+                else: colN = self._data.columns[section]
+                return colN
+                
             if orientation == Qt.Vertical: #y
-                return ''.join(self._data.index[section])'''
+                if type(self._data.index[section]) == tuple:
+                    indexN = str(list(self._data.index[section])[0])
+                else: indexN = self._data.index[section]
+                return indexN
                 
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data):
@@ -112,10 +118,16 @@ class Ui_MainWindow(object):
         Ui_MainWindow.retranslateUi(self, MainWindow)
         
     def updateList(self):
+        #self.__init__(MainWindow)
         itemsTextList =  [str(self.FileListChoose.item(i).text()) for i in range(self.FileListChoose.count())]
         self.selectFile = itemsTextList
         itemsTextList =  [str(self.FileList.item(i).text()) for i in range(self.FileList.count())]
         self.fileNameList = itemsTextList
+        self.RowChoose = []
+        self.ColChoose = []
+        if self.selectFile != []:
+            self.colHeader = cm.getHead()
+        else: self.colHeader = []
         self.dataSource()
         Ui_MainWindow.setupUi(self, MainWindow)
         
@@ -201,14 +213,20 @@ class Ui_MainWindow(object):
         #Ui_MainWindow.setupUi(self, MainWindow)
         
     def dataSource(self):
+        print(self.selectFile)
         if type(self.selectFile) != list:
             self.selectFile = [self.selectFile]
         if self.selectFile != [] :
             if len(self.selectFile)>1:
+                print("Union")
                 self.data = cm.unionFile(self.selectFile)
             else:
-                self.path = self.folderpath+"/"+self.selectFile[0]
+                print("Not Union")
+                cm.path =self.folderpath
+                cm.selectFile = self.selectFile[0] 
+                cm.setPath()
                 self.data = cm.getDataWithPandas()
+            #print(self.data)
 
     def dataSourceSort(self,dimension):
         self.data = cm.setAllDataByOneDimension(dimension)
