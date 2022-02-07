@@ -311,7 +311,7 @@ class Ui_MainWindow(object):
         fil = 'sum'
         for r , c in zip(row,col):
             if r in self.Measure:
-                c = alt.Chart(self.data).mark_bar().encode(
+                chart = alt.Chart(self.data).mark_bar().encode(
                     x=str(col[-1]+':N'),
                     y=str(fil+'('+row[0]+'):Q'),
                     tooltip = str(fil+'('+row[0]+'):Q'),
@@ -319,14 +319,14 @@ class Ui_MainWindow(object):
                 ).facet(column=str(col[0]+':N')
                 ).resolve_scale(x = 'independent')
             elif c in self.Measure:
-                c = alt.Chart(self.data).mark_bar().encode(
+                chart = alt.Chart(self.data).mark_bar().encode(
                     y=str(row[-1]+':N'),
                     x=str(fil+'('+col[0]+'):Q'),
                     tooltip = str(fil+'('+col[0]+'):Q'),
                     color=str(row[0]+':N')
                 ).facet(row=str(row[0]+':N')
                 ).resolve_scale(y = 'independent')
-        return c
+        return chart
 
     def setupUi(self, MainWindow):
         
