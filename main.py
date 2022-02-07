@@ -135,6 +135,7 @@ class Ui_MainWindow(object):
         self.RowChoose = []
         self.ColChoose = []
         self.dataSheet = ""
+        self.Chart = None
         #DimenForChoose = []
         self.setupUi(MainWindow)
                 
@@ -265,15 +266,18 @@ class Ui_MainWindow(object):
         if len(set(Col)) == 0 : 
             print("Row")
             self.sheetPageRow()
-            self.plotBarChart()
-            '''if Row[-1] in self.Measure:
-                self.MeasureChoose = Row[-1]'''
+            self.plotBar1Chart()
+            if Row[-1] in self.Measure:
+                self.MeasureChoose = Row[-1]
+                self.plotBarChart()
+                self.plotChart()
         elif len(set(Row)) == 0:
             print("Col") 
             self.sheetPageCol()
-            self.plotBarChart()
-            '''if Col[-1] in self.Measure:
-                self.MeasureChoose = Col[-1]'''
+            if Col[-1] in self.Measure:
+                self.MeasureChoose = Col[-1]
+                self.plotBarChart()
+                self.plotChart()
         else : 
             print("Row and Col")
             self.dataSheet = cm.setRowAndColumn(Row,Col)
@@ -336,13 +340,12 @@ class Ui_MainWindow(object):
 
         chart = alt.Chart(self.data).mark_line(point=True).encode(
         alt.X(colN),
-        alt.Y(rowN)#,
-        #tooltip = str(fil22+'('+Measua+'):Q') 
+        alt.Y(rowN)
         )
         return chart
-    def plotBar1Chart(self):
-        col = self.ColChoose
-        row = self.RowChoose
+    def plotBarChart(self):
+        col = ["Region","Segment"]
+        row = ["Sale"]
         fil = 'sum'
         for r , c in zip(row,col):
             if r in self.Measure:
@@ -350,12 +353,13 @@ class Ui_MainWindow(object):
                     x=str(col[-1]+':N'),
                     y=str(fil+'('+row[0]+'):Q')
                 ).resolve_scale(x = 'independent')
+                self.Chart = classmethod
             elif c in self.Measure:
                 chart = alt.Chart(self.data).mark_bar().encode(
                     y=str(row[-1]+':N'),
                     x=str(fil+'('+col[0]+'):Q')
                 ).resolve_scale(y = 'independent')
-        return chart
+                self.Chart = c
     
     def plotBar2Chart(self):
         col = self.ColChoose
@@ -370,6 +374,9 @@ class Ui_MainWindow(object):
                     color=str(col[0]+':N')
                 ).facet(column=str(col[0]+':N')
                 ).resolve_scale(x = 'independent')
+                self.Chart = c
+                self.plotChart()
+                break
             elif c in self.Measure:
                 chart = alt.Chart(self.data).mark_bar().encode(
                     y=str(row[-1]+':N'),
@@ -378,8 +385,9 @@ class Ui_MainWindow(object):
                     color=str(row[0]+':N')
                 ).facet(row=str(row[0]+':N')
                 ).resolve_scale(y = 'independent')
-        self.Chart = chart
-        self.plotChart()
+                self.Chart = c
+                self.plotChart()
+                break
         #return chart
 
     def setupUi(self, MainWindow):
