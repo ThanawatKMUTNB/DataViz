@@ -10,8 +10,12 @@ class csvManager:
         self.df = ""
     
     def setPath(self):
-        self.df = pd.read_csv(self.path+"/"+self.selectFile, encoding='windows-1252')
-
+        fileExtension = self.selectFile.split(".")
+        if fileExtension[-1] == "csv":
+            self.df = pd.read_csv(self.path+"/"+self.selectFile, encoding='windows-1252')
+        else:
+            self.df = pd.read_excel('Superstore(xlsx).xlsx', engine = "openpyxl")
+    
     def getHead(self):
        return list(self.df.columns)
 

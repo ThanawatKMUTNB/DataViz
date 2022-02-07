@@ -5,14 +5,17 @@ import numpy as np
 import pandas as pd
 import xlrd
 import openpyxl
+
 def getHead():
     df = pd.read_excel('Superstore.xlsx', engine = "openpyxl")
     #df = pd.read_excel(, index_col=0)
     return list(df.columns)
 
 def getDataWithPandas():
-    df = pd.read_excel('Superstore.xlsx', engine = "openpyxl")
+    df = pd.read_excel('Superstore(xlsx).xlsx', engine = "openpyxl")
     return df
+
+print(getDataWithPandas())
 
 def setAllDataByOneDimention(Dimention): #sort each column
     data = getDataWithPandas()
