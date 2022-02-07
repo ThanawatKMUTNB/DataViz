@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtChart import QChart, QChartView, QBarSet, QPercentBarSeries, QBarCategoryAxis, QLineSeries
 import numpy as np
 import pandas as pd
-from Altair_Graph.Bar_Chart import WebEngineView
+from Altair_Graph.Bar_Chart import Measure, WebEngineView
 import csvManager
 from PyQt5.QtGui import QPainter
 from PyQt5.QtCore import Qt, QPointF
@@ -280,6 +280,30 @@ class Ui_MainWindow(object):
         view.show()
         #MainWindow.setCentralWidget(view)
         #w.resize(640, 480)
+
+    def plotLineChart(self):
+        self.data['Order Date'] = pd.to_datetime(self.data['Order Date'],format='%d/%m/%Y')
+        self.data['Ship Date'] = pd.to_datetime(self.data['Ship Date'],format='%d/%m/%Y')
+        col = self.ColChoose[0]
+        row = self.RowChoose[0]
+        fil11 = 'month'
+        fil22 = 'sum'
+        if col in self.Measure:
+            colN = str(fil22+'('+col+'):Q')
+        else:
+            colN = str(fil11+'('+col+'):T')
+
+        if row in self.Measure:
+            rowN = str(fil22+'('+row+'):Q')
+        else:
+            rowN = str(fil11+'('+row+'):Q')
+
+        chart = alt.Chart(self.data).mark_line(point=True).encode(
+        alt.X(colN),
+        alt.Y(str(rowN)#,
+        #tooltip = str(fil22+'('+Measua+'):Q') 
+        )
+        return chart
     
     def setupUi(self, MainWindow):
         
