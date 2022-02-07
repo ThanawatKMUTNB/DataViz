@@ -352,12 +352,22 @@ class Ui_MainWindow(object):
                     x=str(col[-1]+':N'),
                     y=str(fil+'('+row[0]+'):Q')
                 ).resolve_scale(x = 'independent')
+                return chart
             elif c in self.Measure:
                 chart = alt.Chart(self.data).mark_bar().encode(
                     y=str(row[-1]+':N'),
                     x=str(fil+'('+col[0]+'):Q')
                 ).resolve_scale(y = 'independent')
-        return chart
+                return chart
+    
+    def exam(self):
+        c = alt.Chart(self.data).mark_bar().encode(
+            x=str('State:N'),
+            y=('median(Quantity):Q'),
+            color=str('Region:N')
+        ).facet(column=str('Region:N')
+        ).resolve_scale(x = 'independent')
+        return c
     
     def plotBar2Chart(self):
         col = self.ColChoose
@@ -372,6 +382,7 @@ class Ui_MainWindow(object):
                     color=str(col[0]+':N')
                 ).facet(column=str(col[0]+':N')
                 ).resolve_scale(x = 'independent')
+                return chart
             elif c in self.Measure:
                 chart = alt.Chart(self.data).mark_bar().encode(
                     y=str(row[-1]+':N'),
@@ -380,7 +391,7 @@ class Ui_MainWindow(object):
                     color=str(row[0]+':N')
                 ).facet(row=str(row[0]+':N')
                 ).resolve_scale(y = 'independent')
-        return chart
+                return chart
 
     def setupUi(self, MainWindow):
         
