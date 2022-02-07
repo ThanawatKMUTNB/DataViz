@@ -265,17 +265,15 @@ class Ui_MainWindow(object):
         if len(set(Col)) == 0 : 
             print("Row")
             self.sheetPageRow()
-            if Row[-1] in self.Measure:
-                self.MeasureChoose = Row[-1]
-                self.VerBar()
-                self.plotChart()
+            self.plotBarChart()
+            '''if Row[-1] in self.Measure:
+                self.MeasureChoose = Row[-1]'''
         elif len(set(Row)) == 0:
             print("Col") 
             self.sheetPageCol()
-            if Col[-1] in self.Measure:
-                self.MeasureChoose = Col[-1]
-                self.HonBar()
-                self.plotChart()
+            self.plotBarChart()
+            '''if Col[-1] in self.Measure:
+                self.MeasureChoose = Col[-1]'''
         else : 
             print("Row and Col")
             self.dataSheet = cm.setRowAndColumn(Row,Col)
@@ -364,7 +362,9 @@ class Ui_MainWindow(object):
                     color=str(row[0]+':N')
                 ).facet(row=str(row[0]+':N')
                 ).resolve_scale(y = 'independent')
-        return chart
+        self.Chart = chart
+        self.plotChart()
+        #return chart
 
     def setupUi(self, MainWindow):
         
