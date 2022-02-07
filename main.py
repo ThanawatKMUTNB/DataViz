@@ -266,18 +266,15 @@ class Ui_MainWindow(object):
         if len(set(Col)) == 0 : 
             print("Row")
             self.sheetPageRow()
-            self.plotBar1Chart()
             if Row[-1] in self.Measure:
                 self.MeasureChoose = Row[-1]
-                self.plotBarChart()
-                self.plotChart()
+                self.exam()
         elif len(set(Row)) == 0:
             print("Col") 
             self.sheetPageCol()
             if Col[-1] in self.Measure:
                 self.MeasureChoose = Col[-1]
-                self.plotBarChart()
-                self.plotChart()
+                self.exam()
         else : 
             print("Row and Col")
             self.dataSheet = cm.setRowAndColumn(Row,Col)
@@ -317,7 +314,7 @@ class Ui_MainWindow(object):
         #w.resize(640, 480)
     def plotChart(self):
         view = WebEngineView(self.tab_2)
-        view.setGeometry(QtCore.QRect(200, 90, 581, 401))
+        view.setGeometry(QtCore.QRect(200, 90, 581, 421))
         view.updateChart(self.Chart)
         view.show()
 
@@ -353,20 +350,13 @@ class Ui_MainWindow(object):
                     x=str(col[-1]+':N'),
                     y=str(fil+'('+row[0]+'):Q')
                 ).resolve_scale(x = 'independent')
-<<<<<<< HEAD
-                self.Chart = classmethod
-=======
-                return chart
->>>>>>> 8b35bdb116c04cf70cff80a93a5fdf91c993c351
+                self.Chart = chart
             elif c in self.Measure:
                 chart = alt.Chart(self.data).mark_bar().encode(
                     y=str(row[-1]+':N'),
                     x=str(fil+'('+col[0]+'):Q')
                 ).resolve_scale(y = 'independent')
-<<<<<<< HEAD
-                self.Chart = c
-=======
-                return chart
+                self.Chart = chart
     
     def exam(self):
         c = alt.Chart(self.data).mark_bar().encode(
@@ -377,7 +367,6 @@ class Ui_MainWindow(object):
         ).resolve_scale(x = 'independent')
         self.Chart = c
         self.plotChart()
->>>>>>> 8b35bdb116c04cf70cff80a93a5fdf91c993c351
     
     def plotBar2Chart(self):
         col = self.ColChoose
@@ -392,13 +381,9 @@ class Ui_MainWindow(object):
                     color=str(col[0]+':N')
                 ).facet(column=str(col[0]+':N')
                 ).resolve_scale(x = 'independent')
-<<<<<<< HEAD
                 self.Chart = c
                 self.plotChart()
                 break
-=======
-                return chart
->>>>>>> 8b35bdb116c04cf70cff80a93a5fdf91c993c351
             elif c in self.Measure:
                 chart = alt.Chart(self.data).mark_bar().encode(
                     y=str(row[-1]+':N'),
