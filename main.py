@@ -286,8 +286,9 @@ class Ui_MainWindow(object):
                 self.plotLineChart()
         else : 
             print("Row and Col")
-            self.dataSheet = cm.setRowAndColumn(Row,Col)
             self.plotLineChart()
+            self.dataSheet = cm.setRowAndColumn(Row,Col)
+            
     
     def VerBar(self):
         Measure = self.MeasureChoose
