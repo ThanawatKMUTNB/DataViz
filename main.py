@@ -12,7 +12,6 @@ import pandas as pd
 from io import StringIO
 from Altair_Graph.Bar_Chart import WebEngineView
 import csvManager
-from PyQt5.QtGui import QPainter
 from PyQt5.QtCore import Qt, QPointF
 from PyQt5 import QtCore, QtGui, QtWidgets , QtChart ,QtWebEngineWidgets
 from PyQt5.QtChart import QChart
@@ -149,7 +148,10 @@ class Ui_MainWindow(object):
         self.Chart = None
         #DimenForChoose = []
         self.setupUi(MainWindow)
-                
+    
+    def showText(self,item):
+        print("k")
+        
     def DropDup(self):
         itemsTextList =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
         self.RowChoose = itemsTextList
@@ -289,7 +291,7 @@ class Ui_MainWindow(object):
                 self.plotBarChart()
         else : 
             print("Row and Col")
-            self.plotLineChart()
+            #self.plotLineChart()
             self.dataSheet = cm.setRowAndColumn(Row,Col)
             
     
@@ -502,10 +504,15 @@ class Ui_MainWindow(object):
         
         self.table = QtWidgets.QTableView(self.tab)
         self.table.setGeometry(QtCore.QRect(190, 10, 591, 471))
+        self.table.horizontalHeader().setStretchLastSection(True)
+        self.table.verticalHeader().setStretchLastSection(True)
+        self.table.resizeColumnsToContents()
+        self.table.resizeRowsToContents()
         self.dataSource()
         if self.selectFile != [] : 
             self.model = TableModel(self.data)
             self.table.setModel(self.model)
+        self.table.clicked.connect(self.showText)
 
         self.selectFileLabel = QtWidgets.QLabel(self.tab)
         self.selectFileLabel.setGeometry(QtCore.QRect(10, 11, 131, 20))
@@ -678,7 +685,10 @@ class Ui_MainWindow(object):
         
         self.sheetTable = QtWidgets.QTableView(self.tab_2)
         self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))
-        
+        self.sheetTable.horizontalHeader().setStretchLastSection(True)
+        self.sheetTable.verticalHeader().setStretchLastSection(True)
+        self.sheetTable.resizeColumnsToContents()
+        self.sheetTable.resizeRowsToContents()
         '''self.sheetTableW = QtWidgets.QTableWidget(self.tab_2)
         self.sheetTableW.setGeometry(QtCore.QRect(200, 90, 581, 421))
         '''
