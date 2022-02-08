@@ -148,6 +148,8 @@ class Ui_MainWindow(object):
         self.Chart = None
         #DimenForChoose = []
         self.setupUi(MainWindow)
+    def getMeasual(self):
+        return self.Measure
     
     def showText(self,item):
         print("k")

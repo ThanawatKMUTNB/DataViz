@@ -2,6 +2,7 @@ from itertools import chain
 from re import S
 import numpy as np
 import pandas as pd
+import main as m
 #import mPageByCookie
 class csvManager:
     def __init__(self):
@@ -139,40 +140,47 @@ class csvManager:
             if i not in tmp:
                 tmp.append(i)
         return len(tmp)
-
+    Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
     def setRowAndColumn(self,Row,Col):
-        #self.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
-        #self.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
-        '''baseList = self.setDimensionSort(list(set(Row+Col))).drop_duplicates()
-        baseList[" "] = "abc"'''
-        #print(Row,Col)
-        rowList = self.getDataWithPandasByHead(Row)
-        colList = self.getDataWithPandasByHead(Col)
-        #colList.sort_values()
-        '''for i in allChoose:
-            allChoose.count(i)'''
-        results = pd.concat([rowList, colList], axis=1,ignore_index=True)
-        results[" "] = "abc"
-        results = results.sort_values(by=results.columns.tolist())
-        #print(len(results))
-        #print(sorted(set(results["City"])))
-        results = results.drop_duplicates()
-        cl = results[results.iloc[:][:]=="Ann Arbor"].index.tolist()
-        #print(cl)
-        '''for i in cl:
-            print(results[3][i])'''
-        '''l = str(list(results.columns[len(Row):-1]))
-        p = l.strip('][').split(', ')'''
-        #print(p)
-        #print(len(Row))
-        
-        k = results.pivot(results.columns[len(Row):-1].tolist(),results.columns[:len(Row)].tolist())
-        k = k.replace(np.nan, '')
-        #print(len(k.columns))
+        isInterRow = list(set.intersection(set(Row),set(self.Measure)))
+        isInterCol = list(set.intersection(set(Col),set(self.Measure)))
+        print(isInterRow,isInterCol)
+        if isInterRow == [] and isInterCol == []:
+            rowList = self.getDataWithPandasByHead(Row)
+            colList = self.getDataWithPandasByHead(Col)
+            results = pd.concat([rowList, colList], axis=1,ignore_index=True)
+            results[" "] = "abc"
+            results = results.sort_values(by=results.columns.tolist())
+            results = results.drop_duplicates()
+            k = results.pivot(results.columns[len(Row):-1].tolist(),results.columns[:len(Row)].tolist())
+            k = k.replace(np.nan, '')
+            #print(k.T)
+        else:
+            if isInterRow != []:
+                for i in isInterRow:
+                    Row.remove(i)
+                intersec = isInterRow
+            else:
+                for i in isInterCol:
+                    Col.remove(i)
+                intersec = isInterCol
+            rowList = self.getDataWithPandasByHead(Row)
+            colList = self.getDataWithPandasByHead(Col+intersec)
+            DiList = self.getDataWithPandasByHead(intersec)
+            results = pd.concat([rowList, colList], axis=1,ignore_index=True)
+            #results = results.sort_values(by=results.columns.tolist())
+            #results = results.drop_duplicates()
+            print(results)
+            colNum = results.columns.tolist()
+            beforMesual = (-1)*len(intersec)
+            print("-----------",colNum[beforMesual:])
+            k = pd.pivot_table(results,values = colNum[beforMesual:],index = colNum[len(Row):beforMesual], columns= colNum[:len(Row)],aggfunc=np.sum,fill_value='')
+            k = k.round(0)
+            #k = k.replace(np.nan, 0)
         print(k.T)
         return k.T
-
 '''ex = csvManager()
 ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
+#ex.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
 #ex.setDimensionSort(["Region","Segment","Region","Region"])
-ex.setRowAndColumn(["Region","Segment","Region","Region"],["Ship Mode"])'''
+ex.setRowAndColumn(["Region","Region","Segment"],["Region","Sales"])'''
