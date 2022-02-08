@@ -154,6 +154,7 @@ class csvManager:
             results = results.drop_duplicates()
             k = results.pivot(results.columns[len(Row):-1].tolist(),results.columns[:len(Row)].tolist())
             k = k.replace(np.nan, '')
+            k = k.T
             #print(k.T)
         else:
             if isInterRow != []:
@@ -168,19 +169,24 @@ class csvManager:
             colList = self.getDataWithPandasByHead(Col+intersec)
             DiList = self.getDataWithPandasByHead(intersec)
             results = pd.concat([rowList, colList], axis=1,ignore_index=True)
-            #results = results.sort_values(by=results.columns.tolist())
+            results = results.sort_values(by=results.columns.tolist())
             #results = results.drop_duplicates()
             print(results)
             colNum = results.columns.tolist()
             beforMesual = (-1)*len(intersec)
-            print("-----------",colNum[beforMesual:])
-            k = pd.pivot_table(results,values = colNum[beforMesual:],index = colNum[len(Row):beforMesual], columns= colNum[:len(Row)],aggfunc=np.sum,fill_value='')
-            k = k.round(0)
+            #print("-----------",colNum[beforMesual:])
+            if isInterRow != []:
+                k = pd.pivot_table(results,index = colNum[len(Row):beforMesual], columns= colNum[:len(Row)],values = colNum[beforMesual:],aggfunc=np.sum,fill_value='')
+                k = k.round(0)
+                k=k.T
+            else:
+                k = pd.pivot_table(results,columns = colNum[len(Row):beforMesual], index= colNum[:len(Row)],values = colNum[beforMesual:],aggfunc=np.sum)
+                k = k.round(0)
             #k = k.replace(np.nan, 0)
-        print(k.T)
-        return k.T
+        print(k)
+        return k
 '''ex = csvManager()
 ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
 #ex.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
 #ex.setDimensionSort(["Region","Segment","Region","Region"])
-ex.setRowAndColumn(["Region","Region","Segment"],["Region","Sales"])'''
+ex.setRowAndColumn(["Region","Region","Segment","Sales","Profit"],["Region"])'''
