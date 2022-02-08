@@ -127,13 +127,35 @@ class csvManager:
         return len(tmp)
 
     def setRowAndColumn(self,Row,Col):
-        #self.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
-        baseList = self.setDimensionSort(list(set(Row+Col))).drop_duplicates()
-        baseList[" "] = "abc"
-        k = pd.pivot(baseList, values=[" "], index=Row,columns=Col)
-        k = k.replace(np.nan, '', regex=True)
-        print(k)
-        return k
+        #self.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
+        #self.df = pd.read_csv("SS_100lines.csv", encoding='windows-1252')
+        '''baseList = self.setDimensionSort(list(set(Row+Col))).drop_duplicates()
+        baseList[" "] = "abc"'''
+        rowList = self.setDimensionSort(list(set(Row)))
+        colList = self.setDimensionSort(list(set(Col)))
+        #colList.sort_values()
+        '''for i in allChoose:
+            allChoose.count(i)'''
+        results = pd.concat([rowList, colList], axis=1,ignore_index=True)
+        results[" "] = "abc"
+        results = results.sort_values(by=results.columns.tolist())
+        #print(len(results))
+        #print(sorted(set(results["City"])))
+        results = results.drop_duplicates()
+        cl = results[results.iloc[:][:]=="Ann Arbor"].index.tolist()
+        #print(cl)
+        '''for i in cl:
+            print(results[3][i])'''
+        '''l = str(list(results.columns[len(Row):-1]))
+        p = l.strip('][').split(', ')'''
+        #print(p)
+        #print(len(Row))
+        
+        k = results.pivot(results.columns[len(Row):-1].tolist(),results.columns[:len(Row)].tolist())
+        k = k.replace(np.nan, '')
+        #print(len(k.columns))
+        #print(k.T)
+        return k.T
 
 #ex = csvManager()
-#ex.setRowAndColumn(["Segment","Region"],["Ship Mode","City"])
+#ex.setRowAndColumn(["Segment"],["Region","Ship Mode","City"])

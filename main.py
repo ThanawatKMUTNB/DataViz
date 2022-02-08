@@ -89,13 +89,15 @@ class TableModel2(QtCore.QAbstractTableModel):
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal: #x
                 if type(self._data.columns[section]) == tuple:
-                    colN =str(list(self._data.columns[section])[-1])
+                    colN =list(self._data.columns[section])
+                    colN = "\n".join(colN)
                 else: colN = str(self._data.columns[section])
                 return colN
                 
             if orientation == Qt.Vertical: #y
                 if type(self._data.index[section]) == tuple:
-                    indexN = str(list(self._data.index[section])[-1])
+                    indexN = list(self._data.index[section])
+                    indexN = "\n".join(indexN)
                 else: indexN = str(self._data.index[section])
                 return indexN
                 
