@@ -28,7 +28,7 @@ class csvManager:
         return self.df
 
     def getDataWithPandasByHead(self,head):
-        print(head)
+        #print(head)
         return self.df[head]
 
     def getAxisYName(self,Dimension):
@@ -67,8 +67,28 @@ class csvManager:
         return new
 
     def setDimensionSort(self,Dimension):
-        sortedData = self.getDataWithPandasByHead(Dimension)
-        new = sortedData.sort_values(by=Dimension)
+        if len(Dimension) == len(set(Dimension)):
+            sortedData = self.getDataWithPandasByHead(Dimension)
+            #print(sortedData)
+            new = sortedData.sort_values(by=Dimension)
+        else:
+            sortedData = None
+            dflist = []
+            dflistdup = []
+            for i in Dimension:
+                if i not in dflist:
+                    dflist.append(i)
+                    sortedData = self.getDataWithPandasByHead(dflist)
+                    sortedData = sortedData.sort_values(by=dflist)
+                    #print("---",sortedData.loc[:,sortedData.columns[-1]])
+                else:
+                    #print(pd.DataFrame({i:sortedData[i]}))
+                    dflistdup.append([len(dflist),pd.DataFrame({i:sortedData[i]})])
+            for i in dflistdup:
+                tmp = i[1]
+                sortedData.insert(i[0], tmp.columns[-1] ,tmp.loc[:,tmp.columns[-1]],allow_duplicates=True)
+            new = sortedData
+        #print(new)
         return new
 
     def getMeasure(self):
@@ -121,7 +141,7 @@ class csvManager:
         return len(tmp)
 
     def setRowAndColumn(self,Row,Col):
-        self.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
+        #self.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
         #self.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
         '''baseList = self.setDimensionSort(list(set(Row+Col))).drop_duplicates()
         baseList[" "] = "abc"'''
@@ -152,5 +172,7 @@ class csvManager:
         print(k.T)
         return k.T
 
-ex = csvManager()
-ex.setRowAndColumn(["Segment","Region","Region"],["Ship Mode"])
+'''ex = csvManager()
+ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
+#ex.setDimensionSort(["Region","Segment","Region","Region"])
+ex.setRowAndColumn(["Region","Segment","Region","Region"],["Ship Mode"])'''
