@@ -287,14 +287,9 @@ class Ui_MainWindow(object):
                 self.plotBarChart()
         else : 
             print("Row and Col")
-<<<<<<< HEAD
             self.plotLineChart()
             self.dataSheet = cm.setRowAndColumn(Row,Col)
             
-=======
-            self.dataSheet = cm.setRowAndColumn(Row,Col)
-            #self.plotLineChart()
->>>>>>> cf58cd009610dd6b51a6d6f044135baf80678701
     
     def VerBar(self):
         Measure = self.MeasureChoose
@@ -334,51 +329,7 @@ class Ui_MainWindow(object):
         view.setGeometry(QtCore.QRect(200, 90, 581, 421))
         view.updateChart(self.Chart)
         view.show()
-
-    def plotLineChart(self):
-        self.data['Order Date'] = pd.to_datetime(self.data['Order Date'],format='%d/%m/%Y')
-        self.data['Ship Date'] = pd.to_datetime(self.data['Ship Date'],format='%d/%m/%Y')
-        col = self.ColChoose[0]
-        row = self.RowChoose[0]
-        fil11 = 'month'
-        fil22 = 'sum'
-        if col in self.Measure:
-            colN = str(fil22+'('+col+'):Q')
-        else:
-            colN = str(fil11+'('+col+'):T')
-
-        if row in self.Measure:
-            rowN = str(fil22+'('+row+'):Q')
-        else:
-            rowN = str(fil11+'('+row+'):T')
-
-        chart = alt.Chart(self.data).mark_line(point=True).encode(
-        alt.X(colN),
-        alt.Y(rowN)
-        )
-        self.Chart = chart
-        self.plotChart()
-
-    def plotBarChart(self):
-        col = ["Region","Segment"]
-        row = ["Sale"]
-        fil = 'sum'
-        for r , c in zip(row,col):
-            if r in self.Measure:
-                chart = alt.Chart(self.data).mark_bar().encode(
-                    x=str(col[-1]+':N'),
-                    y=str(fil+'('+row[0]+'):Q')
-                ).resolve_scale(x = 'independent')
-                self.Chart = chart
-                self.plotChart()
-            elif c in self.Measure:
-                chart = alt.Chart(self.data).mark_bar().encode(
-                    y=str(row[-1]+':N'),
-                    x=str(fil+'('+col[0]+'):Q')
-                ).resolve_scale(y = 'independent')
-                self.Chart = chart
-                self.plotChart()
-    
+   
     def exam(self):
         c = alt.Chart(self.data).mark_bar().encode(
             x=str('State:N'),
@@ -389,34 +340,6 @@ class Ui_MainWindow(object):
         self.Chart = c
         self.plotChart()
     
-    def plotBar2Chart(self):
-        col = self.ColChoose
-        row = self.RowChoose
-        fil = 'sum'
-        for r , c in zip(row,col):
-            if r in self.Measure:
-                chart = alt.Chart(self.data).mark_bar().encode(
-                    x=str(col[-1]+':N'),
-                    y=str(fil+'('+row[0]+'):Q'),
-                    tooltip = str(fil+'('+row[0]+'):Q'),
-                    color=str(col[0]+':N')
-                ).facet(column=str(col[0]+':N')
-                ).resolve_scale(x = 'independent')
-                self.Chart = c
-                self.plotChart()
-                break
-            elif c in self.Measure:
-                chart = alt.Chart(self.data).mark_bar().encode(
-                    y=str(row[-1]+':N'),
-                    x=str(fil+'('+col[0]+'):Q'),
-                    tooltip = str(fil+'('+col[0]+'):Q'),
-                    color=str(row[0]+':N')
-                ).facet(row=str(row[0]+':N')
-                ).resolve_scale(y = 'independent')
-                self.Chart = c
-                self.plotChart()
-                break
-        #return chart
 
     def setupUi(self, MainWindow):
         
