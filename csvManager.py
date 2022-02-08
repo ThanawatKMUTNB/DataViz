@@ -68,13 +68,7 @@ class csvManager:
 
     def setDimensionSort(self,Dimension):
         sortedData = self.getDataWithPandasByHead(Dimension)
-        #print(sortedData)
-        #print(Dimension)
         new = sortedData.sort_values(by=Dimension)
-        #new.set_index([Dimension[0]])
-        #new[''] = pd.Series("abc", index=new.index)
-        #print("---------",new)
-        pd.MultiIndex.from_frame(new)
         return new
 
     def getMeasure(self):
@@ -127,12 +121,13 @@ class csvManager:
         return len(tmp)
 
     def setRowAndColumn(self,Row,Col):
-        #self.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
-        #self.df = pd.read_csv("SS_100lines.csv", encoding='windows-1252')
+        self.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
+        #self.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
         '''baseList = self.setDimensionSort(list(set(Row+Col))).drop_duplicates()
         baseList[" "] = "abc"'''
-        rowList = self.setDimensionSort(list(set(Row)))
-        colList = self.setDimensionSort(list(set(Col)))
+        #print(Row,Col)
+        rowList = self.getDataWithPandasByHead(Row)
+        colList = self.getDataWithPandasByHead(Col)
         #colList.sort_values()
         '''for i in allChoose:
             allChoose.count(i)'''
@@ -154,8 +149,8 @@ class csvManager:
         k = results.pivot(results.columns[len(Row):-1].tolist(),results.columns[:len(Row)].tolist())
         k = k.replace(np.nan, '')
         #print(len(k.columns))
-        #print(k.T)
+        print(k.T)
         return k.T
 
-#ex = csvManager()
-#ex.setRowAndColumn(["Segment"],["Region","Ship Mode","City"])
+ex = csvManager()
+ex.setRowAndColumn(["Segment","Region","Region"],["Ship Mode"])
