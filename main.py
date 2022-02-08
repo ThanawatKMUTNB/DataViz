@@ -201,7 +201,7 @@ class Ui_MainWindow(object):
         cm.path = self.folderpath
         cm.selectFile = self.selectFile
         cm.setPath()
-        #print(cm.df)
+        #print(cm.self.data)
         self.colHeader = cm.getHead()
         for i in self.Measure:
             if i in self.colHeader:
@@ -289,8 +289,9 @@ class Ui_MainWindow(object):
                 self.plotBarChart()
         else : 
             print("Row and Col")
+            self.plotLineChart()
             self.dataSheet = cm.setRowAndColumn(Row,Col)
-            #self.plotLineChart()
+            
     
     def VerBar(self):
         Measure = self.MeasureChoose
@@ -330,51 +331,7 @@ class Ui_MainWindow(object):
         view.setGeometry(QtCore.QRect(200, 90, 581, 421))
         view.updateChart(self.Chart)
         view.show()
-
-    def plotLineChart(self):
-        self.data['Order Date'] = pd.to_datetime(self.data['Order Date'],format='%d/%m/%Y')
-        self.data['Ship Date'] = pd.to_datetime(self.data['Ship Date'],format='%d/%m/%Y')
-        col = self.ColChoose[0]
-        row = self.RowChoose[0]
-        fil11 = 'month'
-        fil22 = 'sum'
-        if col in self.Measure:
-            colN = str(fil22+'('+col+'):Q')
-        else:
-            colN = str(fil11+'('+col+'):T')
-
-        if row in self.Measure:
-            rowN = str(fil22+'('+row+'):Q')
-        else:
-            rowN = str(fil11+'('+row+'):T')
-
-        chart = alt.Chart(self.data).mark_line(point=True).encode(
-        alt.X(colN),
-        alt.Y(rowN)
-        )
-        self.Chart = chart
-        self.plotChart()
-
-    def plotBarChart(self):
-        col = ["Region","Segment"]
-        row = ["Sale"]
-        fil = 'sum'
-        for r , c in zip(row,col):
-            if r in self.Measure:
-                chart = alt.Chart(self.data).mark_bar().encode(
-                    x=str(col[-1]+':N'),
-                    y=str(fil+'('+row[0]+'):Q')
-                ).resolve_scale(x = 'independent')
-                self.Chart = chart
-                self.plotChart()
-            elif c in self.Measure:
-                chart = alt.Chart(self.data).mark_bar().encode(
-                    y=str(row[-1]+':N'),
-                    x=str(fil+'('+col[0]+'):Q')
-                ).resolve_scale(y = 'independent')
-                self.Chart = chart
-                self.plotChart()
-    
+   
     def exam(self):
         c = alt.Chart(self.data).mark_bar().encode(
             x=str('State:N'),
@@ -384,35 +341,150 @@ class Ui_MainWindow(object):
         ).resolve_scale(x = 'independent')
         self.Chart = c
         self.plotChart()
-    
-    def plotBar2Chart(self):
-        col = self.ColChoose
+
+    def plotBar(self):
         row = self.RowChoose
-        fil = 'sum'
-        for r , c in zip(row,col):
-            if r in self.Measure:
-                chart = alt.Chart(self.data).mark_bar().encode(
-                    x=str(col[-1]+':N'),
-                    y=str(fil+'('+row[0]+'):Q'),
-                    tooltip = str(fil+'('+row[0]+'):Q'),
-                    color=str(col[0]+':N')
-                ).facet(column=str(col[0]+':N')
+        column = self.ColChoose
+        fil = 'sum'                            ###sum
+        fd = 'month'                            ###month
+        if len(column) == 1 and len(row) == 1:
+            if row[0] in self.Measure:
+                sy = str(fil+'('+row[0]+'):Q')
+                st = sy
+            else:
+                if self.data[row[0]].dtypes == 'datetime64[ns]':
+                    #fd = 'month' 
+                    sy = str(fd+'('+row[0]+'):T')
+                else:
+                    sy = str(row[0]+':N')
+            if column[0] in self.Measure:
+                sx = str(fil+'('+column[0]+'):Q')
+                st = sx
+            else:
+                if self.data[column[0]].dtypes == 'datetime64[ns]':
+                    #fd = 'month' 
+                    sx = str(fd+'('+column[0]+'):T')
+                else:
+                    sx = str(column[0]+':N')
+
+            c = alt.Chart(self.data).mark_bar().encode(
+                x=sx,
+                y=sy,
+                tooltip = st
+            ).resolve_scale(x = 'independent',y = 'independent')
+            self.Chart = c
+            self.plotChart()
+        else:
+            if len(column) > 1 and len(column) <= 2:
+                Di = column
+                Me = row
+                if self.data[Di[0]].dtypes == 'datetime64[ns]':
+                    scol = str(fd+'('+Di[0]+'):T')
+                    sx = str(Di[-1]+':N')
+                elif self.data[Di[-1]].dtypes == 'datetime64[ns]':
+                    scol = str(Di[0]+':N')
+                    sx = str(fd+'('+Di[-1]+'):T')
+                else:
+                    scol = str(Di[0]+':N')
+                    sx = str(Di[-1]+':N')
+
+                c = alt.Chart(self.data).mark_bar().encode(
+                    x=sx,
+                    y=str(fil+'('+Me[0]+'):Q'),
+                    color=scol,
+                    tooltip = str(fil+'('+Me[0]+'):Q')
+                ).facet(column=scol
                 ).resolve_scale(x = 'independent')
                 self.Chart = c
                 self.plotChart()
-                break
-            elif c in self.Measure:
-                chart = alt.Chart(self.data).mark_bar().encode(
-                    y=str(row[-1]+':N'),
-                    x=str(fil+'('+col[0]+'):Q'),
-                    tooltip = str(fil+'('+col[0]+'):Q'),
-                    color=str(row[0]+':N')
-                ).facet(row=str(row[0]+':N')
+
+            elif len(row) > 1 and len(row) <= 2:
+                Di = row
+                Me = column
+                if self.data[Di[0]].dtypes == 'datetime64[ns]':            #year,date error (large data)
+                    srow = str(fd+'('+Di[0]+'):T')
+                    sy = str(Di[-1]+':N')
+                    #print(srow)
+                    #print(sy)
+                elif self.data[Di[-1]].dtypes == 'datetime64[ns]':
+                    srow = str(Di[0]+':N')
+                    sy = str(fd+'('+Di[-1]+'):T')
+                else:
+                    srow = str(Di[0]+':N')
+                    sy = str(Di[-1]+':N')
+
+                c = alt.Chart(self.data).mark_bar().encode(
+                    x=str(fil+'('+Me[0]+'):Q'),
+                    y=sy,
+                    color=srow,
+                    tooltip = str(fil+'('+Me[0]+'):Q')
+                ).facet(row=srow
                 ).resolve_scale(y = 'independent')
                 self.Chart = c
                 self.plotChart()
-                break
-        #return chart
+            else:
+                return 'Pls enter 1 or 2 Dimension'
+            
+    def plotLine(self):
+        row = self.RowChoose
+        column = self.ColChoose
+        if not (len(column) == 1 and len(row) == 1):
+            return
+        fil = 'sum'                                        ###sum
+        fd = 'month'                                        ###month
+        if self.data[row[0]].dtypes == 'datetime64[ns]':
+            Di = row[0]
+            Me = column[0]
+            c = alt.Chart(self.data).mark_line(point=True).encode(
+                alt.X(str(fil+'('+Me+'):Q')),
+                alt.Y(str(fd+'('+Di+'):T')),
+                tooltip = str(fil+'('+Me+'):Q')
+            )
+            self.Chart = c
+            self.plotChart()
+
+        elif self.data[column[0]].dtypes == 'datetime64[ns]':
+            Me = row[0]
+            Di = column[0]
+            c = alt.Chart(self.data).mark_line(point=True).encode(
+                alt.X(str(fd+'('+Di+'):T')),
+                alt.Y(str(fil+'('+Me+'):Q')),
+                tooltip = str(fil+'('+Me+'):Q')
+            )
+            self.Chart = c
+            self.plotChart()
+        else:
+            return
+
+    def plotPie(self):
+        row = self.RowChoose
+        column = self.ColChoose
+        if not (len(column) == 1 and len(row) == 1):
+            return
+        fil = 'sum'                                       ####sum
+        fd = 'year'                                       ####year
+        if row[0] in self.Measure:
+            Mes = row[0]
+            Di = column[0]
+        elif column[0] in self.Measure:
+            Mes = column[0]
+            Di = row[0]
+
+        if self.data[Di].dtypes == 'datetime64[ns]':
+            s = str(fd+'('+Di+'):T')
+        else:
+            s = str(Di+':N')
+
+        base = alt.Chart(self.data).encode(
+            theta=alt.Theta(str(fil+'('+Mes+'):Q')), 
+            color=alt.Color(s, type="nominal"), 
+            tooltip = str(fil+'('+Mes+'):Q')
+        )
+
+        pie = base.mark_arc(outerRadius=120)
+        self.Chart = pie
+        self.plotChart()
+    
 
     def setupUi(self, MainWindow):
         
