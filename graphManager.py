@@ -1,6 +1,8 @@
 import altair as alt
 from altair import pipe, limit_rows, to_values
 import altair_viewer
+import pandas as pd
+
 t = lambda data: pipe(data, limit_rows(max_rows=10000), to_values)
 alt.data_transformers.register('custom', t)
 alt.data_transformers.enable('custom')
@@ -8,14 +10,35 @@ alt.data_transformers.disable_max_rows()
 altair_viewer._global_viewer._use_bundled_js = False
 alt.data_transformers.enable('data_server')
 
+'''df = pd.read_csv('Superstore.csv', encoding='windows-1252')
+df['Order Date'] = pd.to_datetime(df['Order Date'],format='%d/%m/%Y')
+df['Ship Date'] = pd.to_datetime(df['Ship Date'],format='%d/%m/%Y')'''
+
 class graphManager(object):
 
     def __init__(self):
-        self.data = None
+        self.df = None
         self.Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
         self.RowChoose = []
         self.ColChoose = []
         self.Chart = None
+
+    def filterDate(self,Dimension,typ): #Date inly
+
+        self.df[Dimension] = pd.to_datetime(self.df['Order Date'],format='%d/%m/%Y')
+        
+        if typ == 'year':
+            s = str(Dimension+' year')
+            self.df[s] = self.df[Dimension].dt.year
+            return self.df[s]
+        elif typ == 'month':
+            s = str(Dimension+' month')
+            self.df[s] = self.df[Dimension].dt.month
+            return self.df[s]
+        elif typ == 'day':
+            s = str(Dimension+' day')
+            self.df[s] = self.df[Dimension].dt.day
+            return self.df[s]
 
     def plotBar(self):
         row = self.RowChoose
@@ -27,7 +50,7 @@ class graphManager(object):
                 sy = str(fil+'('+row[0]+'):Q')
                 st = sy
             else:
-                if self.data[row[0]].dtypes == 'datetime64[ns]':
+                if self.df[row[0]].dtypes == 'datetime64[ns]':
                     #fd = 'month' 
                     sy = str(fd+'('+row[0]+'):T')
                 else:
@@ -36,13 +59,13 @@ class graphManager(object):
                 sx = str(fil+'('+column[0]+'):Q')
                 st = sx
             else:
-                if self.data[column[0]].dtypes == 'datetime64[ns]':
+                if self.df[column[0]].dtypes == 'datetime64[ns]':
                     #fd = 'month' 
                     sx = str(fd+'('+column[0]+'):T')
                 else:
                     sx = str(column[0]+':N')
 
-            c = alt.Chart(self.data).mark_bar().encode(
+            c = alt.Chart(self.df).mark_bar().encode(
                 x=sx,
                 y=sy,
                 tooltip = st
@@ -53,17 +76,17 @@ class graphManager(object):
             if len(column) > 1 and len(column) <= 2:
                 Di = column
                 Me = row
-                if self.data[Di[0]].dtypes == 'datetime64[ns]':
+                if self.df[Di[0]].dtypes == 'datetime64[ns]':
                     scol = str(fd+'('+Di[0]+'):T')
                     sx = str(Di[-1]+':N')
-                elif self.data[Di[-1]].dtypes == 'datetime64[ns]':
+                elif self.df[Di[-1]].dtypes == 'datetime64[ns]':
                     scol = str(Di[0]+':N')
                     sx = str(fd+'('+Di[-1]+'):T')
                 else:
                     scol = str(Di[0]+':N')
                     sx = str(Di[-1]+':N')
 
-                c = alt.Chart(self.data).mark_bar().encode(
+                c = alt.Chart(self.df).mark_bar().encode(
                     x=sx,
                     y=str(fil+'('+Me[0]+'):Q'),
                     color=scol,
@@ -76,19 +99,19 @@ class graphManager(object):
             elif len(row) > 1 and len(row) <= 2:
                 Di = row
                 Me = column
-                if self.data[Di[0]].dtypes == 'datetime64[ns]':            #year,date error (large data)
+                if self.df[Di[0]].dtypes == 'datetime64[ns]':            #year,date error (large data)
                     srow = str(fd+'('+Di[0]+'):T')
                     sy = str(Di[-1]+':N')
                     #print(srow)
                     #print(sy)
-                elif self.data[Di[-1]].dtypes == 'datetime64[ns]':
+                elif self.df[Di[-1]].dtypes == 'datetime64[ns]':
                     srow = str(Di[0]+':N')
                     sy = str(fd+'('+Di[-1]+'):T')
                 else:
                     srow = str(Di[0]+':N')
                     sy = str(Di[-1]+':N')
 
-                c = alt.Chart(self.data).mark_bar().encode(
+                c = alt.Chart(self.df).mark_bar().encode(
                     x=str(fil+'('+Me[0]+'):Q'),
                     y=sy,
                     color=srow,
@@ -107,10 +130,10 @@ class graphManager(object):
             return
         fil = 'sum'                                        ###sum
         fd = 'month'                                        ###month
-        if self.data[row[0]].dtypes == 'datetime64[ns]':
+        if self.df[row[0]].dtypes == 'datetime64[ns]':
             Di = row[0]
             Me = column[0]
-            c = alt.Chart(self.data).mark_line(point=True).encode(
+            c = alt.Chart(self.df).mark_line(point=True).encode(
                 alt.X(str(fil+'('+Me+'):Q')),
                 alt.Y(str(fd+'('+Di+'):T')),
                 tooltip = str(fil+'('+Me+'):Q')
@@ -118,10 +141,10 @@ class graphManager(object):
             self.Chart = c
             #self.plotChart()
 
-        elif self.data[column[0]].dtypes == 'datetime64[ns]':
+        elif self.df[column[0]].dtypes == 'datetime64[ns]':
             Me = row[0]
             Di = column[0]
-            c = alt.Chart(self.data).mark_line(point=True).encode(
+            c = alt.Chart(self.df).mark_line(point=True).encode(
                 alt.X(str(fd+'('+Di+'):T')),
                 alt.Y(str(fil+'('+Me+'):Q')),
                 tooltip = str(fil+'('+Me+'):Q')
@@ -145,12 +168,12 @@ class graphManager(object):
             Mes = column[0]
             Di = row[0]
 
-        if self.data[Di].dtypes == 'datetime64[ns]':
+        if self.df[Di].dtypes == 'datetime64[ns]':
             s = str(fd+'('+Di+'):T')
         else:
             s = str(Di+':N')
 
-        base = alt.Chart(self.data).encode(
+        base = alt.Chart(self.df).encode(
             theta=alt.Theta(str(fil+'('+Mes+'):Q')), 
             color=alt.Color(s, type="nominal"), 
             tooltip = str(fil+'('+Mes+'):Q')
