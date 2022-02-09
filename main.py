@@ -23,6 +23,8 @@ from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBa
 #from qgis.PyQt.QtWidgets import QVBoxLayout
 from altair import pipe, limit_rows, to_values
 import altair_viewer
+import graphManager 
+
 t = lambda data: pipe(data, limit_rows(max_rows=10000), to_values)
 alt.data_transformers.register('custom', t)
 alt.data_transformers.enable('custom')
@@ -231,34 +233,48 @@ class Ui_MainWindow(object):
             Col = self.ColList.currentRow()
             self.ColList.takeItem(Col)
             self.plot()
-            
+        
     def plot(self):
         tmp = []
         tmp =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
+        tmp3 =  [str(self.RowList3.item(i).text()) for i in range(self.RowList3.count())]
         self.RowChoose = tmp
         tmp = [] 
         tmp =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
+        tmp3 =  [str(self.ColList3.item(i).text()) for i in range(self.ColList3.count())]
         self.ColChoose = tmp
+        
+        while (self.RowChoose.count('')):
+            self.RowChoose.remove('')
+        while (self.ColChoose.count('')):
+            self.ColChoose.remove('')
+            
         isInterRow = list(set.intersection(set(self.RowChoose),set(self.Measure)))
         isInterCol = list(set.intersection(set(self.ColChoose),set(self.Measure)))
-        if isInterRow != [] and isInterCol != []:
-            for i in isInterRow:
-                self.RowChoose.remove(i)
-            self.ColChoose = self.ColChoose + isInterRow
-            self.RowList.addItems(self.RowChoose)
-            self.ColList.addItems(self.ColChoose)
-            #self.setupUi(MainWindow)
-            self.plot()
+        print("--------",self.RowChoose,self.ColChoose)
             
+        if isInterRow != [] or isInterCol != []:
+            gm = graphManager.graphManager()
+            '''for i in isInterRow:
+                self.RowChoose.remove(i)
+            self.ColChoose = self.ColChoose + isInterRow'''
+            gm.setList(self.RowChoose,self.ColChoose,self.data)
+            self.Chart = gm.exam()
+                #self.RowList.addItems(self.RowChoose)
+                #self.ColList.addItems(self.ColChoose)
+                #self.tab3(MainWindow)
+        self.tab2(MainWindow)
+        self.tab3(MainWindow)
         if self.ColChoose != [] or self.RowChoose != [] :
             #print(self.dataSheet)
             self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
             self.model = TableModel2(self.dataSheet)
             self.sheetTable.setModel(self.model)
+        
         if self.ColChoose == [] and self.RowChoose == [] :
             self.sheetTable.reset()
             self.sheetTable.setModel(None)
-        
+            
     def dataSource(self):
         #print(self.selectFile)
         if type(self.selectFile) != list:
@@ -278,10 +294,9 @@ class Ui_MainWindow(object):
     def dataSourceSort(self,dimension):
         self.data = cm.setAllDataByOneDimension(dimension)
         
-    def sheetPageRow(self):
+    '''def sheetPageRow(self):
         self.dataSheet = cm.setDimensionSort(self.RowChoose)
         self.dataSheet=self.dataSheet.drop_duplicates()
-        print()
         if self.RowChoose[-1] not in self.Measure :
             self.dataSheet[" "] = "abc"
         else:
@@ -291,7 +306,7 @@ class Ui_MainWindow(object):
         tmp = cm.setDimensionSort(self.ColChoose)
         tmp = tmp.drop_duplicates()
         tmp[" "] = "abc"
-        self.dataSheet = tmp.T
+        self.dataSheet = tmp.T'''
     
     MeasureChoose = ""
     def sheetPageRowAndCol(self,Row,Col):
@@ -318,201 +333,13 @@ class Ui_MainWindow(object):
             #self.plotLineChart()'''
         if Row!=[] or Col!=[]:
             self.dataSheet = cm.setRowAndColumn(Row,Col)
-            
-    
-    def VerBar(self):
-        Measure = self.MeasureChoose
-        Di1 = self.RowChoose[0]
-        Di2 = 'State'
-        c = alt.Chart(self.data).mark_bar().encode(
-        x=str(Di1+':N'),
-        y=str(Measure+':Q')
-        ).facet(row=str(Di1+':N')
-        )
-        self.Chart = c
-    
-        '''view = WebEngineView(self.tab_2)
-        view.setGeometry(QtCore.QRect(200, 90, 581, 421))
-        view.updateChart(c)
-        view.show()'''
-    
-    def HonBar(self):
-        Measure = self.MeasureChoose
-        Di1 = self.ColChoose[0]
-        Di2 = 'State'
-        c = alt.Chart(self.data).mark_bar().encode(
-        y=str(Di1+':N'),
-        x=str(Measure+':Q')
-        ).facet(column=str(Di1+':N')
-        ).resolve_scale(y = 'independent')
-        self.Chart = c
 
-        '''view = WebEngineView(self.tab_2)
-        view.setGeometry(QtCore.QRect(200, 90, 581, 401))
-        view.updateChart(c)
-        view.show()'''
-        #MainWindow.setCentralWidget(view)
-        #w.resize(640, 480)
-    def plotChart(self):
-        view = WebEngineView(self.tab_3)
-        view.setGeometry(QtCore.QRect(200, 90, 581, 421))
-        view.updateChart(self.Chart)
-        view.show()
-   
-    def exam(self):
-        c = alt.Chart(self.data).mark_bar().encode(
-            x=str('State:N'),
-            y=('median(Quantity):Q'),
-            color=str('Region:N')
-        ).facet(column=str('Region:N')
-        ).resolve_scale(x = 'independent')
-        self.Chart = c
-        self.plotChart()
-
-    def plotBar(self):
-        row = self.RowChoose
-        column = self.ColChoose
-        fil = 'sum'                            ###sum
-        fd = 'month'                            ###month
-        if len(column) == 1 and len(row) == 1:
-            if row[0] in self.Measure:
-                sy = str(fil+'('+row[0]+'):Q')
-                st = sy
-            else:
-                if self.data[row[0]].dtypes == 'datetime64[ns]':
-                    #fd = 'month' 
-                    sy = str(fd+'('+row[0]+'):T')
-                else:
-                    sy = str(row[0]+':N')
-            if column[0] in self.Measure:
-                sx = str(fil+'('+column[0]+'):Q')
-                st = sx
-            else:
-                if self.data[column[0]].dtypes == 'datetime64[ns]':
-                    #fd = 'month' 
-                    sx = str(fd+'('+column[0]+'):T')
-                else:
-                    sx = str(column[0]+':N')
-
-            c = alt.Chart(self.data).mark_bar().encode(
-                x=sx,
-                y=sy,
-                tooltip = st
-            ).resolve_scale(x = 'independent',y = 'independent')
-            self.Chart = c
-            self.plotChart()
-        else:
-            if len(column) > 1 and len(column) <= 2:
-                Di = column
-                Me = row
-                if self.data[Di[0]].dtypes == 'datetime64[ns]':
-                    scol = str(fd+'('+Di[0]+'):T')
-                    sx = str(Di[-1]+':N')
-                elif self.data[Di[-1]].dtypes == 'datetime64[ns]':
-                    scol = str(Di[0]+':N')
-                    sx = str(fd+'('+Di[-1]+'):T')
-                else:
-                    scol = str(Di[0]+':N')
-                    sx = str(Di[-1]+':N')
-
-                c = alt.Chart(self.data).mark_bar().encode(
-                    x=sx,
-                    y=str(fil+'('+Me[0]+'):Q'),
-                    color=scol,
-                    tooltip = str(fil+'('+Me[0]+'):Q')
-                ).facet(column=scol
-                ).resolve_scale(x = 'independent')
-                self.Chart = c
-                self.plotChart()
-
-            elif len(row) > 1 and len(row) <= 2:
-                Di = row
-                Me = column
-                if self.data[Di[0]].dtypes == 'datetime64[ns]':            #year,date error (large data)
-                    srow = str(fd+'('+Di[0]+'):T')
-                    sy = str(Di[-1]+':N')
-                    #print(srow)
-                    #print(sy)
-                elif self.data[Di[-1]].dtypes == 'datetime64[ns]':
-                    srow = str(Di[0]+':N')
-                    sy = str(fd+'('+Di[-1]+'):T')
-                else:
-                    srow = str(Di[0]+':N')
-                    sy = str(Di[-1]+':N')
-
-                c = alt.Chart(self.data).mark_bar().encode(
-                    x=str(fil+'('+Me[0]+'):Q'),
-                    y=sy,
-                    color=srow,
-                    tooltip = str(fil+'('+Me[0]+'):Q')
-                ).facet(row=srow
-                ).resolve_scale(y = 'independent')
-                self.Chart = c
-                self.plotChart()
-            else:
-                return 'Pls enter 1 or 2 Dimension'
-            
-    def plotLine(self):
-        row = self.RowChoose
-        column = self.ColChoose
-        if not (len(column) == 1 and len(row) == 1):
-            return
-        fil = 'sum'                                        ###sum
-        fd = 'month'                                        ###month
-        if self.data[row[0]].dtypes == 'datetime64[ns]':
-            Di = row[0]
-            Me = column[0]
-            c = alt.Chart(self.data).mark_line(point=True).encode(
-                alt.X(str(fil+'('+Me+'):Q')),
-                alt.Y(str(fd+'('+Di+'):T')),
-                tooltip = str(fil+'('+Me+'):Q')
-            )
-            self.Chart = c
-            self.plotChart()
-
-        elif self.data[column[0]].dtypes == 'datetime64[ns]':
-            Me = row[0]
-            Di = column[0]
-            c = alt.Chart(self.data).mark_line(point=True).encode(
-                alt.X(str(fd+'('+Di+'):T')),
-                alt.Y(str(fil+'('+Me+'):Q')),
-                tooltip = str(fil+'('+Me+'):Q')
-            )
-            self.Chart = c
-            self.plotChart()
-        else:
-            return
-
-    def plotPie(self):
-        row = self.RowChoose
-        column = self.ColChoose
-        if not (len(column) == 1 and len(row) == 1):
-            return
-        fil = 'sum'                                       ####sum
-        fd = 'year'                                       ####year
-        if row[0] in self.Measure:
-            Mes = row[0]
-            Di = column[0]
-        elif column[0] in self.Measure:
-            Mes = column[0]
-            Di = row[0]
-
-        if self.data[Di].dtypes == 'datetime64[ns]':
-            s = str(fd+'('+Di+'):T')
-        else:
-            s = str(Di+':N')
-
-        base = alt.Chart(self.data).encode(
-            theta=alt.Theta(str(fil+'('+Mes+'):Q')), 
-            color=alt.Color(s, type="nominal"), 
-            tooltip = str(fil+'('+Mes+'):Q')
-        )
-
-        pie = base.mark_arc(outerRadius=120)
-        self.Chart = pie
-        self.plotChart()
-    
-
+    def on_header_doubleClicked(self,index):
+        #headCur = index
+        self.data = cm.setAllDataByOneDimension(self.colHeader[index])
+        self.model = TableModel(self.data)
+        self.table.setModel(self.model)
+        
     def setupUi(self, MainWindow):
         
         MainWindow.setObjectName("MainWindow")
@@ -537,7 +364,9 @@ class Ui_MainWindow(object):
         if self.selectFile != [] : 
             self.model = TableModel(self.data)
             self.table.setModel(self.model)
-        self.table.clicked.connect(self.showText)
+        #self.table.clicked.connect(self.on_header_doubleClicked)
+        self.table.horizontalHeader().sectionClicked.connect(self.on_header_doubleClicked)
+
 
         self.selectFileLabel = QtWidgets.QLabel(self.tab)
         self.selectFileLabel.setGeometry(QtCore.QRect(10, 11, 131, 20))
@@ -667,12 +496,13 @@ class Ui_MainWindow(object):
         self.RowList.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.RowList.setFlow(QtWidgets.QListView.LeftToRight)
         self.RowList.setObjectName("RowList")
-        for i in range(len(self.RowChoose)):
+        self.RowList.itemDoubleClicked.connect(self.RowDelect)
+        '''for i in range(len(self.RowChoose)):
             item = QtWidgets.QListWidgetItem()
             self.RowList.addItem(item)
             #self.RowList.setModel(self.RowListW)
         self.RowList.itemDoubleClicked.connect(self.RowDelect)
-        #self.RowList.clicked.connect(self.DropDup)
+        #self.RowList.clicked.connect(self.DropDup)'''
         
         self.RowLabel = QtWidgets.QLabel(self.tab_2)
         self.RowLabel.setGeometry(QtCore.QRect(200, 10, 61, 31))
@@ -703,10 +533,11 @@ class Ui_MainWindow(object):
         self.ColList.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.ColList.setFlow(QtWidgets.QListView.LeftToRight)
         self.ColList.setObjectName("ColList")
-        for i in range(len(self.ColChoose)):
+        self.ColList.itemDoubleClicked.connect(self.RowDelect)
+        '''for i in range(len(self.ColChoose)):
             item = QtWidgets.QListWidgetItem()
             self.ColList.addItem(item)
-        self.ColList.itemDoubleClicked.connect(self.ColDelect)
+        self.ColList.itemDoubleClicked.connect(self.ColDelect)'''
         
         self.sheetTable = QtWidgets.QTableView(self.tab_2)
         self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))
@@ -790,12 +621,13 @@ class Ui_MainWindow(object):
         self.RowList3.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.RowList3.setFlow(QtWidgets.QListView.LeftToRight)
         self.RowList3.setObjectName("RowList3")
-        for i in range(len(self.RowChoose)):
+        #self.RowList3.itemDoubleClicked.connect(self.RowDelect)
+        '''for i in range(len(self.RowChoose)):
             item = QtWidgets.QListWidgetItem()
             self.RowList3.addItem(item)
             #self.RowList3.setModel(self.RowList3W)
         self.RowList3.itemDoubleClicked.connect(self.RowDelect)
-        #self.RowList3.clicked.connect(self.DropDup)
+        #self.RowList3.clicked.connect(self.DropDup)'''
         
         self.RowLabel3 = QtWidgets.QLabel(self.tab_3)
         self.RowLabel3.setGeometry(QtCore.QRect(200, 10, 61, 31))
@@ -826,7 +658,8 @@ class Ui_MainWindow(object):
         self.ColList3.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.ColList3.setFlow(QtWidgets.QListView.LeftToRight)
         self.ColList3.setObjectName("ColList3")
-        for i in range(len(self.ColChoose)):
+        #self.ColList3.itemDoubleClicked.connect(self.RowDelect)
+        '''for i in range(len(self.ColChoose)):
             item = QtWidgets.QListWidgetItem()
             self.ColList3.addItem(item)
         self.ColList3.itemDoubleClicked.connect(self.ColDelect)
@@ -834,7 +667,7 @@ class Ui_MainWindow(object):
         view = WebEngineView(self.tab_3)
         view.setGeometry(QtCore.QRect(200, 90, 581, 421))
         #view.updateChart(self.Chart)
-        view.show()
+        view.show()'''
         
         self.plotButton3 = QtWidgets.QPushButton(self.tab_3)
         self.plotButton3.setGeometry(QtCore.QRect(730, 510, 41, 31))
@@ -903,25 +736,19 @@ class Ui_MainWindow(object):
             item.setText(_translate("MainWindow", str(j)))
         self.FileListMes.setSortingEnabled(__sortingEnabled)
         
-        print(self.ColChoose,self.RowChoose)
-        
-        for i,j in zip(range(len(self.ColChoose)),self.ColChoose):
-            item = self.ColList.item(i)
-            item.setText(_translate("MainWindow", str(j)))
-        
-        for i,j in zip(range(len(self.RowChoose)),self.RowChoose):
-            item = self.RowList.item(i)
-            item.setText(_translate("MainWindow", str(j)))
-        
         self.ColLabel.setText(_translate("MainWindow", "Column"))
         self.RowLabel.setText(_translate("MainWindow", "Row"))
-        
+        #self.ColDell.setText(_translate("MainWindow", "DEL"))
+        #self.RowDell.setText(_translate("MainWindow", "DEL"))
+        self.plotButton.setText(_translate("MainWindow", "PLOT"))
+        #TAB3
+        self.ColLabel3.setText(_translate("MainWindow", "Column"))
+        self.RowLabel3.setText(_translate("MainWindow", "Row"))
         #self.ColDell.setText(_translate("MainWindow", "DEL"))
         #self.RowDell.setText(_translate("MainWindow", "DEL"))
                     
-        self.plotButton.setText(_translate("MainWindow", "PLOT"))
+        self.plotButton3.setText(_translate("MainWindow", "PLOT"))
         
-        #tab 3
         self.DimensionValuesLabel3.setText(_translate("MainWindow", "Dimension"))
         __sortingEnabled = self.FileListDimension3.isSortingEnabled()
         for i,j in zip(range(len(self.colHeader)),self.colHeader):
@@ -939,6 +766,73 @@ class Ui_MainWindow(object):
             item.setText(_translate("MainWindow", str(j)))
         self.FileListMes3.setSortingEnabled(__sortingEnabled)
         
+    def tab2(self,MainWindow):
+        for i in range(len(self.RowChoose)):
+            item = QtWidgets.QListWidgetItem()
+            self.RowList.addItem(item)
+            #self.RowList3.setModel(self.RowList3W)
+        self.RowList3.itemDoubleClicked.connect(self.RowDelect)
+        #self.RowList3.clicked.connect(self.DropDup)
+        
+        for i in range(len(self.ColChoose)):
+            item = QtWidgets.QListWidgetItem()
+            self.ColList.addItem(item)
+        self.ColList3.itemDoubleClicked.connect(self.ColDelect)
+        
+        '''self.dataSource()
+        if self.selectFile != [] : 
+            self.model = TableModel(self.data)
+            self.table.setModel(self.model)
+        self.table.clicked.connect(self.showText)
+        
+        view = WebEngineView(self.tab_2)
+        view.setGeometry(QtCore.QRect(200, 90, 581, 421))
+        #view.updateChart(self.Chart)
+        view.show()'''
+        
+        #tab 2
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        
+        for i,j in zip(range(len(self.ColChoose)),self.ColChoose):
+            item = self.ColList.item(i)
+            item.setText(_translate("MainWindow", str(j)))
+        
+        for i,j in zip(range(len(self.RowChoose)),self.RowChoose):
+            item = self.RowList.item(i)
+            item.setText(_translate("MainWindow", str(j)))
+
+    def tab3(self,MainWindow):
+        
+        t = lambda data: pipe(data, limit_rows(max_rows=10000), to_values)
+        alt.data_transformers.register('custom', t)
+        alt.data_transformers.enable('custom')
+        alt.data_transformers.disable_max_rows()
+        altair_viewer._global_viewer._use_bundled_js = False
+        alt.data_transformers.enable('data_server')
+
+        for i in range(len(self.RowChoose)):
+            item = QtWidgets.QListWidgetItem()
+            self.RowList3.addItem(item)
+            #self.RowList3.setModel(self.RowList3W)
+        #self.RowList3.itemDoubleClicked.connect(self.RowDelect)
+        
+        for i in range(len(self.ColChoose)):
+            item = QtWidgets.QListWidgetItem()
+            self.ColList3.addItem(item)
+        #self.ColList3.itemDoubleClicked.connect(self.ColDelect)
+        
+        view = WebEngineView(self.tab_3)
+        view.setGeometry(QtCore.QRect(200, 90, 581, 421))
+        if self.Chart != None :
+            print("Chart not none")
+            view.updateChart(self.Chart)
+        view.show()
+        
+        #tab 3
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        
         for i,j in zip(range(len(self.ColChoose)),self.ColChoose):
             item = self.ColList3.item(i)
             item.setText(_translate("MainWindow", str(j)))
@@ -947,14 +841,6 @@ class Ui_MainWindow(object):
             item = self.RowList3.item(i)
             item.setText(_translate("MainWindow", str(j)))
         
-        self.ColLabel3.setText(_translate("MainWindow", "Column"))
-        self.RowLabel3.setText(_translate("MainWindow", "Row"))
-        
-        #self.ColDell.setText(_translate("MainWindow", "DEL"))
-        #self.RowDell.setText(_translate("MainWindow", "DEL"))
-                    
-        self.plotButton3.setText(_translate("MainWindow", "PLOT"))
-
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)

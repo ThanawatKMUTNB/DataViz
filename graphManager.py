@@ -14,15 +14,20 @@ alt.data_transformers.enable('data_server')
 df['Order Date'] = pd.to_datetime(df['Order Date'],format='%d/%m/%Y')
 df['Ship Date'] = pd.to_datetime(df['Ship Date'],format='%d/%m/%Y')'''
 
-class graphManager(object):
+class graphManager():
 
     def __init__(self):
         self.df = None
         self.Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
         self.RowChoose = []
         self.ColChoose = []
-        self.Chart = None
+        #self.Chart = None
 
+    def setList(self,row,col,dataSheet):
+        self.RowChoose = row
+        self.ColChoose = col
+        self.df = dataSheet
+    
     def filterDate(self,Dimension,typ): #Date inly
 
         self.df[Dimension] = pd.to_datetime(self.df['Order Date'],format='%d/%m/%Y')
@@ -122,7 +127,18 @@ class graphManager(object):
                 #self.plotChart()
             else:
                 return 'Pls enter 1 or 2 Dimension'
-            
+    
+    def exam(self):
+        print(self.RowChoose,self.ColChoose)
+        #print(self.df)
+        c = alt.Chart(self.df).mark_bar().encode(
+            x=str(self.RowChoose[0]),
+            y=str(self.ColChoose[0]),
+            #color=str(self.RowChoose[0]+':N')
+        ).facet(column=str(self.RowChoose[0]+':N')
+        ).resolve_scale(x = 'independent')
+        return c
+    
     def plotLine(self):
         row = self.RowChoose
         column = self.ColChoose
