@@ -2,7 +2,6 @@ from itertools import chain
 from re import S
 import numpy as np
 import pandas as pd
-import main as m
 #import mPageByCookie
 class csvManager:
     def __init__(self):
@@ -17,6 +16,7 @@ class csvManager:
         fileExtension = path.split(".")
         if fileExtension[-1] == "csv":
             df = pd.read_csv(path, encoding='windows-1252')
+            
         else:
             #print(fileExtension[-1])
             df = pd.read_excel(path, engine = "openpyxl")
@@ -29,7 +29,6 @@ class csvManager:
         return self.df
 
     def getDataWithPandasByHead(self,head):
-        #print(head)
         return self.df[head]
 
     def getAxisYName(self,Dimension):
@@ -68,28 +67,14 @@ class csvManager:
         return new
 
     def setDimensionSort(self,Dimension):
-        if len(Dimension) == len(set(Dimension)):
-            sortedData = self.getDataWithPandasByHead(Dimension)
-            #print(sortedData)
-            new = sortedData.sort_values(by=Dimension)
-        else:
-            sortedData = None
-            dflist = []
-            dflistdup = []
-            for i in Dimension:
-                if i not in dflist:
-                    dflist.append(i)
-                    sortedData = self.getDataWithPandasByHead(dflist)
-                    sortedData = sortedData.sort_values(by=dflist)
-                    #print("---",sortedData.loc[:,sortedData.columns[-1]])
-                else:
-                    #print(pd.DataFrame({i:sortedData[i]}))
-                    dflistdup.append([len(dflist),pd.DataFrame({i:sortedData[i]})])
-            for i in dflistdup:
-                tmp = i[1]
-                sortedData.insert(i[0], tmp.columns[-1] ,tmp.loc[:,tmp.columns[-1]],allow_duplicates=True)
-            new = sortedData
-        #print(new)
+        sortedData = self.getDataWithPandasByHead(Dimension)
+        #print(sortedData)
+        #print(Dimension)
+        new = sortedData.sort_values(by=Dimension)
+        #new.set_index([Dimension[0]])
+        #new[''] = pd.Series("abc", index=new.index)
+        #print("---------",new)
+        pd.MultiIndex.from_frame(new)
         return new
 
     def getMeasure(self):
@@ -124,8 +109,10 @@ class csvManager:
             df = self.readFile(self.path+"/"+i)
             li.append(df)
         frame = pd.concat(li, axis=0, ignore_index=True)
-        frame.sort_values("Row ID", inplace = True)
-        frame.drop_duplicates(inplace=True)
+        #frame.sort_values("Row ID", inplace = True)
+
+        ##############################################
+        frame.drop_duplicates(inplace= True) #delete same data
         self.df = frame
         return self.df
         
@@ -140,7 +127,7 @@ class csvManager:
             if i not in tmp:
                 tmp.append(i)
         return len(tmp)
-    Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
+
     def setRowAndColumn(self,Row,Col):
         isInterRow = list(set.intersection(set(Row),set(self.Measure)))
         isInterCol = list(set.intersection(set(Col),set(self.Measure)))
