@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from io import StringIO
 from Altair_Graph.Bar_Chart import WebEngineView
-import csvManager
+import csvManager as cmpage
 from PyQt5.QtCore import Qt, QPointF
 from PyQt5 import QtCore, QtGui, QtWidgets , QtChart ,QtWebEngineWidgets
 from PyQt5.QtChart import QChart
@@ -30,7 +30,7 @@ alt.data_transformers.disable_max_rows()
 altair_viewer._global_viewer._use_bundled_js = False
 alt.data_transformers.enable('data_server')
 
-cm = csvManager.csvManager()
+cm = cmpage.csvManager()
 class WebEngineView(QtWebEngineWidgets.QWebEngineView):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -216,11 +216,13 @@ class Ui_MainWindow(object):
         if len(self.RowChoose) != 0:
             row = self.RowList.currentRow()
             self.RowList.takeItem(row)
+            #self.plot()
             
     def ColDelect(self,item):
         if len(self.ColChoose) != 0:
             Col = self.ColList.currentRow()
             self.ColList.takeItem(Col)
+            #self.plot()
             
     def plot(self):
         tmp = []

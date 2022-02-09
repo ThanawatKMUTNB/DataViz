@@ -144,7 +144,7 @@ class csvManager:
     def setRowAndColumn(self,Row,Col):
         isInterRow = list(set.intersection(set(Row),set(self.Measure)))
         isInterCol = list(set.intersection(set(Col),set(self.Measure)))
-        print(isInterRow,isInterCol)
+        #print(isInterRow,isInterCol)
         if isInterRow == [] and isInterCol == []:
             rowList = self.getDataWithPandasByHead(Row)
             colList = self.getDataWithPandasByHead(Col)
@@ -167,24 +167,29 @@ class csvManager:
                 intersec = isInterCol
             rowList = self.getDataWithPandasByHead(Row)
             colList = self.getDataWithPandasByHead(Col+intersec)
-            DiList = self.getDataWithPandasByHead(intersec)
+            #DiList = self.getDataWithPandasByHead(intersec)
             results = pd.concat([rowList, colList], axis=1,ignore_index=True)
             results = results.sort_values(by=results.columns.tolist())
             #results = results.drop_duplicates()
-            print(results)
+            #print(intersec)
+            #print(results)
+            #print(results)
             colNum = results.columns.tolist()
             beforMesual = (-1)*len(intersec)
+            '''DiList = results.groupby(colNum[:beforMesual])[colNum[beforMesual:]].sum()
+            print(DiList)'''
             #print("-----------",colNum[beforMesual:])
             if isInterRow != []:
-                k = pd.pivot_table(results,index = colNum[len(Row):beforMesual], columns= colNum[:len(Row)],values = colNum[beforMesual:],aggfunc=np.sum,fill_value='')
+                k = pd.pivot_table(results,index = colNum[len(Row):beforMesual], columns = colNum[:len(Row)],values = colNum[beforMesual:],aggfunc=np.sum)
                 k = k.round(0)
                 k=k.T
             else:
                 k = pd.pivot_table(results,columns = colNum[len(Row):beforMesual], index= colNum[:len(Row)],values = colNum[beforMesual:],aggfunc=np.sum)
                 k = k.round(0)
-            #k = k.replace(np.nan, 0)
-        print(k)
+            k = k.replace(np.nan, '')
+        #print(k)
         return k
+    
 '''ex = csvManager()
 ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
 #ex.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
