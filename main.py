@@ -101,7 +101,7 @@ class TableModel2(QtCore.QAbstractTableModel):
             if orientation == Qt.Vertical: #y
                 if type(self._data.index[section]) == tuple:
                     head = self._data.index.names
-                    print(self._data.index)
+                    #print(self._data.index)
                     head = [ "%s" % x for x in list(head) ]
                     #print("Row",head)
                     if len(head) > 1 :head = ["\\".join(head)]
@@ -298,13 +298,13 @@ class Ui_MainWindow(object):
             self.sheetPageRow()
             if Row[-1] in self.Measure:
                 self.MeasureChoose = Row[-1]
-                self.plotBarChart()
+                #self.plotBarChart()
         elif len(set(Row)) == 0:
             print("Col") 
             self.sheetPageCol()
             if Col[-1] in self.Measure:
                 self.MeasureChoose = Col[-1]
-                self.plotBarChart()
+                #self.plotBarChart()
         else : 
             print("Row and Col")
             #self.plotLineChart()
@@ -345,7 +345,7 @@ class Ui_MainWindow(object):
         #MainWindow.setCentralWidget(view)
         #w.resize(640, 480)
     def plotChart(self):
-        view = WebEngineView(self.tab_2)
+        view = WebEngineView(self.tab_3)
         view.setGeometry(QtCore.QRect(200, 90, 581, 421))
         view.updateChart(self.Chart)
         view.show()
@@ -702,7 +702,7 @@ class Ui_MainWindow(object):
         self.sheetTable = QtWidgets.QTableView(self.tab_2)
         self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))
         self.sheetTable.horizontalHeader().setStretchLastSection(True)
-        self.sheetTable.verticalHeader().setStretchLastSection(True).setTextAlignment(Qt.AlignRight)
+        self.sheetTable.verticalHeader().setStretchLastSection(True)
         self.sheetTable.resizeColumnsToContents()
         self.sheetTable.resizeRowsToContents()
         '''self.sheetTableW = QtWidgets.QTableWidget(self.tab_2)
@@ -714,6 +714,125 @@ class Ui_MainWindow(object):
         self.plotButton.clicked.connect(self.plot)
             
         self.tabWidget.addTab(self.tab_2, "Sheet")
+        
+        #Tab3
+        self.tab_3 = QtWidgets.QWidget()
+        self.tab_3.setObjectName("tab_3")
+        
+        self.ColLabel3 = QtWidgets.QLabel(self.tab_3)
+        self.ColLabel3.setGeometry(QtCore.QRect(200, 55, 61, 21))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.ColLabel3.setFont(font)
+        self.ColLabel3.setObjectName("ColLabel")
+        
+        self.DimensionValuesLabel3 = QtWidgets.QLabel(self.tab_3)
+        self.DimensionValuesLabel3.setGeometry(QtCore.QRect(13, 16, 161, 21))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.DimensionValuesLabel3.setFont(font)
+        self.DimensionValuesLabel3.setObjectName("DimensionValuesLabel")
+        
+        self.FileListDimension3 = QtWidgets.QListWidget(self.tab_3)
+        self.FileListDimension3.setGeometry(QtCore.QRect(10, 40, 181, 291))
+        self.FileListDimension3.setAcceptDrops(True)
+        self.FileListDimension3.setDragEnabled(True)
+        self.FileListDimension3.setDragDropMode(QtWidgets.QAbstractItemView.DragOnly)
+        self.FileListDimension3.setDefaultDropAction(QtCore.Qt.CopyAction)
+        self.FileListDimension3.setWordWrap(True)
+        self.FileListDimension3.setObjectName("FileList")
+        for i in range(len(self.colHeader)):
+            item = QtWidgets.QListWidgetItem()
+            self.FileListDimension3.addItem(item)
+        self.FileListDimension3.clicked.connect(self.DropDup)
+        
+        self.MeasureValuesLabel3 = QtWidgets.QLabel(self.tab_3)
+        self.MeasureValuesLabel3.setGeometry(QtCore.QRect(10, 337, 161, 21))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.MeasureValuesLabel3.setFont(font)
+        self.MeasureValuesLabel3.setObjectName("MeasureValuesLabel")
+        
+        self.FileListMes3 = QtWidgets.QListWidget(self.tab_3)
+        self.FileListMes3.setGeometry(QtCore.QRect(10, 360, 181, 151))
+        self.FileListMes3.setAcceptDrops(True)
+        self.FileListMes3.setDragEnabled(True)
+        self.FileListMes3.setDragDropMode(QtWidgets.QAbstractItemView.DragOnly)
+        self.FileListMes3.setDragDropOverwriteMode(True)
+        self.FileListMes3.setDefaultDropAction(QtCore.Qt.CopyAction)
+        self.FileListMes3.setWordWrap(True)
+        self.FileListMes3.setObjectName("FileListMes")
+        for i in range(len(self.Measure)):
+            item = QtWidgets.QListWidgetItem()
+            self.FileListMes3.addItem(item)
+        self.FileListDimension3.clicked.connect(self.DropDup)
+        
+        self.RowList3 = QtWidgets.QListWidget(self.tab_3)
+        #self.RowList3W = RowList3Widget()
+        #self.RowList3W.setGeometry(QtCore.QRect(260, 10, 491, 31))
+        self.RowList3.setGeometry(QtCore.QRect(260, 10, 491, 31))
+        self.RowList3.setAcceptDrops(True)
+        self.RowList3.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.RowList3.setAutoFillBackground(True)
+        self.RowList3.setDragEnabled(True)
+        self.RowList3.setDragDropOverwriteMode(True)
+        self.RowList3.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.RowList3.setDefaultDropAction(QtCore.Qt.MoveAction)
+        self.RowList3.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.RowList3.setFlow(QtWidgets.QListView.LeftToRight)
+        self.RowList3.setObjectName("RowList3")
+        for i in range(len(self.RowChoose)):
+            item = QtWidgets.QListWidgetItem()
+            self.RowList3.addItem(item)
+            #self.RowList3.setModel(self.RowList3W)
+        self.RowList3.itemDoubleClicked.connect(self.RowDelect)
+        #self.RowList3.clicked.connect(self.DropDup)
+        
+        self.RowLabel3 = QtWidgets.QLabel(self.tab_3)
+        self.RowLabel3.setGeometry(QtCore.QRect(200, 10, 61, 31))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.RowLabel3.setFont(font)
+        self.RowLabel3.setObjectName("RowLabel3")
+        
+        '''self.ColDell = QtWidgets.QPushButton(self.tab_3)
+        self.ColDell.setGeometry(QtCore.QRect(750, 50, 31, 31))
+        self.ColDell.setObjectName("ColDell")
+        self.ColDell.clicked.connect(self.ColDelect)
+        
+        self.RowDell = QtWidgets.QPushButton(self.tab_3)
+        self.RowDell.setGeometry(QtCore.QRect(750, 10, 31, 31))
+        self.RowDell.setObjectName("RowDell")
+        self.RowDell.clicked.connect(self.RowDelect)'''
+        
+        self.ColList3 = QtWidgets.QListWidget(self.tab_3)
+        self.ColList3.setGeometry(QtCore.QRect(260, 50, 491, 31))
+        self.ColList3.setAcceptDrops(True)
+        self.ColList3.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.ColList3.setAutoFillBackground(True)
+        self.ColList3.setDragEnabled(True)
+        self.ColList3.setDragDropOverwriteMode(True)
+        self.ColList3.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.ColList3.setDefaultDropAction(QtCore.Qt.MoveAction)
+        self.ColList3.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.ColList3.setFlow(QtWidgets.QListView.LeftToRight)
+        self.ColList3.setObjectName("ColList3")
+        for i in range(len(self.ColChoose)):
+            item = QtWidgets.QListWidgetItem()
+            self.ColList3.addItem(item)
+        self.ColList3.itemDoubleClicked.connect(self.ColDelect)
+        
+        view = WebEngineView(self.tab_3)
+        view.setGeometry(QtCore.QRect(200, 90, 581, 421))
+        #view.updateChart(self.Chart)
+        view.show()
+        
+        self.plotButton3 = QtWidgets.QPushButton(self.tab_3)
+        self.plotButton3.setGeometry(QtCore.QRect(730, 510, 41, 31))
+        self.plotButton3.setObjectName("plotButton3")
+        self.plotButton3.clicked.connect(self.plot)
+            
+        self.tabWidget.addTab(self.tab_3, "Chart")
         
         MainWindow.setCentralWidget(self.centralwidget)
         self.retranslateUi(MainWindow)
@@ -790,6 +909,40 @@ class Ui_MainWindow(object):
         #self.RowDell.setText(_translate("MainWindow", "DEL"))
                     
         self.plotButton.setText(_translate("MainWindow", "PLOT"))
+        
+        #tab 3
+        self.DimensionValuesLabel3.setText(_translate("MainWindow", "Dimension"))
+        __sortingEnabled = self.FileListDimension3.isSortingEnabled()
+        for i,j in zip(range(len(self.colHeader)),self.colHeader):
+            item = self.FileListDimension3.item(i)
+            item.setText(_translate("MainWindow", str(j)))
+        self.FileListDimension3.setSortingEnabled(__sortingEnabled)
+        
+        self.MeasureValuesLabel3.setText(_translate("MainWindow", "Measure Values"))
+        
+        self.FileListMes3.setSortingEnabled(True)
+        __sortingEnabled = self.FileListMes3.isSortingEnabled()
+        self.FileListMes3.setSortingEnabled(False)
+        for i,j in zip(range(len(self.Measure)),self.Measure):
+            item = self.FileListMes3.item(i)
+            item.setText(_translate("MainWindow", str(j)))
+        self.FileListMes3.setSortingEnabled(__sortingEnabled)
+        
+        for i,j in zip(range(len(self.ColChoose)),self.ColChoose):
+            item = self.ColList3.item(i)
+            item.setText(_translate("MainWindow", str(j)))
+        
+        for i,j in zip(range(len(self.RowChoose)),self.RowChoose):
+            item = self.RowList3.item(i)
+            item.setText(_translate("MainWindow", str(j)))
+        
+        self.ColLabel3.setText(_translate("MainWindow", "Column"))
+        self.RowLabel3.setText(_translate("MainWindow", "Row"))
+        
+        #self.ColDell.setText(_translate("MainWindow", "DEL"))
+        #self.RowDell.setText(_translate("MainWindow", "DEL"))
+                    
+        self.plotButton3.setText(_translate("MainWindow", "PLOT"))
 
 if __name__ == "__main__":
     import sys
