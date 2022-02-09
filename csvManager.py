@@ -155,25 +155,52 @@ class csvManager:
             k = results.pivot(results.columns[len(Row):-1].tolist(),results.columns[:len(Row)].tolist())
             k = k.replace(np.nan, '')
             k = k.T
-            #print(k.T)
+            #print(k.columns.names)
         else:
+            intersecAt = ''
             filterChoose = "sum"
             if isInterRow != []:
                 for i in isInterRow:
                     Row.remove(i)
+                intersecAt = 'Row'
                 intersec = isInterRow
             else:
                 for i in isInterCol:
                     Col.remove(i)
+                intersecAt = 'Col'
                 intersec = isInterCol
-            rowList = self.getDataWithPandasByHead(Row)
-            colList = self.getDataWithPandasByHead(Col+intersec)
+            packDf = []
+            if Row == [] and Col == []:
+                #print(Row,Col)
+                colList = self.getDataWithPandasByHead(intersec)
+                colList = colList.sum().round(0)
+                #print(colList.sum().round(0))
+                if intersecAt == 'Row':
+                    colList = colList.to_frame()
+                    return colList
+                else:
+                    colList = colList.to_frame()
+                    return colList.T
+            else:
+                #print(Row,Col)
+                if Row != [] and Col == []:
+                    rowList = self.getDataWithPandasByHead(Row)
+                    colList = self.getDataWithPandasByHead(Col+intersec)
+                    packDf = [rowList,colList]
+                if Row == [] and Col != []:
+                    colList = self.getDataWithPandasByHead(Col+intersec)
+                    packDf = [colList]
+                if Row != [] and Col != []:
+                    rowList = self.getDataWithPandasByHead(Row)
+                    colList = self.getDataWithPandasByHead(Col+intersec)
+                    packDf = [rowList,colList]
+                #print(packDf)
+            #print(intersecAt,intersec)
+
             #DiList = self.getDataWithPandasByHead(intersec)
-            results = pd.concat([rowList, colList], axis=1,ignore_index=True)
+            results = pd.concat(packDf, axis=1,ignore_index=True)
             results = results.sort_values(by=results.columns.tolist())
-            #results = results.drop_duplicates()
             #print(intersec)
-            #print(results)
             #print(results)
             colNum = results.columns.tolist()
             beforMesual = (-1)*len(intersec)
@@ -184,17 +211,15 @@ class csvManager:
                 k = pd.pivot_table(results,index = colNum[len(Row):beforMesual], columns = colNum[:len(Row)],values = colNum[beforMesual:],aggfunc=np.sum)
                 k = k.round(0)
                 k=k.T
-                #print(k.index.names)
-                k.columns.names = Col
-                k.index.names = [None]+Row
+                #k.columns.names = Col
+                #k.index.names = [None]+Row
             else:
                 k = pd.pivot_table(results,columns = colNum[len(Row):beforMesual], index= colNum[:len(Row)],values = colNum[beforMesual:],aggfunc=np.sum)
                 k = k.round(0)
-                #print(k.values)
-                k.columns.names = [None]+Col
-                k.index.names = Row
+                #k.columns.names = [None]+Col
+                #k.index.names = Row
             k = k.replace(np.nan, '')
-        #print(k)
+        print(k)
         '''tmp = [list(ele) for ele in k.index]
         eachList = []
         for j in range(len(tmp[0])):
@@ -212,4 +237,5 @@ class csvManager:
 ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
 #ex.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
 #ex.setDimensionSort(["Region","Segment","Region","Region"])
-ex.setRowAndColumn(["Region","Region","Segment"],["Region","Sales","Profit"])'''
+ex.setRowAndColumn(["Segment","Sales"],["Segment","Region"])
+#ex.setRowAndColumn(["Region","Region","Segment"],["Region","Sales","Profit"])'''
