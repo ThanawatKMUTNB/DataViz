@@ -26,7 +26,7 @@ class graphManager(object):
     def filterDate(self,Dimension,typ): #Date inly
 
         self.df[Dimension] = pd.to_datetime(self.df['Order Date'],format='%d/%m/%Y')
-        
+
         if typ == 'year':
             s = str(Dimension+' year')
             self.df[s] = self.df[Dimension].dt.year
@@ -76,14 +76,14 @@ class graphManager(object):
             if len(column) > 1 and len(column) <= 2:
                 Di = column
                 Me = row
-                if self.df[Di[0]].dtypes == 'datetime64[ns]':
-                    scol = str(fd+'('+Di[0]+'):T')
+                if self.df[Di[-2]].dtypes == 'datetime64[ns]':
+                    scol = str(fd+'('+Di[-2]+'):T')
                     sx = str(Di[-1]+':N')
                 elif self.df[Di[-1]].dtypes == 'datetime64[ns]':
-                    scol = str(Di[0]+':N')
+                    scol = str(Di[-2]+':N')
                     sx = str(fd+'('+Di[-1]+'):T')
                 else:
-                    scol = str(Di[0]+':N')
+                    scol = str(Di[-2]+':N')
                     sx = str(Di[-1]+':N')
 
                 c = alt.Chart(self.df).mark_bar().encode(
@@ -99,16 +99,16 @@ class graphManager(object):
             elif len(row) > 1 and len(row) <= 2:
                 Di = row
                 Me = column
-                if self.df[Di[0]].dtypes == 'datetime64[ns]':            #year,date error (large data)
-                    srow = str(fd+'('+Di[0]+'):T')
+                if self.df[Di[-2]].dtypes == 'datetime64[ns]':            #year,date error (large data)
+                    srow = str(fd+'('+Di[-2]+'):T')
                     sy = str(Di[-1]+':N')
                     #print(srow)
                     #print(sy)
                 elif self.df[Di[-1]].dtypes == 'datetime64[ns]':
-                    srow = str(Di[0]+':N')
+                    srow = str(Di[-2]+':N')
                     sy = str(fd+'('+Di[-1]+'):T')
                 else:
-                    srow = str(Di[0]+':N')
+                    srow = str(Di[-2]+':N')
                     sy = str(Di[-1]+':N')
 
                 c = alt.Chart(self.df).mark_bar().encode(
