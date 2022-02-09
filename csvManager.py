@@ -157,6 +157,7 @@ class csvManager:
             k = k.T
             #print(k.T)
         else:
+            filterChoose = "sum"
             if isInterRow != []:
                 for i in isInterRow:
                     Row.remove(i)
@@ -183,15 +184,21 @@ class csvManager:
                 k = pd.pivot_table(results,index = colNum[len(Row):beforMesual], columns = colNum[:len(Row)],values = colNum[beforMesual:],aggfunc=np.sum)
                 k = k.round(0)
                 k=k.T
+                #print(k.index.names)
+                k.columns.names = Col
+                k.index.names = [None]+Row
             else:
                 k = pd.pivot_table(results,columns = colNum[len(Row):beforMesual], index= colNum[:len(Row)],values = colNum[beforMesual:],aggfunc=np.sum)
                 k = k.round(0)
+                #print(k.values)
+                k.columns.names = [None]+Col
+                k.index.names = Row
             k = k.replace(np.nan, '')
-        #print(k)
+        print(k)
         return k
     
 '''ex = csvManager()
 ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
 #ex.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
 #ex.setDimensionSort(["Region","Segment","Region","Region"])
-ex.setRowAndColumn(["Region","Region","Segment","Sales","Profit"],["Region"])'''
+ex.setRowAndColumn(["Region","Region","Segment"],["Region","Sales","Profit"])'''

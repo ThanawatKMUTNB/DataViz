@@ -30,7 +30,7 @@ alt.data_transformers.disable_max_rows()
 altair_viewer._global_viewer._use_bundled_js = False
 alt.data_transformers.enable('data_server')
 
-cm = cmpage.csvManager()
+#cm = cmpage.csvManager()
 class WebEngineView(QtWebEngineWidgets.QWebEngineView):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -88,15 +88,16 @@ class TableModel2(QtCore.QAbstractTableModel):
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal: #x
                 if type(self._data.columns[section]) == tuple:
-                    colN =list(self._data.columns[section])
+                    colN = [ "%s" % x for x in list(self._data.columns[section]) ]
                     colN = "\n".join(colN)
                 else: colN = str(self._data.columns[section])
                 return colN
                 
             if orientation == Qt.Vertical: #y
                 if type(self._data.index[section]) == tuple:
-                    indexN = list(self._data.index[section])
-                    indexN = "\n".join(indexN)
+                    indexN = [ "%s" % x for x in list(self._data.index[section]) ]
+                    #print(self._data.columns,self._data.index)
+                    indexN = "   ".join(indexN)
                 else: indexN = str(self._data.index[section])
                 return indexN
                 
@@ -216,13 +217,13 @@ class Ui_MainWindow(object):
         if len(self.RowChoose) != 0:
             row = self.RowList.currentRow()
             self.RowList.takeItem(row)
-            #self.plot()
+            self.plot()
             
     def ColDelect(self,item):
         if len(self.ColChoose) != 0:
             Col = self.ColList.currentRow()
             self.ColList.takeItem(Col)
-            #self.plot()
+            self.plot()
             
     def plot(self):
         tmp = []
@@ -785,6 +786,7 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow(MainWindow)
     #ui.setupUi(MainWindow)
+    cm = cmpage.csvManager()
     MainWindow.show()
     try:
         sys.exit(app.exec_())
