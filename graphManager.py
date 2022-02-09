@@ -11,7 +11,7 @@ alt.data_transformers.enable('data_server')
 class graphManager(object):
 
     def __init__(self):
-        self.df = None
+        self.data = None
         self.Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
         self.RowChoose = []
         self.ColChoose = []
