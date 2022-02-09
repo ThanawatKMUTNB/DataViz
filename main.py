@@ -70,11 +70,13 @@ class TableModel2(QtCore.QAbstractTableModel):
         super(TableModel2, self).__init__()
         #self.itemClicked.connect(self.handleItemClick)
         self._data = data
+        #print(data)
         #Ui_MainWindow.connectButton()
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
             value = self._data.iloc[index.row(), index.column()]
+            #print("Value ",value)
             return str(value)
 
     def rowCount(self, index):
@@ -90,10 +92,8 @@ class TableModel2(QtCore.QAbstractTableModel):
                 if type(self._data.columns[section]) == tuple:
                     head = self._data.columns.names
                     head = [ "%s" % x for x in list(head) ]
-                    #print("Col",head)
                     if len(head) > 1 :head = ["\\".join(head)]
                     colN = [ "%s" % x for x in list(self._data.columns[section]) ]
-                    #colN = head+colN
                     colN = "\n".join(colN)
                 else: colN = str(self._data.columns[section])
                 return colN
@@ -101,13 +101,9 @@ class TableModel2(QtCore.QAbstractTableModel):
             if orientation == Qt.Vertical: #y
                 if type(self._data.index[section]) == tuple:
                     head = self._data.index.names
-                    #print(self._data.index)
                     head = [ "%s" % x for x in list(head) ]
-                    #print("Row",head)
                     if len(head) > 1 :head = ["\\".join(head)]
                     indexN = [ "%s" % x for x in list(self._data.index[section]) ]
-                    #indexN = head+indexN
-                    #print(self._data.index)
                     indexN = " ".join(indexN)
                 else: indexN = str(self._data.index[section])
                 return indexN
@@ -243,7 +239,19 @@ class Ui_MainWindow(object):
         tmp = [] 
         tmp =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
         self.ColChoose = tmp
+        isInterRow = list(set.intersection(set(self.RowChoose),set(self.Measure)))
+        isInterCol = list(set.intersection(set(self.ColChoose),set(self.Measure)))
+        if isInterRow != [] and isInterCol != []:
+            for i in isInterRow:
+                self.RowChoose.remove(i)
+            self.ColChoose = self.ColChoose + isInterRow
+            self.RowList.addItems(self.RowChoose)
+            self.ColList.addItems(self.ColChoose)
+            #self.setupUi(MainWindow)
+            self.plot()
+            
         if self.ColChoose != [] or self.RowChoose != [] :
+            #print(self.dataSheet)
             self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
             self.model = TableModel2(self.dataSheet)
             self.sheetTable.setModel(self.model)
@@ -293,7 +301,7 @@ class Ui_MainWindow(object):
         while (Col.count('')):
             Col.remove('')
         print("Start",Row,Col,len(set(Row)),len(set(Col)))
-        if len(set(Col)) == 0 : 
+        '''if len(set(Col)) == 0 : 
             print("Row")
             self.sheetPageRow()
             if Row[-1] in self.Measure:
@@ -307,7 +315,8 @@ class Ui_MainWindow(object):
                 #self.plotBarChart()
         else : 
             print("Row and Col")
-            #self.plotLineChart()
+            #self.plotLineChart()'''
+        if Row!=[] or Col!=[]:
             self.dataSheet = cm.setRowAndColumn(Row,Col)
             
     
@@ -893,6 +902,8 @@ class Ui_MainWindow(object):
             item = self.FileListMes.item(i)
             item.setText(_translate("MainWindow", str(j)))
         self.FileListMes.setSortingEnabled(__sortingEnabled)
+        
+        print(self.ColChoose,self.RowChoose)
         
         for i,j in zip(range(len(self.ColChoose)),self.ColChoose):
             item = self.ColList.item(i)

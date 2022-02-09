@@ -127,22 +127,34 @@ class csvManager:
             if i not in tmp:
                 tmp.append(i)
         return len(tmp)
-
+    Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
     def setRowAndColumn(self,Row,Col):
         isInterRow = list(set.intersection(set(Row),set(self.Measure)))
         isInterCol = list(set.intersection(set(Col),set(self.Measure)))
         #print(isInterRow,isInterCol)
         if isInterRow == [] and isInterCol == []:
-            rowList = self.getDataWithPandasByHead(Row)
-            colList = self.getDataWithPandasByHead(Col)
-            results = pd.concat([rowList, colList], axis=1,ignore_index=True)
+            if Row != [] and Col == []:
+                    rowList = self.getDataWithPandasByHead(Row)
+                    packDf = [rowList]
+            if Row == [] and Col != []:
+                colList = self.getDataWithPandasByHead(Col)
+                packDf = [colList]
+            if Row != [] and Col != []:
+                rowList = self.getDataWithPandasByHead(Row)
+                colList = self.getDataWithPandasByHead(Col)
+                packDf = [rowList,colList]
+            results = pd.concat(packDf, axis=1,ignore_index=True)
             results[" "] = "abc"
             results = results.sort_values(by=results.columns.tolist())
             results = results.drop_duplicates()
             k = results.pivot(results.columns[len(Row):-1].tolist(),results.columns[:len(Row)].tolist())
             k = k.replace(np.nan, '')
-            k = k.T
-            #print(k.columns.names)
+            if type(k) == pd.Series :
+                k = k.to_frame()
+            if Row == [] and Col != []:
+                k = k.T
+            #print(Row,Col)
+            #print(type(k))
         else:
             intersecAt = ''
             filterChoose = "sum"
@@ -164,10 +176,15 @@ class csvManager:
                 #print(colList.sum().round(0))
                 if intersecAt == 'Row':
                     colList = colList.to_frame()
-                    return colList
+                    k = colList
+                    if type(k) == pd.Series :
+                        k = k.to_frame()
                 else:
                     colList = colList.to_frame()
-                    return colList.T
+                    k = colList
+                    if type(k) == pd.Series :
+                        k = k.to_frame()
+                    k = colList.T
             else:
                 #print(Row,Col)
                 if Row != [] and Col == []:
@@ -182,31 +199,32 @@ class csvManager:
                     colList = self.getDataWithPandasByHead(Col+intersec)
                     packDf = [rowList,colList]
                 #print(packDf)
-            #print(intersecAt,intersec)
+                #print(intersecAt,intersec)
 
-            #DiList = self.getDataWithPandasByHead(intersec)
-            results = pd.concat(packDf, axis=1,ignore_index=True)
-            results = results.sort_values(by=results.columns.tolist())
-            #print(intersec)
-            #print(results)
-            colNum = results.columns.tolist()
-            beforMesual = (-1)*len(intersec)
-            '''DiList = results.groupby(colNum[:beforMesual])[colNum[beforMesual:]].sum()
-            print(DiList)'''
-            #print("-----------",colNum[beforMesual:])
-            if isInterRow != []:
-                k = pd.pivot_table(results,index = colNum[len(Row):beforMesual], columns = colNum[:len(Row)],values = colNum[beforMesual:],aggfunc=np.sum)
-                k = k.round(0)
-                k=k.T
-                #k.columns.names = Col
-                #k.index.names = [None]+Row
-            else:
-                k = pd.pivot_table(results,columns = colNum[len(Row):beforMesual], index= colNum[:len(Row)],values = colNum[beforMesual:],aggfunc=np.sum)
-                k = k.round(0)
-                #k.columns.names = [None]+Col
-                #k.index.names = Row
-            k = k.replace(np.nan, '')
-        print(k)
+                #DiList = self.getDataWithPandasByHead(intersec)
+                results = pd.concat(packDf, axis=1,ignore_index=True)
+                results = results.sort_values(by=results.columns.tolist())
+                #print(intersec)
+                #print(results)
+                colNum = results.columns.tolist()
+                beforMesual = (-1)*len(intersec)
+                '''DiList = results.groupby(colNum[:beforMesual])[colNum[beforMesual:]].sum()
+                print(DiList)'''
+                #print("-----------",colNum[beforMesual:])
+                if isInterRow != []:
+                    k = pd.pivot_table(results,index = colNum[len(Row):beforMesual], columns = colNum[:len(Row)],values = colNum[beforMesual:],aggfunc=np.sum)
+                    k = k.round(0)
+                    k=k.T
+                    #k.columns.names = Col
+                    #k.index.names = [None]+Row
+                else:
+                    k = pd.pivot_table(results,columns = colNum[len(Row):beforMesual], index= colNum[:len(Row)],values = colNum[beforMesual:],aggfunc=np.sum)
+                    k = k.round(0)
+                    #k.columns.names = [None]+Col
+                    #k.index.names = Row
+                k = k.replace(np.nan, '')
+        #print(type(k))
+        #print(k)
         '''tmp = [list(ele) for ele in k.index]
         eachList = []
         for j in range(len(tmp[0])):
