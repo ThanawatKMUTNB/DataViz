@@ -336,7 +336,7 @@ class Ui_MainWindow(object):
 
     def on_header_doubleClicked(self,index):
         #headCur = index
-        self.data = cm.setAllDataByOneDimension(self.colHeader[index])
+        self.data = cm.setAllDataByOneDimension(self.colHeader[index],self.data[self.colHeader[index]])
         self.model = TableModel(self.data)
         self.table.setModel(self.model)
         
