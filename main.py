@@ -88,16 +88,27 @@ class TableModel2(QtCore.QAbstractTableModel):
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal: #x
                 if type(self._data.columns[section]) == tuple:
+                    head = self._data.columns.names
+                    head = [ "%s" % x for x in list(head) ]
+                    #print("Col",head)
+                    if len(head) > 1 :head = ["\\".join(head)]
                     colN = [ "%s" % x for x in list(self._data.columns[section]) ]
+                    #colN = head+colN
                     colN = "\n".join(colN)
                 else: colN = str(self._data.columns[section])
                 return colN
                 
             if orientation == Qt.Vertical: #y
                 if type(self._data.index[section]) == tuple:
+                    head = self._data.index.names
+                    print(self._data.index)
+                    head = [ "%s" % x for x in list(head) ]
+                    #print("Row",head)
+                    if len(head) > 1 :head = ["\\".join(head)]
                     indexN = [ "%s" % x for x in list(self._data.index[section]) ]
-                    #print(self._data.columns,self._data.index)
-                    indexN = "   ".join(indexN)
+                    #indexN = head+indexN
+                    #print(self._data.index)
+                    indexN = " ".join(indexN)
                 else: indexN = str(self._data.index[section])
                 return indexN
                 
@@ -691,7 +702,7 @@ class Ui_MainWindow(object):
         self.sheetTable = QtWidgets.QTableView(self.tab_2)
         self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))
         self.sheetTable.horizontalHeader().setStretchLastSection(True)
-        self.sheetTable.verticalHeader().setStretchLastSection(True)
+        self.sheetTable.verticalHeader().setStretchLastSection(True).setTextAlignment(Qt.AlignRight)
         self.sheetTable.resizeColumnsToContents()
         self.sheetTable.resizeRowsToContents()
         '''self.sheetTableW = QtWidgets.QTableWidget(self.tab_2)

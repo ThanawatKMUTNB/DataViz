@@ -194,9 +194,20 @@ class csvManager:
                 k.columns.names = [None]+Col
                 k.index.names = Row
             k = k.replace(np.nan, '')
-        print(k)
+        #print(k)
+        '''tmp = [list(ele) for ele in k.index]
+        eachList = []
+        for j in range(len(tmp[0])):
+            eachList.append([i[j] for i in tmp[:]])
+        for i in range(len(eachList)):
+            for j in range(len(eachList[i])-1,0,-1):
+                if eachList[i][j] == eachList[i][j-1] :
+                    eachList[i][j]=''
+        changIndex = pd.MultiIndex.from_arrays(eachList, names=k.index.names)
+        k.index = changIndex
+        print(k)'''
         return k
-    
+
 '''ex = csvManager()
 ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
 #ex.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
