@@ -771,13 +771,13 @@ class Ui_MainWindow(object):
             item = QtWidgets.QListWidgetItem()
             self.RowList.addItem(item)
             #self.RowList3.setModel(self.RowList3W)
-        self.RowList3.itemDoubleClicked.connect(self.RowDelect)
-        #self.RowList3.clicked.connect(self.DropDup)
+        self.RowList.itemDoubleClicked.connect(self.RowDelect)
+        self.RowList.clicked.connect(self.DropDup)
         
         for i in range(len(self.ColChoose)):
             item = QtWidgets.QListWidgetItem()
             self.ColList.addItem(item)
-        self.ColList3.itemDoubleClicked.connect(self.ColDelect)
+        self.ColList.itemDoubleClicked.connect(self.ColDelect)
         
         '''self.dataSource()
         if self.selectFile != [] : 
