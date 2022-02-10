@@ -226,7 +226,7 @@ class csvManager:
                     #k.index.names = Row
                 k = k.replace(np.nan, '')
         #print(type(k))
-        #print(k)
+        print(k)
         '''tmp = [list(ele) for ele in k.index]
         eachList = []
         for j in range(len(tmp[0])):

@@ -235,13 +235,14 @@ class Ui_MainWindow(object):
             self.plot()
         
     def plot(self):
+        print("--------",self.RowChoose,self.ColChoose)
         tmp = []
         tmp =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
-        tmp3 =  [str(self.RowList3.item(i).text()) for i in range(self.RowList3.count())]
+        #tmp3 =  [str(self.RowList3.item(i).text()) for i in range(self.RowList3.count())]
         self.RowChoose = tmp
         tmp = [] 
         tmp =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
-        tmp3 =  [str(self.ColList3.item(i).text()) for i in range(self.ColList3.count())]
+        #tmp3 =  [str(self.ColList3.item(i).text()) for i in range(self.ColList3.count())]
         self.ColChoose = tmp
         
         while (self.RowChoose.count('')):
@@ -253,18 +254,19 @@ class Ui_MainWindow(object):
         isInterCol = list(set.intersection(set(self.ColChoose),set(self.Measure)))
         print("--------",self.RowChoose,self.ColChoose)
             
-        if isInterRow != [] or isInterCol != []:
+        '''if isInterRow != [] or isInterCol != []:
             gm = graphManager.graphManager()
-            '''for i in isInterRow:
+            for i in isInterRow:
                 self.RowChoose.remove(i)
-            self.ColChoose = self.ColChoose + isInterRow'''
+            self.ColChoose = self.ColChoose + isInterRow
             gm.setList(self.RowChoose,self.ColChoose,self.data)
             self.Chart = gm.exam()
                 #self.RowList.addItems(self.RowChoose)
                 #self.ColList.addItems(self.ColChoose)
-                #self.tab3(MainWindow)
+                #self.tab3(MainWindow)'''
         self.tab2(MainWindow)
         self.tab3(MainWindow)
+        
         if self.ColChoose != [] or self.RowChoose != [] :
             #print(self.dataSheet)
             self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
@@ -533,7 +535,7 @@ class Ui_MainWindow(object):
         self.ColList.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.ColList.setFlow(QtWidgets.QListView.LeftToRight)
         self.ColList.setObjectName("ColList")
-        self.ColList.itemDoubleClicked.connect(self.RowDelect)
+        self.ColList.itemDoubleClicked.connect(self.ColDelect)
         '''for i in range(len(self.ColChoose)):
             item = QtWidgets.QListWidgetItem()
             self.ColList.addItem(item)
@@ -767,13 +769,15 @@ class Ui_MainWindow(object):
         self.FileListMes3.setSortingEnabled(__sortingEnabled)
         
     def tab2(self,MainWindow):
+        print(self.RowChoose,self.ColChoose)
+        self.RowList.clear()
         for i in range(len(self.RowChoose)):
             item = QtWidgets.QListWidgetItem()
             self.RowList.addItem(item)
             #self.RowList3.setModel(self.RowList3W)
         self.RowList.itemDoubleClicked.connect(self.RowDelect)
-        self.RowList.clicked.connect(self.DropDup)
-        
+        #self.RowList.clicked.connect(self.DropDup)
+        self.ColList.clear()
         for i in range(len(self.ColChoose)):
             item = QtWidgets.QListWidgetItem()
             self.ColList.addItem(item)
