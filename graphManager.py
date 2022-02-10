@@ -127,13 +127,14 @@ class graphManager():
                 #self.plotChart()
             else:
                 return 'Pls enter 1 or 2 Dimension'
+        return self.Chart
     
     def exam(self):
         print(self.RowChoose,self.ColChoose)
         #print(self.df)
         c = alt.Chart(self.df).mark_bar().encode(
-            x=str(self.RowChoose[0]),
-            y=str(self.ColChoose[0]),
+            x=str(self.ColChoose[0]),
+            y=str(self.RowChoose[0]),
             #color=str(self.RowChoose[0]+':N')
         ).facet(column=str(self.RowChoose[0]+':N')
         ).resolve_scale(x = 'independent')

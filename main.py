@@ -254,16 +254,28 @@ class Ui_MainWindow(object):
         isInterCol = list(set.intersection(set(self.ColChoose),set(self.Measure)))
         print("--------",self.RowChoose,self.ColChoose)
             
-        '''if isInterRow != [] or isInterCol != []:
+        if isInterRow != [] and isInterCol == []:
             gm = graphManager.graphManager()
-            for i in isInterRow:
+            '''for i in isInterRow:
                 self.RowChoose.remove(i)
-            self.ColChoose = self.ColChoose + isInterRow
+            self.ColChoose = self.ColChoose + isInterRow'''
             gm.setList(self.RowChoose,self.ColChoose,self.data)
-            self.Chart = gm.exam()
+            self.Chart = gm.plotBar()
                 #self.RowList.addItems(self.RowChoose)
                 #self.ColList.addItems(self.ColChoose)
-                #self.tab3(MainWindow)'''
+                #self.tab3(MainWindow)
+        
+        if isInterRow == [] and isInterCol != []:
+            gm = graphManager.graphManager()
+            '''for i in isInterCol:
+                self.ColChoose.remove(i)
+            self.RowChoose = self.RowChoose + isInterCol'''
+            gm.setList(self.RowChoose,self.ColChoose,self.data)
+            self.Chart = gm.plotBar()
+                #self.RowList.addItems(self.RowChoose)
+                #self.ColList.addItems(self.ColChoose)
+                #self.tab3(MainWindow)
+        
         self.tab2(MainWindow)
         self.tab3(MainWindow)
         
@@ -338,7 +350,7 @@ class Ui_MainWindow(object):
 
     def on_header_doubleClicked(self,index):
         #headCur = index
-        self.data = cm.setAllDataByOneDimension(self.colHeader[index],self.data[self.colHeader[index]])
+        self.data = cm.setAllDataByOneDimension(self.colHeader[index])
         self.model = TableModel(self.data)
         self.table.setModel(self.model)
         
@@ -743,6 +755,7 @@ class Ui_MainWindow(object):
         #self.ColDell.setText(_translate("MainWindow", "DEL"))
         #self.RowDell.setText(_translate("MainWindow", "DEL"))
         self.plotButton.setText(_translate("MainWindow", "PLOT"))
+        
         #TAB3
         self.ColLabel3.setText(_translate("MainWindow", "Column"))
         self.RowLabel3.setText(_translate("MainWindow", "Row"))
@@ -807,20 +820,19 @@ class Ui_MainWindow(object):
             item.setText(_translate("MainWindow", str(j)))
 
     def tab3(self,MainWindow):
-        
         t = lambda data: pipe(data, limit_rows(max_rows=10000), to_values)
         alt.data_transformers.register('custom', t)
         alt.data_transformers.enable('custom')
         alt.data_transformers.disable_max_rows()
         altair_viewer._global_viewer._use_bundled_js = False
         alt.data_transformers.enable('data_server')
-
+        self.RowList3.clear()
         for i in range(len(self.RowChoose)):
             item = QtWidgets.QListWidgetItem()
             self.RowList3.addItem(item)
             #self.RowList3.setModel(self.RowList3W)
         #self.RowList3.itemDoubleClicked.connect(self.RowDelect)
-        
+        self.ColList3.clear()
         for i in range(len(self.ColChoose)):
             item = QtWidgets.QListWidgetItem()
             self.ColList3.addItem(item)
