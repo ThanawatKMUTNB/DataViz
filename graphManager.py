@@ -3,9 +3,9 @@ from altair import pipe, limit_rows, to_values
 import altair_viewer
 import pandas as pd
 
-t = lambda data: pipe(data, limit_rows(max_rows=10000), to_values)
+'''t = lambda data: pipe(data, limit_rows(max_rows=10000), to_values)
 alt.data_transformers.register('custom', t)
-alt.data_transformers.enable('custom')
+alt.data_transformers.enable('custom')'''
 alt.data_transformers.disable_max_rows()
 altair_viewer._global_viewer._use_bundled_js = False
 alt.data_transformers.enable('data_server')
