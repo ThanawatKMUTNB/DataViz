@@ -33,7 +33,7 @@ class graphManager():
             return self.plotBar()
         elif chart == 'Pie':
             return self.plotPie()
-        elif chart == ' Line':
+        elif chart == 'Line':
             return self.plotLine()
     
     def filterDate(self,Dimension,typ): #Date inly

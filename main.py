@@ -21,13 +21,13 @@ import altair as alt
 from PyQt5.QtWidgets import (QApplication, QMainWindow)
 from PyQt5.QtChart import QChart, QChartView, QHorizontalBarSeries, QBarSet, QBarCategoryAxis, QValueAxis
 #from qgis.PyQt.QtWidgets import QVBoxLayout
-from altair import pipe, limit_rows, to_values
+#from altair import pipe, limit_rows, to_values
 import altair_viewer
 import graphManager 
 
-t = lambda data: pipe(data, limit_rows(max_rows=10000), to_values)
+'''t = lambda data: pipe(data, limit_rows(max_rows=10000), to_values)
 alt.data_transformers.register('custom', t)
-alt.data_transformers.enable('custom')
+alt.data_transformers.enable('custom')'''
 alt.data_transformers.disable_max_rows()
 altair_viewer._global_viewer._use_bundled_js = False
 alt.data_transformers.enable('data_server')
