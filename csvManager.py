@@ -60,12 +60,13 @@ class csvManager:
                 Val.append(i)
         return Val
 
-    def setAllDataByOneDimension(self,Dimension,oldDF): #sort each column
-        data = self.getDataWithPandas()
+    def setAllDataByOneDimension(self,Dimension): #sort each column
+        data = self.df
         #if data == data.sort_values(by=str(Dimension)):
-        if oldDF == sorted(data[Dimension].tolist()):
+        '''if oldDF == sorted(data[Dimension].tolist()):
             new = data.sort_values(by=str(Dimension),ascending=False)
-        else : new = data.sort_values(by=str(Dimension))
+        else :''' 
+        new = data.sort_values(by=str(Dimension))
         return new
 
     def setDimensionSort(self,Dimension):
@@ -226,7 +227,7 @@ class csvManager:
                     #k.index.names = Row
                 k = k.replace(np.nan, '')
         #print(type(k))
-        #print(k)
+        print(k)
         '''tmp = [list(ele) for ele in k.index]
         eachList = []
         for j in range(len(tmp[0])):
