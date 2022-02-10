@@ -28,6 +28,14 @@ class graphManager():
         self.ColChoose = col
         self.df = dataSheet
     
+    def chooseChart(self,chart):
+        if chart == 'Bar':
+            return self.plotBar()
+        elif chart == 'Pie':
+            return self.plotPie()
+        elif chart == ' Line':
+            return self.plotLine()
+    
     def filterDate(self,Dimension,typ): #Date inly
 
         self.df[Dimension] = pd.to_datetime(self.df['Order Date'],format='%d/%m/%Y')
