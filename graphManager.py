@@ -27,13 +27,15 @@ class graphManager():
         self.RowChoose = row
         self.ColChoose = col
         self.df = dataSheet
+        self.df['Order Date'] = pd.to_datetime(self.df['Order Date'],format='%d/%m/%Y')
+        self.df['Ship Date'] = pd.to_datetime(self.df['Ship Date'],format='%d/%m/%Y')
     
     def chooseChart(self,chart):
         if chart == 'Bar':
             return self.plotBar()
         elif chart == 'Pie':
             return self.plotPie()
-        elif chart == ' Line':
+        elif chart == 'Line':
             return self.plotLine()
     
     def filterDate(self,Dimension,typ): #Date inly
@@ -177,13 +179,14 @@ class graphManager():
             self.Chart = c
             #self.plotChart()
         else:
-            return
+            return 0
+        return self.Chart
 
     def plotPie(self):
         row = self.RowChoose
         column = self.ColChoose
         if not (len(column) == 1 and len(row) == 1):
-            return
+            return 0
         fil = 'sum'                                       ####sum
         fd = 'year'                                       ####year
         if row[0] in self.Measure:
@@ -206,4 +209,5 @@ class graphManager():
 
         pie = base.mark_arc(outerRadius=120)
         self.Chart = pie
+        return self.Chart
         #self.plotChart()
