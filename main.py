@@ -155,6 +155,7 @@ class Ui_MainWindow(object):
         self.RowChoose = []
         self.ColChoose = []
         self.dataSheet = ""
+        self.typeChart = ['Line', 'Bar', 'Pie']
         self.Chart = None
         #DimenForChoose = []
         self.setupUi(MainWindow)
@@ -253,28 +254,29 @@ class Ui_MainWindow(object):
         isInterRow = list(set.intersection(set(self.RowChoose),set(self.Measure)))
         isInterCol = list(set.intersection(set(self.ColChoose),set(self.Measure)))
         print("--------",self.RowChoose,self.ColChoose)
+        if  isInterRow != [] or isInterCol != []:
+            #print(self.comboBox.currentText())
+            if isInterRow != [] and isInterCol == []:
+                gm = graphManager.graphManager()
+                '''for i in isInterRow:
+                    self.RowChoose.remove(i)
+                self.ColChoose = self.ColChoose + isInterRow'''
+                gm.setList(self.RowChoose,self.ColChoose,self.data)
+                self.Chart = gm.chooseChart(str(self.comboBox.currentText()))
+                    #self.RowList.addItems(self.RowChoose)
+                    #self.ColList.addItems(self.ColChoose)
+                    #self.tab3(MainWindow)
             
-        if isInterRow != [] and isInterCol == []:
-            gm = graphManager.graphManager()
-            '''for i in isInterRow:
-                self.RowChoose.remove(i)
-            self.ColChoose = self.ColChoose + isInterRow'''
-            gm.setList(self.RowChoose,self.ColChoose,self.data)
-            self.Chart = gm.plotBar()
-                #self.RowList.addItems(self.RowChoose)
-                #self.ColList.addItems(self.ColChoose)
-                #self.tab3(MainWindow)
-        
-        if isInterRow == [] and isInterCol != []:
-            gm = graphManager.graphManager()
-            '''for i in isInterCol:
-                self.ColChoose.remove(i)
-            self.RowChoose = self.RowChoose + isInterCol'''
-            gm.setList(self.RowChoose,self.ColChoose,self.data)
-            self.Chart = gm.plotBar()
-                #self.RowList.addItems(self.RowChoose)
-                #self.ColList.addItems(self.ColChoose)
-                #self.tab3(MainWindow)
+            if isInterRow == [] and isInterCol != []:
+                gm = graphManager.graphManager()
+                '''for i in isInterCol:
+                    self.ColChoose.remove(i)
+                self.RowChoose = self.RowChoose + isInterCol'''
+                gm.setList(self.RowChoose,self.ColChoose,self.data)
+                self.Chart = gm.chooseChart(str(self.comboBox.currentText()))
+                    #self.RowList.addItems(self.RowChoose)
+                    #self.ColList.addItems(self.ColChoose)
+                    #self.tab3(MainWindow)
         
         self.tab2(MainWindow)
         self.tab3(MainWindow)
@@ -498,8 +500,8 @@ class Ui_MainWindow(object):
         
         self.RowList = QtWidgets.QListWidget(self.tab_2)
         #self.RowListW = RowListWidget()
-        #self.RowListW.setGeometry(QtCore.QRect(260, 10, 491, 31))
-        self.RowList.setGeometry(QtCore.QRect(260, 10, 491, 31))
+        #self.RowListW.setGeometry(QtCore.QRect(260, 10, 521, 31))
+        self.RowList.setGeometry(QtCore.QRect(260, 10, 521, 31))
         self.RowList.setAcceptDrops(True)
         self.RowList.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.RowList.setAutoFillBackground(True)
@@ -536,7 +538,7 @@ class Ui_MainWindow(object):
         self.RowDell.clicked.connect(self.RowDelect)'''
         
         self.ColList = QtWidgets.QListWidget(self.tab_2)
-        self.ColList.setGeometry(QtCore.QRect(260, 50, 491, 31))
+        self.ColList.setGeometry(QtCore.QRect(260, 50, 521, 31))
         self.ColList.setAcceptDrops(True)
         self.ColList.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.ColList.setAutoFillBackground(True)
@@ -623,8 +625,8 @@ class Ui_MainWindow(object):
         
         self.RowList3 = QtWidgets.QListWidget(self.tab_3)
         #self.RowList3W = RowList3Widget()
-        #self.RowList3W.setGeometry(QtCore.QRect(260, 10, 491, 31))
-        self.RowList3.setGeometry(QtCore.QRect(260, 10, 491, 31))
+        #self.RowList3W.setGeometry(QtCore.QRect(260, 10, 521, 31))
+        self.RowList3.setGeometry(QtCore.QRect(260, 10, 521, 31))
         self.RowList3.setAcceptDrops(True)
         self.RowList3.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.RowList3.setAutoFillBackground(True)
@@ -661,7 +663,7 @@ class Ui_MainWindow(object):
         self.RowDell.clicked.connect(self.RowDelect)'''
         
         self.ColList3 = QtWidgets.QListWidget(self.tab_3)
-        self.ColList3.setGeometry(QtCore.QRect(260, 50, 491, 31))
+        self.ColList3.setGeometry(QtCore.QRect(260, 50, 521, 31))
         self.ColList3.setAcceptDrops(True)
         self.ColList3.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.ColList3.setAutoFillBackground(True)
@@ -683,10 +685,18 @@ class Ui_MainWindow(object):
         #view.updateChart(self.Chart)
         view.show()'''
         
+        self.comboBox = QtWidgets.QComboBox(self.tab_3)
+        self.comboBox.setGeometry(QtCore.QRect(610, 510, 121, 31))
+        self.comboBox.setObjectName("comboBox")
+        for i in self.typeChart :
+            self.comboBox.addItem(i)
+        self.comboBox.activated.connect(self.plot)
+        #self.tabWidget.addTab(self.tab_2, "")
+        
         self.plotButton3 = QtWidgets.QPushButton(self.tab_3)
         self.plotButton3.setGeometry(QtCore.QRect(730, 510, 41, 31))
         self.plotButton3.setObjectName("plotButton3")
-        self.plotButton3.clicked.connect(self.plot)
+        #self.plotButton3.clicked.connect(self.plot)
             
         self.tabWidget.addTab(self.tab_3, "Chart")
         
