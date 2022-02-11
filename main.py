@@ -569,7 +569,7 @@ class Ui_MainWindow(object):
             
         self.tabWidget.addTab(self.tab_2, "Sheet")
         
-        #Tab3
+        ######################################################################################Tab3
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
         
@@ -820,9 +820,6 @@ class Ui_MainWindow(object):
             item.setText(_translate("MainWindow", str(j)))
 
     def tab3(self,MainWindow):
-        t = lambda data: pipe(data, limit_rows(max_rows=10000), to_values)
-        alt.data_transformers.register('custom', t)
-        alt.data_transformers.enable('custom')
         alt.data_transformers.disable_max_rows()
         altair_viewer._global_viewer._use_bundled_js = False
         alt.data_transformers.enable('data_server')
