@@ -227,7 +227,11 @@ class csvManager:
                     #k.index.names = Row
                 k = k.replace(np.nan, '')
         #print(type(k))
-        print(k)
+        #print(k.index.tolist())
+        list_of_lists = [list(elem) for elem in k.index.tolist()]
+        #print(list_of_lists)
+        #print(len(k))
+        #print(k)
         '''tmp = [list(ele) for ele in k.index]
         eachList = []
         for j in range(len(tmp[0])):
@@ -241,9 +245,9 @@ class csvManager:
         print(k)'''
         return k
 
-'''ex = csvManager()
+ex = csvManager()
 ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
 #ex.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
 #ex.setDimensionSort(["Region","Segment","Region","Region"])
-ex.setRowAndColumn(["Segment","Sales"],["Segment","Region"])
-#ex.setRowAndColumn(["Region","Region","Segment"],["Region","Sales","Profit"])'''
+ex.setRowAndColumn(["Segment","Sales","Profit"],["Segment","Region","Region"])
+#ex.setRowAndColumn(["Region","Region","Segment"],["Region","Sales","Profit"])
