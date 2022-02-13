@@ -33,7 +33,6 @@ class graphManager():
     def chooseChart(self,chart):
         row = self.RowChoose
         column = self.ColChoose
-        print(chart)
 
         f = 'sum'
         def checkMeasure(R,C):      #True when row is measure
@@ -63,7 +62,7 @@ class graphManager():
                 elif len(column) == 4:
                     return alt.hconcat(self.plotBar(row,column[0],f),self.plotBar(row,column[1],f),self.plotBar(row,column[2],f),self.plotBar(row,column[3],f))
         elif chart == 'Pie':
-            return self.plotPie()
+            return self.plotPie(row,column,f)
         elif chart == 'Line':
             if checkMeasure(row,column):    #row is measure
                 if len(row) == 1:
