@@ -162,6 +162,7 @@ class Ui_MainWindow(object):
         self.typeChart = ['Line', 'Bar', 'Pie']
         self.Chart = None
         self.filDic = {}
+        self.chartTypeS = ''
         self.setupUi(MainWindow)
         #DimenForChoose = []
     def filChange(self):
@@ -189,7 +190,7 @@ class Ui_MainWindow(object):
             self.uiM.setupUi(self.Window)
             #fp.setupUi(filPage)
         else :
-            self.uiD = filterDimen.Ui_MainWindowD()
+            self.uiD = filterDimen.Ui_MainWindow()
             self.uiD.setupUi(self.Window)
         self.Window.show()
             #fp.setupUi(filPage)
@@ -317,17 +318,21 @@ class Ui_MainWindow(object):
         tmp = [] 
         tmp =  [str(self.ColList_2.item(i).text()) for i in range(self.ColList_2.count())]
         self.ColChoose = tmp
+        self.chartTypeS = self.chartType_2.currentText()
+        # print(self.chartTypeS)
         self.plot()
         
     def setplot(self):
-        print("--------",self.RowChoose,self.ColChoose)
+        #print("--------",self.RowChoose,self.ColChoose)
         tmp = []
         tmp =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
         self.RowChoose = tmp
         tmp = [] 
         tmp =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
         self.ColChoose = tmp
-        print("--------",self.RowChoose,self.ColChoose)
+        self.chartTypeS = self.chartType.currentText()
+        # print(self.chartTypeS)
+        #print("--------",self.RowChoose,self.ColChoose)
         self.plot()
         
     def plot(self):
@@ -338,16 +343,18 @@ class Ui_MainWindow(object):
             
         isInterRow = list(set.intersection(set(self.RowChoose),set(self.Measure)))
         isInterCol = list(set.intersection(set(self.ColChoose),set(self.Measure)))
-        print("--------",self.RowChoose,self.ColChoose)
+        # print("--------",self.RowChoose,self.ColChoose)
+        print(str(self.chartTypeS))
+        
         if  isInterRow != [] or isInterCol != []:
-            #print(self.comboBox.currentText())
+            # print(self.chartType.currentText())
             if isInterRow != [] and isInterCol == []:
                 gm = graphManager.graphManager()
                 '''for i in isInterRow:
                     self.RowChoose.remove(i)
                 self.ColChoose = self.ColChoose + isInterRow'''
                 gm.setList(self.RowChoose,self.ColChoose,self.data)
-                self.Chart = gm.chooseChart(str(self.chartType.currentText()))
+                self.Chart = gm.chooseChart(str(self.chartTypeS))
                     #self.RowList.addItems(self.RowChoose)
                     #self.ColList.addItems(self.ColChoose)
                     #self.tab3(MainWindow)
@@ -358,11 +365,10 @@ class Ui_MainWindow(object):
                     self.ColChoose.remove(i)
                 self.RowChoose = self.RowChoose + isInterCol'''
                 gm.setList(self.RowChoose,self.ColChoose,self.data)
-                self.Chart = gm.chooseChart(str(self.chartType.currentText()))
+                self.Chart = gm.chooseChart(str(self.chartTypeS))
                     #self.RowList.addItems(self.RowChoose)
                     #self.ColList.addItems(self.ColChoose)
                     #self.tab3(MainWindow)
-        
         self.tab2(MainWindow)
         self.tab3(MainWindow)
         
@@ -600,7 +606,7 @@ class Ui_MainWindow(object):
         self.chartType.setObjectName("chartType")
         for i in self.typeChart :
             self.chartType.addItem(i)
-        self.chartType.activated.connect(self.plot)
+        self.chartType.activated.connect(self.setplot)
         
         self.gridLayout_9.addWidget(self.chartType, 0, 1, 1, 1)
         
@@ -867,7 +873,7 @@ class Ui_MainWindow(object):
         self.chartType_2.setObjectName("chartType_2")
         for i in self.typeChart :
             self.chartType_2.addItem(i)
-        self.chartType_2.activated.connect(self.plot)
+        self.chartType_2.activated.connect(self.setplot_2)
         
         self.gridLayout_16.addWidget(self.chartType_2, 0, 1, 1, 1)
         
