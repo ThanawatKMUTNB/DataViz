@@ -1,4 +1,3 @@
-from curses import BUTTON1_CLICKED
 from email import header
 from msilib.schema import Class
 from operator import mod
@@ -183,7 +182,7 @@ class Ui_MainWindow(object):
             
     def openFilterPage(self):
         filterItem = self.filterList.currentRow()
-        strItem = self.filterList.item(filterItem).text()
+        strItem = self.filterList.item(filterItem)
         self.Window = QtWidgets.QMainWindow()
         if strItem in self.Measure :
             self.uiM = filterMes.Ui_MainWindowM()
@@ -1079,11 +1078,11 @@ class Ui_MainWindow(object):
         self.FileListMes_2.setSizePolicy(sizePolicy)
         self.FileListMes_2.setAcceptDrops(True)
         self.FileListMes_2.setDragEnabled(True)
-        self.FileListMes_2.setDragDropOverwriteMode(True)
-        self.FileListMes_2.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+        # self.FileListMes_2.setDragDropOverwriteMode(True)
+        self.FileListMes_2.setDragDropMode(QtWidgets.QAbstractItemView.DragOnly)
         self.FileListMes_2.setDefaultDropAction(QtCore.Qt.CopyAction)
         self.FileListMes_2.setBatchSize(100)
-        self.FileListMes_2.setWordWrap(True)
+        # self.FileListMes_2.setWordWrap(True)
         self.FileListMes_2.setObjectName("FileListMes_2")
         for i in range(len(self.Measure)):
             item = QtWidgets.QListWidgetItem()
