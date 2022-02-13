@@ -2,8 +2,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import csvManager
 cm = csvManager.csvManager()
 class Ui_MainWindow(object):
-    def __init__(self):
-        super().__init__()
+    def __init__(self,parent=None):
+        super().__init__(parent)
         self.filtered = {}
         self.head = ''
         self.sheet = ''
@@ -22,7 +22,14 @@ class Ui_MainWindow(object):
         self.filtered[self.head] = self.sheet[self.head].drop_duplicates().tolist()
         print(self.filtered)
         self.setupUi(MainWindow)
-        
+    
+    def clickApply(self):
+        print("kk")
+        for index in range(self.filterItemListWidget.count()):
+            print(self.filterItemListWidget.item(index).checkState())
+            # if self.filterItemListWidget.item(index).checkState() == 2:
+            #     checked_items.append(self.listWidgetLabels.item(index))
+            
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(443, 605)
@@ -60,10 +67,12 @@ class Ui_MainWindow(object):
         for i in self.sheet[self.head].drop_duplicates():
             item = QtWidgets.QListWidgetItem()
             if i in self.filtered[self.head]:
-                item.setCheckState(QtCore.Qt.Checked)
+                item.setCheckState(QtCore.Qt.Checked) #2
             else:
-                item.setCheckState(QtCore.Qt.Unchecked)
+                item.setCheckState(QtCore.Qt.Unchecked) #0
             self.filterItemListWidget.addItem(item)
+        
+        # print(self.filterItemListWidget.item(0).checkState())
         # self.filterItemListWidget.addItems(self.sheet[self.head].drop_duplicates().setCheckState(QtCore.Qt.Checked))
         
         self.gridLayout_4.addWidget(self.filterItemListWidget, 1, 0, 1, 1)
@@ -83,6 +92,8 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addWidget(self.resetButton, 0, 0, 1, 1)
         self.okButton = QtWidgets.QPushButton(self.tab)
         self.okButton.setObjectName("okButton")
+        self.okButton.clicked.connect(self.clickApply)
+        
         self.gridLayout_3.addWidget(self.okButton, 0, 2, 1, 1)
         self.cancleButton = QtWidgets.QPushButton(self.tab)
         self.cancleButton.setObjectName("cancleButton")
@@ -94,10 +105,10 @@ class Ui_MainWindow(object):
         self.deleteButton.setObjectName("deleteButton")
         self.gridLayout_4.addWidget(self.deleteButton, 6, 0, 1, 1)
         self.tabWidget.addTab(self.tab, "")
-        self.tab_2 = QtWidgets.QWidget()
-        self.tab_2.setEnabled(True)
-        self.tab_2.setObjectName("tab_2")
-        self.tabWidget.addTab(self.tab_2, "")
+        # self.tab_2 = QtWidgets.QWidget()
+        # self.tab_2.setEnabled(True)
+        # self.tab_2.setObjectName("tab_2")
+        # self.tabWidget.addTab(self.tab_2, "")
         self.gridLayout.addWidget(self.tabWidget, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -116,7 +127,6 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.allButton.setText(_translate("MainWindow", "All"))
-        self.allButton.clicked.connect(self.setAll)
         
         self.noneButton.setText(_translate("MainWindow", "None"))
         __sortingEnabled = self.filterItemListWidget.isSortingEnabled()
@@ -138,10 +148,12 @@ class Ui_MainWindow(object):
         self.selectionLabel.setText(_translate("MainWindow", "Selection : "))
         self.resetButton.setText(_translate("MainWindow", "Reset"))
         self.okButton.setText(_translate("MainWindow", "Apply"))
+        self.okButton.clicked.connect(self.clickApply)
+        
         self.cancleButton.setText(_translate("MainWindow", "Cancle"))
         self.deleteButton.setText(_translate("MainWindow", "Delete from Filter"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Genneral"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Tab 2"))
+        # self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Tab 2"))
 
 
 if __name__ == "__main__":
