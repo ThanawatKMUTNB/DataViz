@@ -1,7 +1,28 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-
-
+import csvManager
+cm = csvManager.csvManager()
 class Ui_MainWindow(object):
+    def __init__(self):
+        super().__init__()
+        self.filtered = {}
+        self.head = ''
+        self.sheet = ''
+    
+    def setStart(self,filHead,dic,data):
+        # print(filHead)
+        self.filtered = dic
+        self.head = filHead
+        self.sheet = data
+        # print("sheet ",self.sheet)
+        # self.setupUi(MainWindow)
+    
+    def setAll(self):
+        print("kk")
+        print(self.filtered)
+        self.filtered[self.head] = self.sheet[self.head].drop_duplicates().tolist()
+        print(self.filtered)
+        self.setupUi(MainWindow)
+        
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(443, 605)
@@ -17,8 +38,11 @@ class Ui_MainWindow(object):
         self.gridLayout_4.setObjectName("gridLayout_4")
         self.gridLayout_2 = QtWidgets.QGridLayout()
         self.gridLayout_2.setObjectName("gridLayout_2")
+        
         self.allButton = QtWidgets.QPushButton(self.tab)
         self.allButton.setObjectName("allButton")
+        self.allButton.clicked.connect(self.setAll)
+        
         self.gridLayout_2.addWidget(self.allButton, 0, 0, 1, 1)
         self.noneButton = QtWidgets.QPushButton(self.tab)
         self.noneButton.setObjectName("noneButton")
@@ -30,18 +54,18 @@ class Ui_MainWindow(object):
         self.filterItemListWidget.setFocusPolicy(QtCore.Qt.NoFocus)
         self.filterItemListWidget.setContextMenuPolicy(QtCore.Qt.NoContextMenu)
         self.filterItemListWidget.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked|QtWidgets.QAbstractItemView.EditKeyPressed)
-        self.filterItemListWidget.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
+        self.filterItemListWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.filterItemListWidget.setObjectName("filterItemListWidget")
-        item = QtWidgets.QListWidgetItem()
-        item.setFlags(QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled|QtCore.Qt.ItemIsTristate)
-        item.setCheckState(QtCore.Qt.Unchecked)
-        self.filterItemListWidget.addItem(item)
-        item = QtWidgets.QListWidgetItem()
-        item.setCheckState(QtCore.Qt.Unchecked)
-        self.filterItemListWidget.addItem(item)
-        item = QtWidgets.QListWidgetItem()
-        item.setCheckState(QtCore.Qt.Unchecked)
-        self.filterItemListWidget.addItem(item)
+        # print(type(self.sheet[self.head]))
+        for i in self.sheet[self.head].drop_duplicates():
+            item = QtWidgets.QListWidgetItem()
+            if i in self.filtered[self.head]:
+                item.setCheckState(QtCore.Qt.Checked)
+            else:
+                item.setCheckState(QtCore.Qt.Unchecked)
+            self.filterItemListWidget.addItem(item)
+        # self.filterItemListWidget.addItems(self.sheet[self.head].drop_duplicates().setCheckState(QtCore.Qt.Checked))
+        
         self.gridLayout_4.addWidget(self.filterItemListWidget, 1, 0, 1, 1)
         self.summaryLabel = QtWidgets.QLabel(self.tab)
         self.summaryLabel.setObjectName("summaryLabel")
@@ -92,21 +116,28 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.allButton.setText(_translate("MainWindow", "All"))
+        self.allButton.clicked.connect(self.setAll)
+        
         self.noneButton.setText(_translate("MainWindow", "None"))
         __sortingEnabled = self.filterItemListWidget.isSortingEnabled()
-        self.filterItemListWidget.setSortingEnabled(False)
-        item = self.filterItemListWidget.item(0)
-        item.setText(_translate("MainWindow", "New Item"))
-        item = self.filterItemListWidget.item(1)
-        item.setText(_translate("MainWindow", "New Item"))
-        item = self.filterItemListWidget.item(2)
-        item.setText(_translate("MainWindow", "New Item"))
+        n=0
+        for i in self.sheet[self.head].drop_duplicates():
+            item = self.filterItemListWidget.item(n)
+            item.setText(_translate("MainWindow", i))
+            n+=1
+        # self.filterItemListWidget.setSortingEnabled(False)
+        # item = self.filterItemListWidget.item(0)
+        # item.setText(_translate("MainWindow", "New Item"))
+        # item = self.filterItemListWidget.item(1)
+        # item.setText(_translate("MainWindow", "New Item"))
+        # item = self.filterItemListWidget.item(2)
+        # item.setText(_translate("MainWindow", "New Item"))
         self.filterItemListWidget.setSortingEnabled(__sortingEnabled)
         self.summaryLabel.setText(_translate("MainWindow", "Summary : "))
         self.fieldLabel.setText(_translate("MainWindow", "Field :"))
         self.selectionLabel.setText(_translate("MainWindow", "Selection : "))
         self.resetButton.setText(_translate("MainWindow", "Reset"))
-        self.okButton.setText(_translate("MainWindow", "OK"))
+        self.okButton.setText(_translate("MainWindow", "Apply"))
         self.cancleButton.setText(_translate("MainWindow", "Cancle"))
         self.deleteButton.setText(_translate("MainWindow", "Delete from Filter"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Genneral"))

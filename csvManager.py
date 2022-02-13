@@ -1,4 +1,5 @@
 from itertools import chain
+import os
 from re import S
 import numpy as np
 import pandas as pd
@@ -10,17 +11,21 @@ class csvManager:
         self.df = ""
     
     def setPath(self):
-        self.df = self.readFile(self.path+"/"+self.selectFile)
+        pathBuf = os.path.join(self.path,self.selectFile) 
+        self.df = self.readFile(pathBuf)
         
     def readFile(self,path):
-        fileExtension = path.split(".")
-        if fileExtension[-1] == "csv":
-            df = pd.read_csv(path, encoding='windows-1252')
-            
-        else:
-            #print(fileExtension[-1])
-            df = pd.read_excel(path, engine = "openpyxl")
-        return df
+        isdir = os.path.isdir(path)
+        if isdir == False:
+            fileExtension = path.split(".")
+            # print(fileExtension[-1])
+            if fileExtension[-1] == "csv":
+                df = pd.read_csv(path, encoding='windows-1252')
+            else:
+                print("Excel ",path)
+                #print(fileExtension[-1])
+                df = pd.read_excel(path, engine = "openpyxl")
+            return df
     
     def getHead(self):
        return list(self.df.columns)
@@ -108,8 +113,8 @@ class csvManager:
         li = []
         #print(Listfilename)
         for i in Listfilename:
-            #print(i)
-            df = self.readFile(self.path+"/"+i)
+            pathBuf = os.path.join(self.path,i) 
+            df = self.readFile(pathBuf)
             li.append(df)
         frame = pd.concat(li, axis=0, ignore_index=True)
         #frame.sort_values("Row ID", inplace = True)

@@ -1,6 +1,7 @@
 from email import header
 from msilib.schema import Class
 from operator import mod
+import filterDimen
 import os
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -170,18 +171,23 @@ class Ui_MainWindow(object):
         self.filterList_2.clear()
         for j in itemsTextList:
             self.filterList_2.addItem(j)
-        self.filDic = dict.fromkeys(itemsTextList, "")
-        print(self.filDic)
+            # print(j)
+            self.filDic[j] = cm.getDataWithPandasByHead(j).drop_duplicates().to_list()
+            # self.filDic = dict.fromkeys(itemsTextList, "")
+            # print(self.filDic)
         
     def filChange_2(self):
         itemsTextList =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]
         self.filterList.clear()
         for j in itemsTextList:
             self.filterList.addItem(j)
-        self.filDic = dict.fromkeys(itemsTextList, "")
-        print(self.filDic)
+            # print(j)
+            self.filDic[j] = cm.getDataWithPandasByHead(j).drop_duplicates().to_list()
+            # self.filDic = dict.fromkeys(itemsTextList, "")
+            # print(self.filDic)
             
     def openFilterPage(self):
+        # print(self.data)
         filterItem = self.filterList.currentRow()
         strItem = self.filterList.item(filterItem)
         self.Window = QtWidgets.QMainWindow()
@@ -190,9 +196,11 @@ class Ui_MainWindow(object):
             self.uiM.setupUi(self.Window)
             #fp.setupUi(filPage)
         else :
-            self.uiD = filterDimen.Ui_MainWindow()
-            self.uiD.setupUi(self.Window)
-        self.Window.show()
+            fd = filterDimen.Ui_MainWindow()
+            # fd.reffil = self.data
+            fd.setStart(strItem.text(),self.filDic,self.data)
+            fd.setupUi(self.Window)
+            self.Window.show()
             #fp.setupUi(filPage)
     
     def DropDup(self):
@@ -242,7 +250,8 @@ class Ui_MainWindow(object):
         tmp.remove(self.selectFile)
         #print(tmp)
         self.fileNameList = tmp
-        self.path = self.folderpath+"/"+self.selectFile
+        self.path = os.path.join(self.folderpath,self.selectFile) 
+        # self.path = self.folderpath+"/"+self.selectFile
         cm.path = self.folderpath
         cm.selectFile = self.selectFile
         cm.setPath()
@@ -330,6 +339,7 @@ class Ui_MainWindow(object):
         tmp = [] 
         tmp =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
         self.ColChoose = tmp
+        
         self.chartTypeS = self.chartType.currentText()
         # print(self.chartTypeS)
         #print("--------",self.RowChoose,self.ColChoose)
@@ -383,9 +393,10 @@ class Ui_MainWindow(object):
             self.sheetTable.setModel(None)
             
     def dataSource(self):
-        #print(self.selectFile)
+        # print(self.selectFile)
         if type(self.selectFile) != list:
             self.selectFile = [self.selectFile]
+        # print(self.selectFile)
         if self.selectFile != [] :
             if len(self.selectFile)>1:
                 print("Union")
@@ -515,21 +526,19 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addWidget(self.usedFileLabel, 2, 0, 1, 1)
         
         self.FileListChoose = QtWidgets.QListWidget(self.dataSourceTab)
-        self.FileListChoose.setMouseTracking(True)
         self.FileListChoose.setTabletTracking(True)
         self.FileListChoose.setAcceptDrops(True)
-        self.FileListChoose.setTabKeyNavigation(True)
         self.FileListChoose.setDragEnabled(True)
-        self.FileListChoose.setDragDropOverwriteMode(True)
         self.FileListChoose.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
         self.FileListChoose.setDefaultDropAction(QtCore.Qt.MoveAction)
         self.FileListChoose.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        self.FileListChoose.setProperty("isWrapping", False)
-        self.FileListChoose.setWordWrap(False)
         self.FileListChoose.setObjectName("FileListChoose")
+        if type(self.selectFile) != list:
+            self.selectFile = [self.selectFile]
         for i in range(len(self.selectFile)):
             item = QtWidgets.QListWidgetItem()
             self.FileListChoose.addItem(item)
+            
         self.tabWidget.addTab(self.dataSourceTab, "Data Source")
         
         self.gridLayout_3.addWidget(self.FileListChoose, 3, 0, 1, 2)
@@ -539,6 +548,7 @@ class Ui_MainWindow(object):
         
         self.usedFileButton = QtWidgets.QPushButton(self.dataSourceTab)
         self.usedFileButton.setObjectName("usedFileButton")
+        self.usedFileButton.clicked.connect(self.updateList)
         
         self.gridLayout_2.addWidget(self.usedFileButton, 0, 0, 1, 1)
         self.gridLayout_3.addLayout(self.gridLayout_2, 2, 1, 1, 1)
@@ -1167,12 +1177,13 @@ class Ui_MainWindow(object):
             item.setText(_translate("MainWindow", str(j)))
         self.FileList.setSortingEnabled(__sortingEnabled)
         
-        self.FileListChoose.setSortingEnabled(True)
-        __sortingEnabled = self.FileListChoose.isSortingEnabled()
         self.FileListChoose.setSortingEnabled(False)
+        __sortingEnabled = self.FileListChoose.isSortingEnabled()
+        print("Select file ",self.selectFile)
         for i,j in zip(range(len(set(self.selectFile))),set(self.selectFile)):
             item = self.FileListChoose.item(i)
             item.setText(_translate("MainWindow", str(j)))
+        # self.FileListChoose.setSortingEnabled(True)
         
         self.saveButton.setText(_translate("MainWindow", "Save"))
         self.loadButton.setText(_translate("MainWindow", "Load"))
