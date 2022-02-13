@@ -4,7 +4,7 @@ from operator import mod
 import os
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QEvent,Qt
 from PyQt5.QtWidgets import *
 from PyQt5.QtChart import QChart, QChartView, QBarSet, QPercentBarSeries, QBarCategoryAxis, QLineSeries
 import numpy as np
@@ -159,14 +159,15 @@ class Ui_MainWindow(object):
         self.dataSheet = ""
         self.typeChart = ['Line', 'Bar', 'Pie']
         self.Chart = None
-        #DimenForChoose = []
         self.setupUi(MainWindow)
+        #DimenForChoose = []
+        
     def getMeasual(self):
         return self.Measure
     
-    def showText(self,item):
-        print("k")
-        
+    def wc(self):
+        return self.Measure
+    
     def DropDup(self):
         itemsTextList =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
         self.RowChoose = itemsTextList
@@ -311,20 +312,6 @@ class Ui_MainWindow(object):
 
     def dataSourceSort(self,dimension):
         self.data = cm.setAllDataByOneDimension(dimension)
-        
-    '''def sheetPageRow(self):
-        self.dataSheet = cm.setDimensionSort(self.RowChoose)
-        self.dataSheet=self.dataSheet.drop_duplicates()
-        if self.RowChoose[-1] not in self.Measure :
-            self.dataSheet[" "] = "abc"
-        else:
-            self.dataSheet[" "] = "abc"
-                
-    def sheetPageCol(self):
-        tmp = cm.setDimensionSort(self.ColChoose)
-        tmp = tmp.drop_duplicates()
-        tmp[" "] = "abc"
-        self.dataSheet = tmp.T'''
     
     MeasureChoose = ""
     def sheetPageRowAndCol(self,Row,Col):
@@ -373,25 +360,28 @@ class Ui_MainWindow(object):
         #self.tabWidget.setGeometry(QtCore.QRect(4, 0, 791, 571))
         self.tabWidget.setObjectName("tabWidget")
         
-        self.tab = QtWidgets.QWidget()
-        self.tab.setObjectName("tab")
+        # self.tab = QtWidgets.QWidget()
+        # self.tab.setObjectName("tab")
         
-        self.gridLayout_6 = QtWidgets.QGridLayout(self.tab)
+        self.dataSourceTab = QtWidgets.QWidget()
+        self.dataSourceTab.setObjectName("dataSourceTab")
+        
+        self.gridLayout_6 = QtWidgets.QGridLayout(self.dataSourceTab)
         self.gridLayout_6.setObjectName("gridLayout_6")
         self.gridLayout_5 = QtWidgets.QGridLayout()
         self.gridLayout_5.setObjectName("gridLayout_5")
         
-        self.saveButton = QtWidgets.QPushButton(self.tab)
-        #self.saveButton.setGeometry(QtCore.QRect(600, 490, 93, 28))
+        self.saveButton = QtWidgets.QPushButton(self.dataSourceTab)
         self.saveButton.setObjectName("saveButton")
+        
         self.gridLayout_5.addWidget(self.saveButton, 0, 1, 1, 1)
         
-        self.loadButton = QtWidgets.QPushButton(self.tab)
-        #self.loadButton.setGeometry(QtCore.QRect(700, 490, 83, 28))
+        self.loadButton = QtWidgets.QPushButton(self.dataSourceTab)
         self.loadButton.setObjectName("loadButton")
+        
         self.gridLayout_5.addWidget(self.loadButton, 0, 2, 1, 1)
         
-        spacerItem = QtWidgets.QSpacerItem(700, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        spacerItem = QtWidgets.QSpacerItem(700, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         
         self.gridLayout_5.addItem(spacerItem, 0, 0, 1, 1)
         self.gridLayout_6.addLayout(self.gridLayout_5, 1, 0, 1, 1)
@@ -402,22 +392,70 @@ class Ui_MainWindow(object):
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
         
-        self.selectFileLabel = QtWidgets.QLabel(self.tab)
+        self.selectDimentionLabel = QtWidgets.QLabel(self.dataSourceTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.selectDimentionLabel.sizePolicy().hasHeightForWidth())
+        self.selectDimentionLabel.setSizePolicy(sizePolicy)
+        self.selectDimentionLabel.setMinimumSize(QtCore.QSize(50, 0))
+        self.selectDimentionLabel.setSizeIncrement(QtCore.QSize(50, 0))
         font = QtGui.QFont()
         font.setPointSize(10)
-        self.selectFileLabel.setFont(font)
-        self.selectFileLabel.setObjectName("selectFileLabel")
-        self.gridLayout.addWidget(self.selectFileLabel, 0, 0, 1, 1)
+        self.selectDimentionLabel.setFont(font)
+        self.selectDimentionLabel.setObjectName("selectDimentionLabel")
+        self.gridLayout.addWidget(self.selectDimentionLabel, 0, 0, 1, 1)
         
-        self.selectFileButton = QtWidgets.QPushButton(self.tab)
-        #self.selectFileButton.setGeometry(QtCore.QRect(142, 10, 41, 28))
-        self.selectFileButton.setObjectName("selectFileButton")
-        self.selectFileButton.clicked.connect(self.launchDialog)
+        self.selectDimentionButton = QtWidgets.QPushButton(self.dataSourceTab)
+        #self.selectDimentionLabel.setGeometry(QtCore.QRect(142, 10, 41, 28))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.selectDimentionButton.sizePolicy().hasHeightForWidth())
+        self.selectDimentionButton.setSizePolicy(sizePolicy)
+        self.selectDimentionButton.setObjectName("selectDimentionButton")
+        self.selectDimentionButton.clicked.connect(self.launchDialog)
         
-        self.gridLayout.addWidget(self.selectFileButton, 0, 1, 1, 1)
+        self.gridLayout.addWidget(self.selectDimentionButton, 0, 1, 1, 1)
         self.gridLayout_3.addLayout(self.gridLayout, 0, 0, 1, 2)
         
-        self.FileList = QtWidgets.QListWidget(self.tab)
+        self.usedFileLabel = QtWidgets.QLabel(self.dataSourceTab)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.usedFileLabel.setFont(font)
+        self.usedFileLabel.setObjectName("usedFileLabel")
+        self.gridLayout_3.addWidget(self.usedFileLabel, 2, 0, 1, 1)
+        
+        self.FileListChoose = QtWidgets.QListWidget(self.dataSourceTab)
+        self.FileListChoose.setMouseTracking(True)
+        self.FileListChoose.setTabletTracking(True)
+        self.FileListChoose.setAcceptDrops(True)
+        self.FileListChoose.setTabKeyNavigation(True)
+        self.FileListChoose.setDragEnabled(True)
+        self.FileListChoose.setDragDropOverwriteMode(True)
+        self.FileListChoose.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.FileListChoose.setDefaultDropAction(QtCore.Qt.MoveAction)
+        self.FileListChoose.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.FileListChoose.setProperty("isWrapping", False)
+        self.FileListChoose.setWordWrap(False)
+        self.FileListChoose.setObjectName("FileListChoose")
+        for i in range(len(self.selectFile)):
+            item = QtWidgets.QListWidgetItem()
+            self.FileListChoose.addItem(item)
+        self.tabWidget.addTab(self.dataSourceTab, "Data Source")
+        
+        self.gridLayout_3.addWidget(self.FileListChoose, 3, 0, 1, 2)
+        
+        self.gridLayout_2 = QtWidgets.QGridLayout()
+        self.gridLayout_2.setObjectName("gridLayout_2")
+        
+        self.usedFileButton = QtWidgets.QPushButton(self.dataSourceTab)
+        self.usedFileButton.setObjectName("usedFileButton")
+        
+        self.gridLayout_2.addWidget(self.usedFileButton, 0, 0, 1, 1)
+        self.gridLayout_3.addLayout(self.gridLayout_2, 2, 1, 1, 1)
+        
+        self.FileList = QtWidgets.QListWidget(self.dataSourceTab)
         #self.FileList.setGeometry(QtCore.QRect(10, 50, 171, 221))
         self.FileList.setAcceptDrops(True)
         self.FileList.setDragEnabled(True)
@@ -433,45 +471,9 @@ class Ui_MainWindow(object):
                 self.FileList.addItem(item)
         
         self.gridLayout_3.addWidget(self.FileList, 1, 0, 1, 2)
-        
-        self.usedFile = QtWidgets.QLabel(self.tab)
-        #self.usedFile.setGeometry(QtCore.QRect(10, 280, 121, 21))
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.usedFile.setFont(font)
-        self.usedFile.setObjectName("usedFile")
-        
-        self.gridLayout_3.addWidget(self.usedFile, 2, 0, 1, 1)
-        
-        self.gridLayout_2 = QtWidgets.QGridLayout()
-        self.gridLayout_2.setObjectName("gridLayout_2")
-        
-        self.usedFileButton = QtWidgets.QPushButton(self.tab)
-        #self.usedFileButton.setGeometry(QtCore.QRect(142, 275, 41, 28))
-        self.usedFileButton.setObjectName("selectFileButton")
-        self.usedFileButton.clicked.connect(self.updateList)
-        
-        self.gridLayout_2.addWidget(self.usedFileButton, 0, 1, 1, 1)
-        self.gridLayout_3.addLayout(self.gridLayout_2, 2, 1, 1, 1)
-        
-        self.FileListChoose = QtWidgets.QListWidget(self.tab)
-        #self.FileListChoose.setGeometry(QtCore.QRect(10, 310, 171, 171))
-        self.FileListChoose.setAcceptDrops(True)
-        self.FileListChoose.setDragEnabled(True)
-        self.FileListChoose.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
-        self.FileListChoose.setDefaultDropAction(QtCore.Qt.MoveAction)
-        self.FileListChoose.setWordWrap(True)
-        self.FileListChoose.setObjectName("FileListChoose")
-        #print(self.FileListChoose.item)
-        for i in range(len(self.selectFile)):
-            item = QtWidgets.QListWidgetItem()
-            self.FileListChoose.addItem(item)
-        self.tabWidget.addTab(self.tab, "Data Source")
-        
-        self.gridLayout_3.addWidget(self.FileListChoose, 3, 0, 1, 2)
         self.gridLayout_4.addLayout(self.gridLayout_3, 0, 0, 1, 1)
-
-        self.table = QtWidgets.QTableView(self.tab)
+        
+        self.table = QtWidgets.QTableView(self.dataSourceTab)
         #self.table.setGeometry(QtCore.QRect(190, 10, 591, 471))
         self.table.horizontalHeader().setStretchLastSection(True)
         #self.table.verticalHeader().setStretchLastSection(True)
@@ -487,18 +489,85 @@ class Ui_MainWindow(object):
         self.gridLayout_4.addWidget(self.table, 0, 1, 1, 1)
         self.gridLayout_6.addLayout(self.gridLayout_4, 0, 0, 1, 1)
         
-        self.tabWidget.addTab(self.tab, "Data Souce")
+        self.tabWidget.addTab(self.dataSourceTab, "Data Source")
 
-        #Tab2
-        self.tab_2 = QtWidgets.QWidget()
-        self.tab_2.setObjectName("tab_2")
+        self.gridLayout_4.addWidget(self.table, 0, 1, 1, 1)
+        self.gridLayout_6.addLayout(self.gridLayout_4, 0, 0, 1, 1)
         
-        self.gridLayout_11 = QtWidgets.QGridLayout(self.tab_2)
+        #self.tabWidget.addTab(self.dataSourceTab, "Data Souce")
+
+
+
+
+        #Tab2 ############################################################
+        self.SheetTab = QtWidgets.QWidget()
+        self.SheetTab.setObjectName("SheetTab")
+        
+        self.gridLayout_14 = QtWidgets.QGridLayout(self.SheetTab)
+        self.gridLayout_14.setObjectName("gridLayout_14")
+        self.gridLayout_11 = QtWidgets.QGridLayout()
         self.gridLayout_11.setObjectName("gridLayout_11")
+        self.gridLayout_9 = QtWidgets.QGridLayout()
+        self.gridLayout_9.setObjectName("gridLayout_9")
+        
+        spacerItem1 = QtWidgets.QSpacerItem(500, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_9.addItem(spacerItem1, 0, 0, 1, 1)
+        
+        self.chartType = QtWidgets.QComboBox(self.SheetTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.chartType.sizePolicy().hasHeightForWidth())
+        self.chartType.setObjectName("chartType")
+        for i in self.typeChart :
+            self.chartType.addItem(i)
+        self.chartType.activated.connect(self.plot)
+        
+        self.gridLayout_9.addWidget(self.chartType, 0, 1, 1, 1)
+        
+        self.plotButton = QtWidgets.QPushButton(self.SheetTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.plotButton.sizePolicy().hasHeightForWidth())
+        self.plotButton.setSizePolicy(sizePolicy)
+        self.plotButton.setObjectName("plotButton")
+        self.plotButton.clicked.connect(self.plot)
+        
+        self.gridLayout_9.addWidget(self.plotButton, 0, 2, 1, 1)
+        self.gridLayout_11.addLayout(self.gridLayout_9, 1, 0, 1, 3)
+        
+        self.gridLayout_13 = QtWidgets.QGridLayout()
+        self.gridLayout_13.setObjectName("gridLayout_13")
         self.gridLayout_8 = QtWidgets.QGridLayout()
         self.gridLayout_8.setObjectName("gridLayout_8")
         
-        self.ColLabel = QtWidgets.QLabel(self.tab_2)
+        self.ColList = QtWidgets.QListWidget(self.SheetTab)
+        #self.ColList.setGeometry(QtCore.QRect(260, 50, 521, 31))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.ColList.sizePolicy().hasHeightForWidth())
+        self.ColList.setSizePolicy(sizePolicy)
+        self.ColList.setMinimumSize(QtCore.QSize(0, 20))
+        self.ColList.setMaximumSize(QtCore.QSize(16777215, 30))
+        self.ColList.setAcceptDrops(True)
+        self.ColList.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.ColList.setAutoFillBackground(True)
+        self.ColList.setDragEnabled(True)
+        self.ColList.setDragDropOverwriteMode(True)
+        self.ColList.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.ColList.setDefaultDropAction(QtCore.Qt.MoveAction)
+        self.ColList.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.ColList.setFlow(QtWidgets.QListView.LeftToRight)
+        self.ColList.setGridSize(QtCore.QSize(100, 0))
+        self.ColList.setObjectName("ColList")
+        self.ColList.itemDoubleClicked.connect(self.ColDelect)
+        #self.ColList.itemClicked.connect(self.cw)
+        
+        self.gridLayout_8.addWidget(self.ColList, 1, 1, 1, 1)
+        
+        self.ColLabel = QtWidgets.QLabel(self.SheetTab)
         #self.ColLabel.setGeometry(QtCore.QRect(200, 55, 61, 21))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -512,27 +581,7 @@ class Ui_MainWindow(object):
         
         self.gridLayout_8.addWidget(self.ColLabel, 1, 0, 1, 1)
         
-        self.ColList = QtWidgets.QListWidget(self.tab_2)
-        #self.ColList.setGeometry(QtCore.QRect(260, 50, 521, 31))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Ignored)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.ColList.sizePolicy().hasHeightForWidth())
-        self.ColList.setSizePolicy(sizePolicy)
-        self.ColList.setAcceptDrops(True)
-        self.ColList.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.ColList.setAutoFillBackground(True)
-        self.ColList.setDragEnabled(True)
-        self.ColList.setDragDropOverwriteMode(True)
-        self.ColList.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
-        self.ColList.setDefaultDropAction(QtCore.Qt.MoveAction)
-        self.ColList.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        self.ColList.setFlow(QtWidgets.QListView.LeftToRight)
-        self.ColList.setObjectName("ColList")
-        self.ColList.itemDoubleClicked.connect(self.ColDelect)
-        self.gridLayout_8.addWidget(self.ColList, 1, 1, 1, 1)
-        
-        self.RowLabel = QtWidgets.QLabel(self.tab_2)
+        self.RowLabel = QtWidgets.QLabel(self.SheetTab)
         #self.RowLabel.setGeometry(QtCore.QRect(200, 10, 61, 31))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -546,13 +595,15 @@ class Ui_MainWindow(object):
         
         self.gridLayout_8.addWidget(self.RowLabel, 0, 0, 1, 1)
         
-        self.RowList = QtWidgets.QListWidget(self.tab_2)
+        self.RowList = QtWidgets.QListWidget(self.SheetTab)
         #self.RowList.setGeometry(QtCore.QRect(260, 10, 521, 31))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Ignored)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.RowList.sizePolicy().hasHeightForWidth())
         self.RowList.setSizePolicy(sizePolicy)
+        self.RowList.setMinimumSize(QtCore.QSize(0, 20))
+        self.RowList.setMaximumSize(QtCore.QSize(16777215, 30))
         self.RowList.setAcceptDrops(True)
         self.RowList.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.RowList.setAutoFillBackground(True)
@@ -566,26 +617,31 @@ class Ui_MainWindow(object):
         self.RowList.itemDoubleClicked.connect(self.RowDelect)
         
         self.gridLayout_8.addWidget(self.RowList, 0, 1, 1, 1)
-        self.gridLayout_11.addLayout(self.gridLayout_8, 0, 1, 1, 1)
+        self.gridLayout_13.addLayout(self.gridLayout_8, 0, 0, 1, 1)
         
-        self.sheetTable = QtWidgets.QTableView(self.tab_2)
+        self.sheetTable = QtWidgets.QTableView(self.SheetTab)
         #self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.sheetTable.sizePolicy().hasHeightForWidth())
         self.sheetTable.setSizePolicy(sizePolicy)
+        self.sheetTable.setMinimumSize(QtCore.QSize(0, 0))
+        self.sheetTable.setBaseSize(QtCore.QSize(0, 1000))
         self.sheetTable.resizeColumnsToContents()
         self.sheetTable.resizeRowsToContents()
+        self.sheetTable.horizontalHeader().setCascadingSectionResizes(True)
+        self.sheetTable.verticalHeader().setCascadingSectionResizes(True)
         self.sheetTable.verticalHeader().hide()
         self.sheetTable.horizontalHeader().hide()
         
-        self.gridLayout_11.addWidget(self.sheetTable, 1, 1, 1, 1)
+        self.gridLayout_13.addWidget(self.sheetTable, 1, 0, 1, 1)
+        self.gridLayout_11.addLayout(self.gridLayout_13, 0, 2, 1, 1)
+        
         self.gridLayout_10 = QtWidgets.QGridLayout()
-        self.gridLayout_10.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
         self.gridLayout_10.setObjectName("gridLayout_10")
         
-        self.DimensionValuesLabel = QtWidgets.QLabel(self.tab_2)
+        self.DimensionValuesLabel = QtWidgets.QLabel(self.SheetTab)
         #self.DimensionValuesLabel.setGeometry(QtCore.QRect(13, 16, 161, 21))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -599,9 +655,9 @@ class Ui_MainWindow(object):
         
         self.gridLayout_10.addWidget(self.DimensionValuesLabel, 0, 0, 1, 1)
         
-        self.FileListDimension = QtWidgets.QListWidget(self.tab_2)
+        self.FileListDimension = QtWidgets.QListWidget(self.SheetTab)
         #self.FileListDimension.setGeometry(QtCore.QRect(10, 40, 181, 291))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.FileListDimension.sizePolicy().hasHeightForWidth())
@@ -611,26 +667,45 @@ class Ui_MainWindow(object):
         self.FileListDimension.setDragDropMode(QtWidgets.QAbstractItemView.DragOnly)
         self.FileListDimension.setDefaultDropAction(QtCore.Qt.CopyAction)
         self.FileListDimension.setWordWrap(True)
-        self.FileListDimension.setObjectName("FileList")
+        self.FileListDimension.setObjectName("FileListDimension")
         for i in range(len(self.colHeader)):
             item = QtWidgets.QListWidgetItem()
             self.FileListDimension.addItem(item)
         self.FileListDimension.clicked.connect(self.DropDup)
         
-        self.gridLayout_10.addWidget(self.FileListDimension, 1, 0, 1, 1)
+        self.gridLayout_10.addWidget(self.FileListDimension, 1, 0, 2, 1)
         
-        self.MeasureValuesLabel = QtWidgets.QLabel(self.tab_2)
-        self.MeasureValuesLabel.setGeometry(QtCore.QRect(10, 337, 161, 21))
+        self.MeasureValuesLabel = QtWidgets.QLabel(self.SheetTab)
+        #self.MeasureValuesLabel.setGeometry(QtCore.QRect(10, 337, 161, 21))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.MeasureValuesLabel.sizePolicy().hasHeightForWidth())
+        self.MeasureValuesLabel.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setPointSize(10)
         self.MeasureValuesLabel.setFont(font)
         self.MeasureValuesLabel.setObjectName("MeasureValuesLabel")
 
-        self.gridLayout_10.addWidget(self.MeasureValuesLabel, 2, 0, 1, 1)
+        self.gridLayout_10.addWidget(self.MeasureValuesLabel, 3, 0, 1, 1)
         
-        self.FileListMes = QtWidgets.QListWidget(self.tab_2)
+        self.filterLabel = QtWidgets.QLabel(self.SheetTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.filterLabel.sizePolicy().hasHeightForWidth())
+        self.filterLabel.setSizePolicy(sizePolicy)
+        self.filterLabel.setMinimumSize(QtCore.QSize(30, 30))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.filterLabel.setFont(font)
+        self.filterLabel.setObjectName("filterLabel")
+        
+        self.gridLayout_10.addWidget(self.filterLabel, 0, 1, 1, 1)
+        
+        self.FileListMes = QtWidgets.QListWidget(self.SheetTab)
         #self.FileListMes.setGeometry(QtCore.QRect(10, 360, 181, 151))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.FileListMes.sizePolicy().hasHeightForWidth())
@@ -647,241 +722,323 @@ class Ui_MainWindow(object):
             self.FileListMes.addItem(item)
         self.FileListMes.clicked.connect(self.DropDup)
         
-        self.gridLayout_10.addWidget(self.FileListMes, 3, 0, 1, 1)
-        self.gridLayout_11.addLayout(self.gridLayout_10, 0, 0, 2, 1)
+        self.gridLayout_10.addWidget(self.FileListMes, 4, 0, 1, 1)
         
-        self.gridLayout_9 = QtWidgets.QGridLayout()
-        self.gridLayout_9.setObjectName("gridLayout_9")
-        
-        spacerItem1 = QtWidgets.QSpacerItem(700, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_9.addItem(spacerItem1, 0, 0, 1, 1)
-        
-        self.comboBoxt2 = QtWidgets.QComboBox(self.tab_2)
-        #self.comboBox.setGeometry(QtCore.QRect(610, 510, 121, 31))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.comboBoxt2.sizePolicy().hasHeightForWidth())
-        self.comboBoxt2.setObjectName("comboBoxt2")
-        for i in self.typeChart :
-            self.comboBoxt2.addItem(i)
-        self.comboBoxt2.activated.connect(self.plot)
-        
-        self.gridLayout_9.addWidget(self.comboBoxt2, 0, 1, 1, 1)
-        
-        self.plotButton = QtWidgets.QPushButton(self.tab_2)
-        #self.plotButton.setGeometry(QtCore.QRect(730, 510, 41, 31))
+        self.filterButton = QtWidgets.QPushButton(self.SheetTab)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.plotButton.sizePolicy().hasHeightForWidth())
-        self.plotButton.setSizePolicy(sizePolicy)
-        self.plotButton.setObjectName("plotButton")
-        self.plotButton.clicked.connect(self.plot)
+        sizePolicy.setHeightForWidth(self.filterButton.sizePolicy().hasHeightForWidth())
+        self.filterButton.setSizePolicy(sizePolicy)
+        self.filterButton.setMinimumSize(QtCore.QSize(30, 30))
+        self.filterButton.setObjectName("filterButton")
         
-        self.gridLayout_9.addWidget(self.plotButton, 0, 2, 1, 1)
-        self.gridLayout_11.addLayout(self.gridLayout_9, 2, 0, 1, 2)
+        self.gridLayout_10.addWidget(self.filterButton, 0, 2, 1, 1)
         
-        
-        self.tabWidget.addTab(self.tab_2, "Sheet")
-        
-        ######################################################################################Tab3
-        self.tab_3 = QtWidgets.QWidget()
-        self.tab_3.setObjectName("tab_3")
-        
-        self.gridLayout_12 = QtWidgets.QGridLayout(self.tab_3)
-        self.gridLayout_12.setObjectName("gridLayout_12")
-        self.gridLayout_13 = QtWidgets.QGridLayout()
-        self.gridLayout_13.setObjectName("gridLayout_13")
-        
-        self.ColLabel3 = QtWidgets.QLabel(self.tab_3)
-        #self.ColLabel3.setGeometry(QtCore.QRect(200, 55, 61, 21))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
+        self.filterList = QtWidgets.QListWidget(self.SheetTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.ColLabel3.sizePolicy().hasHeightForWidth())
-        self.ColLabel3.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.ColLabel3.setFont(font)
-        self.ColLabel3.setObjectName("ColLabel3")
+        sizePolicy.setHeightForWidth(self.filterList.sizePolicy().hasHeightForWidth())
+        self.filterList.setSizePolicy(sizePolicy)
+        self.filterList.setMinimumSize(QtCore.QSize(70, 100))
+        self.filterList.setAcceptDrops(True)
+        self.filterList.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.filterList.setDefaultDropAction(QtCore.Qt.MoveAction)
+        self.filterList.setObjectName("filterList")
+        item = QtWidgets.QListWidgetItem()
+        self.filterList.addItem(item)
+        item = QtWidgets.QListWidgetItem()
+        self.filterList.addItem(item)
+        item = QtWidgets.QListWidgetItem()
+        self.filterList.addItem(item)
+        self.gridLayout_10.addWidget(self.filterList, 1, 1, 2, 2)
         
-        self.gridLayout_13.addWidget(self.ColLabel3, 1, 0, 1, 1)
+        self.gridLayout_11.addLayout(self.gridLayout_10, 0, 0, 1, 1)
+        self.gridLayout_14.addLayout(self.gridLayout_11, 0, 0, 1, 1)
         
-        self.ColList3 = QtWidgets.QListWidget(self.tab_3)
-        #self.ColList3.setGeometry(QtCore.QRect(260, 50, 521, 31))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Ignored)
+        self.tabWidget.addTab(self.SheetTab, "Sheet")
+        
+        
+        
+        
+        
+        
+        
+        # Tab 3 ######################################################################################Tab3
+        self.chartTab = QtWidgets.QWidget()
+        self.chartTab.setObjectName("chartTab")
+        
+        self.gridLayout_20 = QtWidgets.QGridLayout(self.chartTab)
+        self.gridLayout_20.setObjectName("gridLayout_20")
+        self.gridLayout_15 = QtWidgets.QGridLayout()
+        self.gridLayout_15.setObjectName("gridLayout_15")
+        self.gridLayout_16 = QtWidgets.QGridLayout()
+        self.gridLayout_16.setObjectName("gridLayout_16")
+        
+        spacerItem2 = QtWidgets.QSpacerItem(500, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        
+        self.gridLayout_16.addItem(spacerItem2, 0, 0, 1, 1)
+        
+        self.chartType_2 = QtWidgets.QComboBox(self.chartTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.ColList3.sizePolicy().hasHeightForWidth())
-        self.ColList3.setSizePolicy(sizePolicy)
-        self.ColList3.setAcceptDrops(True)
-        self.ColList3.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.ColList3.setAutoFillBackground(True)
-        self.ColList3.setDragEnabled(True)
-        self.ColList3.setDragDropOverwriteMode(True)
-        self.ColList3.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
-        self.ColList3.setDefaultDropAction(QtCore.Qt.MoveAction)
-        self.ColList3.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        self.ColList3.setFlow(QtWidgets.QListView.LeftToRight)
-        self.ColList3.setObjectName("ColList3")
-        #self.ColList3.itemDoubleClicked.connect(self.RowDelect)
-        self.gridLayout_13.addWidget(self.ColList3, 1, 1, 1, 1)
+        sizePolicy.setHeightForWidth(self.chartType_2.sizePolicy().hasHeightForWidth())
+        self.chartType_2.setSizePolicy(sizePolicy)
+        self.chartType_2.setObjectName("chartType_2")
+        for i in self.typeChart :
+            self.chartType_2.addItem(i)
+        self.chartType_2.activated.connect(self.plot)
         
-        self.RowLabel3 = QtWidgets.QLabel(self.tab_3)
-        #self.RowLabel3.setGeometry(QtCore.QRect(200, 10, 61, 31))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
+        self.gridLayout_16.addWidget(self.chartType_2, 0, 1, 1, 1)
+        
+        self.plotButton_2 = QtWidgets.QPushButton(self.chartTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.RowLabel3.sizePolicy().hasHeightForWidth())
-        self.RowLabel3.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.RowLabel3.setFont(font)
-        self.RowLabel3.setObjectName("RowLabel3")
+        sizePolicy.setHeightForWidth(self.plotButton_2.sizePolicy().hasHeightForWidth())
+        self.plotButton_2.setSizePolicy(sizePolicy)
+        self.plotButton_2.setObjectName("plotButton_2")
         
-        self.gridLayout_13.addWidget(self.RowLabel3, 0, 0, 1, 1)
+        self.gridLayout_16.addWidget(self.plotButton_2, 0, 2, 1, 1)
         
-        self.RowList3 = QtWidgets.QListWidget(self.tab_3)
-        #self.RowList3W = RowList3Widget()
-        #self.RowList3W.setGeometry(QtCore.QRect(260, 10, 521, 31))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Ignored)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.RowList3.sizePolicy().hasHeightForWidth())
-        self.RowList3.setSizePolicy(sizePolicy)
-        self.RowList3.setGeometry(QtCore.QRect(260, 10, 521, 31))
-        self.RowList3.setAcceptDrops(True)
-        self.RowList3.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.RowList3.setAutoFillBackground(True)
-        self.RowList3.setDragEnabled(True)
-        self.RowList3.setDragDropOverwriteMode(True)
-        self.RowList3.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
-        self.RowList3.setDefaultDropAction(QtCore.Qt.MoveAction)
-        self.RowList3.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        self.RowList3.setFlow(QtWidgets.QListView.LeftToRight)
-        self.RowList3.setObjectName("RowList3")
-        #self.RowList3.itemDoubleClicked.connect(self.RowDelect)
+        self.gridLayout_15.addLayout(self.gridLayout_16, 1, 0, 1, 3)
         
-        self.gridLayout_13.addWidget(self.RowList3, 0, 1, 1, 1)
-        self.gridLayout_12.addLayout(self.gridLayout_13, 0, 1, 1, 1)
-
-        self.sheetTable3 = QtWidgets.QTableView(self.tab_3)
-        #self.sheetTable.setGeometry(QtCore.QRect(200, 90, 581, 421))
+        self.gridLayout_17 = QtWidgets.QGridLayout()
+        self.gridLayout_17.setObjectName("gridLayout_17")
+        
+        self.widget_2 = QtWidgets.QWidget(self.chartTab)
+        self.widget_2.setObjectName("widget_2")
+        
+        self.gridLayout_17.addWidget(self.widget_2, 2, 0, 1, 1)
+        
+        self.widget = QtWidgets.QWidget(self.chartTab)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.sheetTable3.sizePolicy().hasHeightForWidth())
-        self.sheetTable3.setSizePolicy(sizePolicy)
-        self.sheetTable3.resizeColumnsToContents()
-        self.sheetTable3.resizeRowsToContents()
-        self.sheetTable3.verticalHeader().hide()
-        self.sheetTable3.horizontalHeader().hide()
+        sizePolicy.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
+        self.widget.setSizePolicy(sizePolicy)
+        self.widget.setObjectName("widget")
         
-        self.gridLayout_12.addWidget(self.sheetTable3, 1, 1, 1, 1)
+        self.gridLayout_17.addWidget(self.widget, 1, 0, 1, 1)
         
-        self.gridLayout_14 = QtWidgets.QGridLayout()
-        self.gridLayout_14.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
-        self.gridLayout_14.setObjectName("gridLayout_14")
+        self.gridLayout_18 = QtWidgets.QGridLayout()
+        self.gridLayout_18.setObjectName("gridLayout_18")
         
-        self.DimensionValuesLabel3 = QtWidgets.QLabel(self.tab_3)
-        #self.DimensionValuesLabel3.setGeometry(QtCore.QRect(13, 16, 161, 21))
+        self.ColList_2 = QtWidgets.QListWidget(self.chartTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.ColList_2.sizePolicy().hasHeightForWidth())
+        self.ColList_2.setSizePolicy(sizePolicy)
+        self.ColList_2.setMinimumSize(QtCore.QSize(0, 20))
+        self.ColList_2.setMaximumSize(QtCore.QSize(16777215, 30))
+        self.ColList_2.setAcceptDrops(True)
+        self.ColList_2.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.ColList_2.setAutoScroll(True)
+        self.ColList_2.setDragEnabled(True)
+        self.ColList_2.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.ColList_2.setDefaultDropAction(QtCore.Qt.MoveAction)
+        self.ColList_2.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.ColList_2.setTextElideMode(QtCore.Qt.ElideRight)
+        self.ColList_2.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerItem)
+        self.ColList_2.setHorizontalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
+        self.ColList_2.setFlow(QtWidgets.QListView.LeftToRight)
+        self.ColList_2.setProperty("isWrapping", False)
+        self.ColList_2.setGridSize(QtCore.QSize(100, 0))
+        self.ColList_2.setViewMode(QtWidgets.QListView.ListMode)
+        self.ColList_2.setUniformItemSizes(False)
+        self.ColList_2.setWordWrap(True)
+        self.ColList_2.setSelectionRectVisible(False)
+        self.ColList_2.setObjectName("ColList_2")
+        self.ColList_2.itemDoubleClicked.connect(self.RowDelect)
+        self.gridLayout_18.addWidget(self.ColList_2, 1, 1, 1, 1)
+        
+        self.ColLabel_2 = QtWidgets.QLabel(self.chartTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.ColLabel_2.sizePolicy().hasHeightForWidth())
+        self.ColLabel_2.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.ColLabel_2.setFont(font)
+        self.ColLabel_2.setObjectName("ColLabel_2")
+        
+        self.gridLayout_18.addWidget(self.ColLabel_2, 1, 0, 1, 1)
+        
+        self.RowLabel_2 = QtWidgets.QLabel(self.chartTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.RowLabel_2.sizePolicy().hasHeightForWidth())
+        self.RowLabel_2.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.RowLabel_2.setFont(font)
+        self.RowLabel_2.setObjectName("RowLabel_2")
+        
+        self.gridLayout_18.addWidget(self.RowLabel_2, 0, 0, 1, 1)
+        
+        self.RowList_2 = QtWidgets.QListWidget(self.chartTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.RowList_2.sizePolicy().hasHeightForWidth())
+        self.RowList_2.setSizePolicy(sizePolicy)
+        self.RowList_2.setMinimumSize(QtCore.QSize(0, 20))
+        self.RowList_2.setMaximumSize(QtCore.QSize(16777215, 30))
+        self.RowList_2.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
+        self.RowList_2.setAcceptDrops(True)
+        self.RowList_2.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.RowList_2.setAutoFillBackground(True)
+        self.RowList_2.setAutoScroll(True)
+        self.RowList_2.setAutoScrollMargin(5)
+        self.RowList_2.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked|QtWidgets.QAbstractItemView.EditKeyPressed|QtWidgets.QAbstractItemView.SelectedClicked)
+        self.RowList_2.setDragEnabled(True)
+        self.RowList_2.setDragDropOverwriteMode(False)
+        self.RowList_2.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.RowList_2.setDefaultDropAction(QtCore.Qt.MoveAction)
+        self.RowList_2.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.RowList_2.setTextElideMode(QtCore.Qt.ElideRight)
+        self.RowList_2.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerItem)
+        self.RowList_2.setHorizontalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
+        self.RowList_2.setFlow(QtWidgets.QListView.LeftToRight)
+        self.RowList_2.setProperty("isWrapping", False)
+        self.RowList_2.setGridSize(QtCore.QSize(100, 0))
+        self.RowList_2.setViewMode(QtWidgets.QListView.ListMode)
+        self.RowList_2.setUniformItemSizes(False)
+        self.RowList_2.setWordWrap(True)
+        self.RowList_2.setSelectionRectVisible(False)
+        self.RowList_2.setObjectName("RowList_2")
+        self.RowList_2.itemDoubleClicked.connect(self.RowDelect)
+        
+        self.gridLayout_18.addWidget(self.RowList_2, 0, 1, 1, 1)
+        
+        self.gridLayout_17.addLayout(self.gridLayout_18, 0, 0, 1, 1)
+        self.gridLayout_15.addLayout(self.gridLayout_17, 0, 2, 1, 1)
+        
+        self.gridLayout_19 = QtWidgets.QGridLayout()
+        self.gridLayout_19.setObjectName("gridLayout_19")
+        
+        self.DimensionValuesLabel_2 = QtWidgets.QLabel(self.chartTab)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.DimensionValuesLabel3.sizePolicy().hasHeightForWidth())
-        self.DimensionValuesLabel3.setSizePolicy(sizePolicy)
+        sizePolicy.setHeightForWidth(self.DimensionValuesLabel_2.sizePolicy().hasHeightForWidth())
+        self.DimensionValuesLabel_2.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setPointSize(10)
-        self.DimensionValuesLabel3.setFont(font)
-        self.DimensionValuesLabel3.setObjectName("DimensionValuesLabel")
+        self.DimensionValuesLabel_2.setFont(font)
+        self.DimensionValuesLabel_2.setObjectName("DimensionValuesLabel_2")
         
-        self.gridLayout_14.addWidget(self.DimensionValuesLabel3, 0, 0, 1, 1)
+        self.gridLayout_19.addWidget(self.DimensionValuesLabel_2, 0, 0, 1, 1)
         
-        self.FileListDimension3 = QtWidgets.QListWidget(self.tab_3)
-        #self.FileListDimension3.setGeometry(QtCore.QRect(10, 40, 181, 291))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        self.FileListDimension_2 = QtWidgets.QListWidget(self.chartTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.FileListDimension3.sizePolicy().hasHeightForWidth())
-        self.FileListDimension3.setSizePolicy(sizePolicy)
-        self.FileListDimension3.setAcceptDrops(True)
-        self.FileListDimension3.setDragEnabled(True)
-        self.FileListDimension3.setDragDropMode(QtWidgets.QAbstractItemView.DragOnly)
-        self.FileListDimension3.setDefaultDropAction(QtCore.Qt.CopyAction)
-        self.FileListDimension3.setWordWrap(True)
-        self.FileListDimension3.setObjectName("FileList")
+        sizePolicy.setHeightForWidth(self.FileListDimension_2.sizePolicy().hasHeightForWidth())
+        self.FileListDimension_2.setSizePolicy(sizePolicy)
+        self.FileListDimension_2.setMinimumSize(QtCore.QSize(0, 100))
+        self.FileListDimension_2.setAcceptDrops(True)
+        self.FileListDimension_2.setEditTriggers(QtWidgets.QAbstractItemView.AllEditTriggers)
+        self.FileListDimension_2.setDragEnabled(True)
+        self.FileListDimension_2.setDragDropOverwriteMode(True)
+        self.FileListDimension_2.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+        self.FileListDimension_2.setDefaultDropAction(QtCore.Qt.CopyAction)
+        self.FileListDimension_2.setBatchSize(100)
+        self.FileListDimension_2.setWordWrap(True)
+        self.FileListDimension_2.setObjectName("FileListDimension_2")
         for i in range(len(self.colHeader)):
             item = QtWidgets.QListWidgetItem()
-            self.FileListDimension3.addItem(item)
-        self.FileListDimension3.clicked.connect(self.DropDup)
+            self.FileListDimension_2.addItem(item)
+        self.FileListDimension_2.clicked.connect(self.DropDup)
         
-        self.gridLayout_14.addWidget(self.FileListDimension3, 1, 0, 1, 1)
+        self.gridLayout_19.addWidget(self.FileListDimension_2, 1, 0, 2, 1)
         
-        self.MeasureValuesLabel3 = QtWidgets.QLabel(self.tab_3)
-        #self.MeasureValuesLabel3.setGeometry(QtCore.QRect(10, 337, 161, 21))
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.MeasureValuesLabel3.setFont(font)
-        self.MeasureValuesLabel3.setObjectName("MeasureValuesLabel")
-        
-        self.gridLayout_14.addWidget(self.MeasureValuesLabel3, 2, 0, 1, 1)
-        
-        self.FileListMes3 = QtWidgets.QListWidget(self.tab_3)
-        #self.FileListMes3.setGeometry(QtCore.QRect(10, 360, 181, 151))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.FileListMes3.sizePolicy().hasHeightForWidth())
-        self.FileListMes3.setSizePolicy(sizePolicy)
-        self.FileListMes3.setAcceptDrops(True)
-        self.FileListMes3.setDragEnabled(True)
-        self.FileListMes3.setDragDropMode(QtWidgets.QAbstractItemView.DragOnly)
-        self.FileListMes3.setDragDropOverwriteMode(True)
-        self.FileListMes3.setDefaultDropAction(QtCore.Qt.CopyAction)
-        self.FileListMes3.setWordWrap(True)
-        self.FileListMes3.setObjectName("FileListMes")
-        for i in range(len(self.Measure)):
-            item = QtWidgets.QListWidgetItem()
-            self.FileListMes3.addItem(item)
-        #self.FileListMes3.clicked.connect(self.DropDup)
-        
-        self.gridLayout_14.addWidget(self.FileListMes3, 3, 0, 1, 1)
-        self.gridLayout_12.addLayout(self.gridLayout_14, 0, 0, 2, 1)
-        
-        self.gridLayout_15 = QtWidgets.QGridLayout()
-        self.gridLayout_15.setObjectName("gridLayout_15")
-        
-        spacerItem1 = QtWidgets.QSpacerItem(700, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_15.addItem(spacerItem1, 0, 0, 1, 1)
-        
-        self.comboBoxt3 = QtWidgets.QComboBox(self.tab_3)
-        #self.comboBox.setGeometry(QtCore.QRect(610, 510, 121, 31))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.comboBoxt3.sizePolicy().hasHeightForWidth())
-        self.comboBoxt3.setObjectName("comboBoxt2")
-        for i in self.typeChart :
-            self.comboBoxt3.addItem(i)
-        self.comboBoxt3.activated.connect(self.plot)
-        
-        self.gridLayout_15.addWidget(self.comboBoxt3, 0, 1, 1, 1)
-        
-        self.plotButton3 = QtWidgets.QPushButton(self.tab_3)
-        #self.plotButton3.setGeometry(QtCore.QRect(730, 510, 41, 31))
+        self.MeasureValuesLabel_2 = QtWidgets.QLabel(self.chartTab)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.plotButton3.sizePolicy().hasHeightForWidth())
-        self.plotButton3.setSizePolicy(sizePolicy)
-        self.plotButton3.setObjectName("plotButton3")
-        self.plotButton3.clicked.connect(self.plot)
+        sizePolicy.setHeightForWidth(self.MeasureValuesLabel_2.sizePolicy().hasHeightForWidth())
+        self.MeasureValuesLabel_2.setSizePolicy(sizePolicy)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.MeasureValuesLabel_2.setFont(font)
+        self.MeasureValuesLabel_2.setObjectName("MeasureValuesLabel_2")
         
-        self.gridLayout_15.addWidget(self.plotButton3, 0, 2, 1, 1)
-        self.gridLayout_12.addLayout(self.gridLayout_15, 2, 0, 1, 2)
+        self.gridLayout_19.addWidget(self.MeasureValuesLabel_2, 3, 0, 1, 1)
         
-        self.tabWidget.addTab(self.tab_3, "Chart")
+        self.filterLabel_2 = QtWidgets.QLabel(self.chartTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.filterLabel_2.sizePolicy().hasHeightForWidth())
+        self.filterLabel_2.setSizePolicy(sizePolicy)
+        self.filterLabel_2.setMinimumSize(QtCore.QSize(30, 30))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.filterLabel_2.setFont(font)
+        self.filterLabel_2.setObjectName("filterLabel_2")
+        
+        self.gridLayout_19.addWidget(self.filterLabel_2, 0, 1, 1, 1)
+        
+        self.FileListMes_2 = QtWidgets.QListWidget(self.chartTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.FileListMes_2.sizePolicy().hasHeightForWidth())
+        self.FileListMes_2.setSizePolicy(sizePolicy)
+        self.FileListMes_2.setAcceptDrops(True)
+        self.FileListMes_2.setDragEnabled(True)
+        self.FileListMes_2.setDragDropOverwriteMode(True)
+        self.FileListMes_2.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+        self.FileListMes_2.setDefaultDropAction(QtCore.Qt.CopyAction)
+        self.FileListMes_2.setBatchSize(100)
+        self.FileListMes_2.setWordWrap(True)
+        self.FileListMes_2.setObjectName("FileListMes_2")
+        for i in range(len(self.Measure)):
+            item = QtWidgets.QListWidgetItem()
+            self.FileListMes_2.addItem(item)
+        #self.FileListMes3.clicked.connect(self.DropDup)
+        
+        self.gridLayout_19.addWidget(self.FileListMes_2, 4, 0, 1, 1)
+        
+        self.filterButton_2 = QtWidgets.QPushButton(self.chartTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.filterButton_2.sizePolicy().hasHeightForWidth())
+        self.filterButton_2.setSizePolicy(sizePolicy)
+        self.filterButton_2.setMinimumSize(QtCore.QSize(30, 30))
+        self.filterButton_2.setObjectName("filterButton_2")
+        
+        self.gridLayout_19.addWidget(self.filterButton_2, 0, 2, 1, 1)
+        
+        self.filterList_2 = QtWidgets.QListWidget(self.chartTab)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.filterList_2.sizePolicy().hasHeightForWidth())
+        self.filterList_2.setSizePolicy(sizePolicy)
+        self.filterList_2.setMinimumSize(QtCore.QSize(70, 100))
+        self.filterList_2.setAcceptDrops(True)
+        self.filterList_2.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.filterList_2.setDefaultDropAction(QtCore.Qt.MoveAction)
+        self.filterList_2.setObjectName("filterList_2")
+        item = QtWidgets.QListWidgetItem()
+        self.filterList_2.addItem(item)
+        item = QtWidgets.QListWidgetItem()
+        self.filterList_2.addItem(item)
+        item = QtWidgets.QListWidgetItem()
+        self.filterList_2.addItem(item)
+        self.gridLayout_19.addWidget(self.filterList_2, 1, 1, 2, 2)
+        self.gridLayout_15.addLayout(self.gridLayout_19, 0, 0, 1, 1)
+        self.gridLayout_20.addLayout(self.gridLayout_15, 0, 0, 1, 1)
+        
+        self.tabWidget.addTab(self.chartTab, "Chart")
         
         self.gridLayout_7.addWidget(self.tabWidget, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -904,11 +1061,11 @@ class Ui_MainWindow(object):
         if self.selectFile != []: fileSelectName = self.selectFile[0]
         #print(fileSelectName)
         
-        self.selectFileLabel.setText(_translate("MainWindow", fileSelectName))
-        self.usedFile.setText(_translate("MainWindow", "Used File"))
+        self.selectDimentionLabel.setText(_translate("MainWindow", fileSelectName))
+        self.usedFileLabel.setText(_translate("MainWindow", "Used File"))
         
         self.usedFileButton.setText(_translate("MainWindow", "Use"))
-        self.selectFileButton.setText(_translate("MainWindow", "Directory"))
+        self.selectDimentionButton.setText(_translate("MainWindow", "Directory"))
         
         #if self.selectFile in self.fileNameList :
         self.FileList.setSortingEnabled(True)
@@ -932,8 +1089,10 @@ class Ui_MainWindow(object):
         self.loadButton.setText(_translate("MainWindow", "Load"))
         
         #tab 2
-        self.DimensionValuesLabel.setText(_translate("MainWindow", "Dimension"))
         
+        self.DimensionValuesLabel.setText(_translate("MainWindow", "Dimension"))
+        self.filterLabel.setText(_translate("MainWindow", " Filter "))
+        self.filterButton.setText(_translate("MainWindow", " Filter "))
         self.FileList.setSortingEnabled(True)
         __sortingEnabled = self.FileListDimension.isSortingEnabled()
         self.FileList.setSortingEnabled(False)
@@ -959,29 +1118,32 @@ class Ui_MainWindow(object):
         self.plotButton.setText(_translate("MainWindow", "PLOT"))
         
         #TAB3
-        self.ColLabel3.setText(_translate("MainWindow", "Column"))
-        self.RowLabel3.setText(_translate("MainWindow", "Row"))
+        self.ColLabel_2.setText(_translate("MainWindow", "Column"))
+        self.RowLabel_2.setText(_translate("MainWindow", "Row"))
+        self.filterLabel_2.setText(_translate("MainWindow", "Filter"))
+        self.filterButton_2.setText(_translate("MainWindow", " Filter "))
+        
         #self.ColDell.setText(_translate("MainWindow", "DEL"))
         #self.RowDell.setText(_translate("MainWindow", "DEL"))
                     
-        self.plotButton3.setText(_translate("MainWindow", "PLOT"))
+        self.plotButton_2.setText(_translate("MainWindow", "PLOT"))
         
-        self.DimensionValuesLabel3.setText(_translate("MainWindow", "Dimension"))
-        __sortingEnabled = self.FileListDimension3.isSortingEnabled()
+        self.DimensionValuesLabel_2.setText(_translate("MainWindow", "Dimension"))
+        __sortingEnabled = self.FileListDimension_2.isSortingEnabled()
         for i,j in zip(range(len(self.colHeader)),self.colHeader):
-            item = self.FileListDimension3.item(i)
+            item = self.FileListDimension_2.item(i)
             item.setText(_translate("MainWindow", str(j)))
-        self.FileListDimension3.setSortingEnabled(__sortingEnabled)
+        self.FileListDimension_2.setSortingEnabled(__sortingEnabled)
         
-        self.MeasureValuesLabel3.setText(_translate("MainWindow", "Measure Values"))
+        self.MeasureValuesLabel_2.setText(_translate("MainWindow", "Measure Values"))
         
-        self.FileListMes3.setSortingEnabled(True)
-        __sortingEnabled = self.FileListMes3.isSortingEnabled()
-        self.FileListMes3.setSortingEnabled(False)
+        self.FileListMes_2.setSortingEnabled(True)
+        __sortingEnabled = self.FileListMes_2.isSortingEnabled()
+        self.FileListMes_2.setSortingEnabled(False)
         for i,j in zip(range(len(self.Measure)),self.Measure):
-            item = self.FileListMes3.item(i)
+            item = self.FileListMes_2.item(i)
             item.setText(_translate("MainWindow", str(j)))
-        self.FileListMes3.setSortingEnabled(__sortingEnabled)
+        self.FileListMes_2.setSortingEnabled(__sortingEnabled)
         
     def tab2(self,MainWindow):
         print(self.RowChoose,self.ColChoose)
@@ -1002,8 +1164,20 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         
+        __sortingEnabled = self.filterList.isSortingEnabled()
+        self.filterList.setSortingEnabled(False)
+        item = self.filterList.item(0)
+        item.setText(_translate("MainWindow", "New Item"))
+        item = self.filterList.item(1)
+        item.setText(_translate("MainWindow", "22"))
+        item = self.filterList.item(2)
+        item.setText(_translate("MainWindow", "New Item"))
+        self.filterList.setSortingEnabled(__sortingEnabled)
+        
         for i,j in zip(range(len(self.ColChoose)),self.ColChoose):
+            item = QListWidgetItem('Blue')
             item = self.ColList.item(i)
+            
             item.setText(_translate("MainWindow", str(j)))
         
         for i,j in zip(range(len(self.RowChoose)),self.RowChoose):
@@ -1021,6 +1195,7 @@ class Ui_MainWindow(object):
             #self.RowList3.setModel(self.RowList3W)
         #self.RowList3.itemDoubleClicked.connect(self.RowDelect)
         self.ColList3.clear()
+        
         for i in range(len(self.ColChoose)):
             item = QtWidgets.QListWidgetItem()
             self.ColList3.addItem(item)
