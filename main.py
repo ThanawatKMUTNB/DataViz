@@ -1,3 +1,4 @@
+from curses import BUTTON1_CLICKED
 from email import header
 from msilib.schema import Class
 from operator import mod
@@ -12,6 +13,8 @@ import pandas as pd
 from io import StringIO
 from Altair_Graph.Bar_Chart import WebEngineView
 import csvManager as cmpage
+import filterMes
+import filterDimen
 from PyQt5.QtCore import Qt, QPointF
 from PyQt5 import QtCore, QtGui, QtWidgets , QtChart ,QtWebEngineWidgets
 from PyQt5.QtChart import QChart
@@ -159,14 +162,38 @@ class Ui_MainWindow(object):
         self.dataSheet = ""
         self.typeChart = ['Line', 'Bar', 'Pie']
         self.Chart = None
+        self.filDic = {}
         self.setupUi(MainWindow)
         #DimenForChoose = []
+    def filChange(self):
+        itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
+        self.filterList_2.clear()
+        for j in itemsTextList:
+            self.filterList_2.addItem(j)
+        self.filDic = dict.fromkeys(itemsTextList, "")
+        print(self.filDic)
         
-    def getMeasual(self):
-        return self.Measure
-    
-    def wc(self):
-        return self.Measure
+    def filChange_2(self):
+        itemsTextList =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]
+        self.filterList.clear()
+        for j in itemsTextList:
+            self.filterList.addItem(j)
+        self.filDic = dict.fromkeys(itemsTextList, "")
+        print(self.filDic)
+            
+    def openFilterPage(self):
+        filterItem = self.filterList.currentRow()
+        strItem = self.filterList.item(filterItem).text()
+        self.Window = QtWidgets.QMainWindow()
+        if strItem in self.Measure :
+            self.uiM = filterMes.Ui_MainWindowM()
+            self.uiM.setupUi(self.Window)
+            #fp.setupUi(filPage)
+        else :
+            self.uiD = filterDimen.Ui_MainWindowD()
+            self.uiD.setupUi(self.Window)
+        self.Window.show()
+            #fp.setupUi(filPage)
     
     def DropDup(self):
         itemsTextList =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
@@ -226,29 +253,85 @@ class Ui_MainWindow(object):
                 self.colHeader.remove(i)
         Ui_MainWindow.setupUi(self, MainWindow)
         
+    def fillDel_2(self):
+        cur = self.filterList_2.currentRow()
+        self.filterList_2.takeItem(cur)
+        self.filChange_2()
+        
+    def fillDel(self):
+        cur = self.filterList.currentRow()
+        self.filterList.takeItem(cur)
+        self.filChange()
+            
+    def RowDelect_2(self,item):
+        if len(self.RowChoose) != 0:
+            row_2 = self.RowList_2.currentRow()
+            self.RowList_2.takeItem(row_2)
+            tmp = []
+            tmp =  [str(self.RowList_2.item(i).text()) for i in range(self.RowList_2.count())]
+            self.RowChoose = tmp
+            tmp = [] 
+            tmp =  [str(self.ColList_2.item(i).text()) for i in range(self.ColList_2.count())]
+            self.ColChoose = tmp
+            self.plot()
+            
     def RowDelect(self,item):
         if len(self.RowChoose) != 0:
             row = self.RowList.currentRow()
             self.RowList.takeItem(row)
+            tmp = []
+            tmp =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
+            self.RowChoose = tmp
+            tmp = [] 
+            tmp =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
+            self.ColChoose = tmp
             self.plot()
-            
+    
+    def ColDelect_2(self,item):
+        if len(self.ColChoose) != 0:
+            Col_2 = self.ColList_2.currentRow()
+            self.ColList_2.takeItem(Col_2)
+            tmp = []
+            tmp =  [str(self.RowList_2.item(i).text()) for i in range(self.RowList_2.count())]
+            self.RowChoose = tmp
+            tmp = [] 
+            tmp =  [str(self.ColList_2.item(i).text()) for i in range(self.ColList_2.count())]
+            self.ColChoose = tmp
+            self.plot()
+        
     def ColDelect(self,item):
         if len(self.ColChoose) != 0:
             Col = self.ColList.currentRow()
             self.ColList.takeItem(Col)
+            tmp = []
+            tmp =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
+            self.RowChoose = tmp
+            tmp = []
+            tmp =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
+            self.ColChoose = tmp
             self.plot()
+            
+    def setplot_2(self):
+        tmp = []
+        tmp =  [str(self.RowList_2.item(i).text()) for i in range(self.RowList_2.count())]
+        self.RowChoose = tmp
+        tmp = [] 
+        tmp =  [str(self.ColList_2.item(i).text()) for i in range(self.ColList_2.count())]
+        self.ColChoose = tmp
+        self.plot()
         
-    def plot(self):
+    def setplot(self):
         print("--------",self.RowChoose,self.ColChoose)
         tmp = []
         tmp =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
-        #tmp3 =  [str(self.RowList3.item(i).text()) for i in range(self.RowList3.count())]
         self.RowChoose = tmp
         tmp = [] 
         tmp =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
-        #tmp3 =  [str(self.ColList3.item(i).text()) for i in range(self.ColList3.count())]
         self.ColChoose = tmp
+        print("--------",self.RowChoose,self.ColChoose)
+        self.plot()
         
+    def plot(self):
         while (self.RowChoose.count('')):
             self.RowChoose.remove('')
         while (self.ColChoose.count('')):
@@ -265,7 +348,7 @@ class Ui_MainWindow(object):
                     self.RowChoose.remove(i)
                 self.ColChoose = self.ColChoose + isInterRow'''
                 gm.setList(self.RowChoose,self.ColChoose,self.data)
-                self.Chart = gm.chooseChart(str(self.comboBox.currentText()))
+                self.Chart = gm.chooseChart(str(self.chartType.currentText()))
                     #self.RowList.addItems(self.RowChoose)
                     #self.ColList.addItems(self.ColChoose)
                     #self.tab3(MainWindow)
@@ -276,7 +359,7 @@ class Ui_MainWindow(object):
                     self.ColChoose.remove(i)
                 self.RowChoose = self.RowChoose + isInterCol'''
                 gm.setList(self.RowChoose,self.ColChoose,self.data)
-                self.Chart = gm.chooseChart(str(self.comboBox.currentText()))
+                self.Chart = gm.chooseChart(str(self.chartType.currentText()))
                     #self.RowList.addItems(self.RowChoose)
                     #self.ColList.addItems(self.ColChoose)
                     #self.tab3(MainWindow)
@@ -490,9 +573,6 @@ class Ui_MainWindow(object):
         self.gridLayout_6.addLayout(self.gridLayout_4, 0, 0, 1, 1)
         
         self.tabWidget.addTab(self.dataSourceTab, "Data Source")
-
-        self.gridLayout_4.addWidget(self.table, 0, 1, 1, 1)
-        self.gridLayout_6.addLayout(self.gridLayout_4, 0, 0, 1, 1)
         
         #self.tabWidget.addTab(self.dataSourceTab, "Data Souce")
 
@@ -532,7 +612,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.plotButton.sizePolicy().hasHeightForWidth())
         self.plotButton.setSizePolicy(sizePolicy)
         self.plotButton.setObjectName("plotButton")
-        self.plotButton.clicked.connect(self.plot)
+        self.plotButton.clicked.connect(self.setplot)
         
         self.gridLayout_9.addWidget(self.plotButton, 0, 2, 1, 1)
         self.gridLayout_11.addLayout(self.gridLayout_9, 1, 0, 1, 3)
@@ -563,6 +643,7 @@ class Ui_MainWindow(object):
         self.ColList.setGridSize(QtCore.QSize(100, 0))
         self.ColList.setObjectName("ColList")
         self.ColList.itemDoubleClicked.connect(self.ColDelect)
+        # self.ColList.itemChanged.connect(self.setplot)
         #self.ColList.itemClicked.connect(self.cw)
         
         self.gridLayout_8.addWidget(self.ColList, 1, 1, 1, 1)
@@ -614,6 +695,7 @@ class Ui_MainWindow(object):
         self.RowList.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.RowList.setFlow(QtWidgets.QListView.LeftToRight)
         self.RowList.setObjectName("RowList")
+        # self.RowList.itemChanged.connect(self.setplot)
         self.RowList.itemDoubleClicked.connect(self.RowDelect)
         
         self.gridLayout_8.addWidget(self.RowList, 0, 1, 1, 1)
@@ -632,8 +714,8 @@ class Ui_MainWindow(object):
         self.sheetTable.resizeRowsToContents()
         self.sheetTable.horizontalHeader().setCascadingSectionResizes(True)
         self.sheetTable.verticalHeader().setCascadingSectionResizes(True)
-        self.sheetTable.verticalHeader().hide()
-        self.sheetTable.horizontalHeader().hide()
+        #self.sheetTable.verticalHeader().hide()
+        #self.sheetTable.horizontalHeader().hide()
         
         self.gridLayout_13.addWidget(self.sheetTable, 1, 0, 1, 1)
         self.gridLayout_11.addLayout(self.gridLayout_13, 0, 2, 1, 1)
@@ -746,14 +828,11 @@ class Ui_MainWindow(object):
         self.filterList.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
         self.filterList.setDefaultDropAction(QtCore.Qt.MoveAction)
         self.filterList.setObjectName("filterList")
-        item = QtWidgets.QListWidgetItem()
-        self.filterList.addItem(item)
-        item = QtWidgets.QListWidgetItem()
-        self.filterList.addItem(item)
-        item = QtWidgets.QListWidgetItem()
-        self.filterList.addItem(item)
-        self.gridLayout_10.addWidget(self.filterList, 1, 1, 2, 2)
+        self.filterList.itemClicked.connect(self.openFilterPage)
+        self.filterList.itemChanged.connect(self.filChange)
+        #self.filterList.itemDoubleClicked.connect(self.fillDel)
         
+        self.gridLayout_10.addWidget(self.filterList, 1, 1, 2, 2)
         self.gridLayout_11.addLayout(self.gridLayout_10, 0, 0, 1, 1)
         self.gridLayout_14.addLayout(self.gridLayout_11, 0, 0, 1, 1)
         
@@ -800,6 +879,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.plotButton_2.sizePolicy().hasHeightForWidth())
         self.plotButton_2.setSizePolicy(sizePolicy)
         self.plotButton_2.setObjectName("plotButton_2")
+        self.plotButton_2.clicked.connect(self.setplot_2)
         
         self.gridLayout_16.addWidget(self.plotButton_2, 0, 2, 1, 1)
         
@@ -808,20 +888,23 @@ class Ui_MainWindow(object):
         self.gridLayout_17 = QtWidgets.QGridLayout()
         self.gridLayout_17.setObjectName("gridLayout_17")
         
-        self.widget_2 = QtWidgets.QWidget(self.chartTab)
-        self.widget_2.setObjectName("widget_2")
+        self.view = WebEngineView(self.chartTab)
+        if self.Chart != None :
+            print("Chart not none")
+            self.view.updateChart(self.Chart)
+            self.view.show()
+                  
+        self.gridLayout_17.addWidget(self.view, 1, 0, 1, 1)
         
-        self.gridLayout_17.addWidget(self.widget_2, 2, 0, 1, 1)
+        # self.widget = QtWidgets.QWidget(self.chartTab)
+        # sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        # sizePolicy.setHorizontalStretch(0)
+        # sizePolicy.setVerticalStretch(0)
+        # sizePolicy.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
+        # self.widget.setSizePolicy(sizePolicy)
+        # self.widget.setObjectName("widget")
         
-        self.widget = QtWidgets.QWidget(self.chartTab)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
-        self.widget.setSizePolicy(sizePolicy)
-        self.widget.setObjectName("widget")
-        
-        self.gridLayout_17.addWidget(self.widget, 1, 0, 1, 1)
+        # self.gridLayout_17.addWidget(self.widget, 1, 0, 1, 1)
         
         self.gridLayout_18 = QtWidgets.QGridLayout()
         self.gridLayout_18.setObjectName("gridLayout_18")
@@ -852,7 +935,9 @@ class Ui_MainWindow(object):
         self.ColList_2.setWordWrap(True)
         self.ColList_2.setSelectionRectVisible(False)
         self.ColList_2.setObjectName("ColList_2")
-        self.ColList_2.itemDoubleClicked.connect(self.RowDelect)
+        # self.ColList_2.itemChanged.connect(self.setplot_2)
+        self.ColList_2.itemDoubleClicked.connect(self.ColDelect_2)
+        
         self.gridLayout_18.addWidget(self.ColList_2, 1, 1, 1, 1)
         
         self.ColLabel_2 = QtWidgets.QLabel(self.chartTab)
@@ -912,7 +997,8 @@ class Ui_MainWindow(object):
         self.RowList_2.setWordWrap(True)
         self.RowList_2.setSelectionRectVisible(False)
         self.RowList_2.setObjectName("RowList_2")
-        self.RowList_2.itemDoubleClicked.connect(self.RowDelect)
+        self.RowList_2.itemDoubleClicked.connect(self.RowDelect_2)
+        # self.RowList_2.itemChanged.connect(self.setplot_2)
         
         self.gridLayout_18.addWidget(self.RowList_2, 0, 1, 1, 1)
         
@@ -946,7 +1032,7 @@ class Ui_MainWindow(object):
         self.FileListDimension_2.setEditTriggers(QtWidgets.QAbstractItemView.AllEditTriggers)
         self.FileListDimension_2.setDragEnabled(True)
         self.FileListDimension_2.setDragDropOverwriteMode(True)
-        self.FileListDimension_2.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+        self.FileListDimension_2.setDragDropMode(QtWidgets.QAbstractItemView.DragOnly)
         self.FileListDimension_2.setDefaultDropAction(QtCore.Qt.CopyAction)
         self.FileListDimension_2.setBatchSize(100)
         self.FileListDimension_2.setWordWrap(True)
@@ -1028,12 +1114,10 @@ class Ui_MainWindow(object):
         self.filterList_2.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
         self.filterList_2.setDefaultDropAction(QtCore.Qt.MoveAction)
         self.filterList_2.setObjectName("filterList_2")
-        item = QtWidgets.QListWidgetItem()
-        self.filterList_2.addItem(item)
-        item = QtWidgets.QListWidgetItem()
-        self.filterList_2.addItem(item)
-        item = QtWidgets.QListWidgetItem()
-        self.filterList_2.addItem(item)
+        self.filterList_2.itemClicked.connect(self.openFilterPage)
+        self.filterList_2.itemChanged.connect(self.filChange_2)
+        # self.filterList.itemDoubleClicked.connect(self.fillDel_2)
+        
         self.gridLayout_19.addWidget(self.filterList_2, 1, 1, 2, 2)
         self.gridLayout_15.addLayout(self.gridLayout_19, 0, 0, 1, 1)
         self.gridLayout_20.addLayout(self.gridLayout_15, 0, 0, 1, 1)
@@ -1106,15 +1190,14 @@ class Ui_MainWindow(object):
         self.FileListMes.setSortingEnabled(True)
         __sortingEnabled = self.FileListMes.isSortingEnabled()
         self.FileListMes.setSortingEnabled(False)
-        for i,j in zip(range(len(self.Measure)),self.Measure):
-            item = self.FileListMes.item(i)
-            item.setText(_translate("MainWindow", str(j)))
+        if self.selectFile != []:
+            for i,j in zip(range(len(self.Measure)),self.Measure):
+                item = self.FileListMes.item(i)
+                item.setText(_translate("MainWindow", str(j)))
         self.FileListMes.setSortingEnabled(__sortingEnabled)
         
         self.ColLabel.setText(_translate("MainWindow", "Column"))
         self.RowLabel.setText(_translate("MainWindow", "Row"))
-        #self.ColDell.setText(_translate("MainWindow", "DEL"))
-        #self.RowDell.setText(_translate("MainWindow", "DEL"))
         self.plotButton.setText(_translate("MainWindow", "PLOT"))
         
         #TAB3
@@ -1122,9 +1205,6 @@ class Ui_MainWindow(object):
         self.RowLabel_2.setText(_translate("MainWindow", "Row"))
         self.filterLabel_2.setText(_translate("MainWindow", "Filter"))
         self.filterButton_2.setText(_translate("MainWindow", " Filter "))
-        
-        #self.ColDell.setText(_translate("MainWindow", "DEL"))
-        #self.RowDell.setText(_translate("MainWindow", "DEL"))
                     
         self.plotButton_2.setText(_translate("MainWindow", "PLOT"))
         
@@ -1140,9 +1220,10 @@ class Ui_MainWindow(object):
         self.FileListMes_2.setSortingEnabled(True)
         __sortingEnabled = self.FileListMes_2.isSortingEnabled()
         self.FileListMes_2.setSortingEnabled(False)
-        for i,j in zip(range(len(self.Measure)),self.Measure):
-            item = self.FileListMes_2.item(i)
-            item.setText(_translate("MainWindow", str(j)))
+        if self.selectFile != []:
+            for i,j in zip(range(len(self.Measure)),self.Measure):
+                item = self.FileListMes_2.item(i)
+                item.setText(_translate("MainWindow", str(j)))
         self.FileListMes_2.setSortingEnabled(__sortingEnabled)
         
     def tab2(self,MainWindow):
@@ -1164,16 +1245,6 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         
-        __sortingEnabled = self.filterList.isSortingEnabled()
-        self.filterList.setSortingEnabled(False)
-        item = self.filterList.item(0)
-        item.setText(_translate("MainWindow", "New Item"))
-        item = self.filterList.item(1)
-        item.setText(_translate("MainWindow", "22"))
-        item = self.filterList.item(2)
-        item.setText(_translate("MainWindow", "New Item"))
-        self.filterList.setSortingEnabled(__sortingEnabled)
-        
         for i,j in zip(range(len(self.ColChoose)),self.ColChoose):
             item = QListWidgetItem('Blue')
             item = self.ColList.item(i)
@@ -1188,36 +1259,37 @@ class Ui_MainWindow(object):
         alt.data_transformers.disable_max_rows()
         altair_viewer._global_viewer._use_bundled_js = False
         alt.data_transformers.enable('data_server')
-        self.RowList3.clear()
+        
+        self.RowList_2.clear()
         for i in range(len(self.RowChoose)):
             item = QtWidgets.QListWidgetItem()
-            self.RowList3.addItem(item)
+            self.RowList_2.addItem(item)
             #self.RowList3.setModel(self.RowList3W)
         #self.RowList3.itemDoubleClicked.connect(self.RowDelect)
-        self.ColList3.clear()
         
+        self.ColList_2.clear()
         for i in range(len(self.ColChoose)):
             item = QtWidgets.QListWidgetItem()
-            self.ColList3.addItem(item)
+            self.ColList_2.addItem(item)
         #self.ColList3.itemDoubleClicked.connect(self.ColDelect)
         
-        view = WebEngineView(self.tab_3)
-        view.setGeometry(QtCore.QRect(200, 90, 581, 421))
+        # view = WebEngineView(self.chartTab)
+        #view.setGeometry(QtCore.QRect(200, 90, 581, 421))
         if self.Chart != None :
             print("Chart not none")
-            view.updateChart(self.Chart)
-        view.show()
+            self.view.updateChart(self.Chart)
+            self.view.show()
         
         #tab 3
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         
         for i,j in zip(range(len(self.ColChoose)),self.ColChoose):
-            item = self.ColList3.item(i)
+            item = self.ColList_2.item(i)
             item.setText(_translate("MainWindow", str(j)))
         
         for i,j in zip(range(len(self.RowChoose)),self.RowChoose):
-            item = self.RowList3.item(i)
+            item = self.RowList_2.item(i)
             item.setText(_translate("MainWindow", str(j)))
         
 if __name__ == "__main__":

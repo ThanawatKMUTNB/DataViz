@@ -228,7 +228,9 @@ class csvManager:
                 k = k.replace(np.nan, '')
         #print(type(k))
         #print(k.index.tolist())
-        list_of_lists = [list(elem) for elem in k.index.tolist()]
+        
+        #list_of_lists = [list(elem) for elem in k.index.tolist()]
+        
         #print(list_of_lists)
         #print(len(k))
         #print(k)
