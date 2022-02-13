@@ -33,6 +33,7 @@ class graphManager():
     def chooseChart(self,chart):
         row = self.RowChoose
         column = self.ColChoose
+        print(chart)
 
         f = 'sum'
         def checkMeasure(R,C):      #True when row is measure
@@ -43,7 +44,6 @@ class graphManager():
                     return False
 
         if chart == 'Bar':
-            print('Bar')
             if checkMeasure(row,column):    #row is measure
                 if len(row) == 1:
                     return alt.vconcat(self.plotBar(row[0],column,f))
