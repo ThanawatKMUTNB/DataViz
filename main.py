@@ -159,7 +159,7 @@ class Ui_MainWindow(object):
         self.RowChoose = []
         self.ColChoose = []
         self.dataSheet = ""
-        self.typeChart = ['Line', 'Bar', 'Pie']
+        self.typeChart = ['Bar','Line', 'Pie']
         self.Chart = None
         self.filDic = {}
         self.chartTypeS = ''
@@ -340,11 +340,10 @@ class Ui_MainWindow(object):
             self.RowChoose.remove('')
         while (self.ColChoose.count('')):
             self.ColChoose.remove('')
-            
         isInterRow = list(set.intersection(set(self.RowChoose),set(self.Measure)))
         isInterCol = list(set.intersection(set(self.ColChoose),set(self.Measure)))
         # print("--------",self.RowChoose,self.ColChoose)
-        print(str(self.chartTypeS))
+        # print(str(self.chartTypeS))
         if  isInterRow != [] and isInterCol != []:
             self.chartType.clear()
             self.chartType.addItems([""])
@@ -368,13 +367,14 @@ class Ui_MainWindow(object):
                         self.ColChoose.remove(i)
                     self.RowChoose = self.RowChoose + isInterCol'''
                     gm.setList(self.RowChoose,self.ColChoose,self.data)
+                    # print(str(self.chartTypeS))
                     self.Chart = gm.chooseChart(str(self.chartTypeS))
                         #self.RowList.addItems(self.RowChoose)
                         #self.ColList.addItems(self.ColChoose)
                         #self.tab3(MainWindow)
-                    
-        self.tab2(MainWindow)
         self.tab3(MainWindow)
+        self.tab2(MainWindow)
+        # self.tab3(MainWindow)
         
         if self.ColChoose != [] or self.RowChoose != [] :
             #print(self.dataSheet)
