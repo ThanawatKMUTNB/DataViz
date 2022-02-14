@@ -251,9 +251,6 @@ class csvManager:
         k.index = changIndex
         print(k)'''
         return k
-    def savePandas(self) :
-        #df = self.data
-        self.df.to_json(r"C:\Users\Pooncharat Wongkom\Desktop\Test4\TableauDataAnalysis\FileName.json",orient='table') #change disk
 
 ex = csvManager()
 ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')

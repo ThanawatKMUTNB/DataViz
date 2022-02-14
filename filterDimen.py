@@ -9,7 +9,7 @@ class Ui_MainWindow(object):
         self.sheet = ''
     
     def setStart(self,filHead,dic,data):
-        # print(filHead)
+        print("HHHHHHHH",filHead)
         self.filtered = dic
         self.head = filHead
         self.sheet = data
@@ -21,12 +21,12 @@ class Ui_MainWindow(object):
         print(self.filtered)
         self.filtered[self.head] = self.sheet[self.head].drop_duplicates().tolist()
         print(self.filtered)
-        self.setupUi(MainWindow)
+        # self.setupUi(MainWindow)
     
     def clickApply(self):
         print("kk")
-        for index in range(self.filterItemListWidget.count()):
-            print(self.filterItemListWidget.item(index).checkState())
+        # for index in range(self.filterItemListWidget.count()):
+        #     print(self.filterItemListWidget.item(index).checkState())
             # if self.filterItemListWidget.item(index).checkState() == 2:
             #     checked_items.append(self.listWidgetLabels.item(index))
             
@@ -64,12 +64,14 @@ class Ui_MainWindow(object):
         self.filterItemListWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.filterItemListWidget.setObjectName("filterItemListWidget")
         # print(type(self.sheet[self.head]))
+        # l = self.sheet[self.head]
         for i in self.sheet[self.head].drop_duplicates():
+            # print(i)
             item = QtWidgets.QListWidgetItem()
             if i in self.filtered[self.head]:
-                item.setCheckState(QtCore.Qt.Checked) #2
+                item.setCheckState(QtCore.Qt.Unchecked) #2
             else:
-                item.setCheckState(QtCore.Qt.Unchecked) #0
+                item.setCheckState(QtCore.Qt.Checked) #0
             self.filterItemListWidget.addItem(item)
         
         # print(self.filterItemListWidget.item(0).checkState())
@@ -157,11 +159,11 @@ class Ui_MainWindow(object):
         # self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Tab 2"))
 
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+# if __name__ == "__main__":
+#     import sys
+#     app = QtWidgets.QApplication(sys.argv)
+#     MainWindow = QtWidgets.QMainWindow()
+#     ui = Ui_MainWindow()
+#     ui.setupUi(MainWindow)
+#     MainWindow.show()
+#     sys.exit(app.exec_())

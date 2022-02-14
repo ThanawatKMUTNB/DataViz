@@ -7,6 +7,7 @@ class Ui_MainWindow(object):
         self.sheet = ''
         self.min = ''
         self.max = ''
+        # self.atMostSlider.valueChanged.connect(self.valuechange)
     
     def setStart(self,filHead,dic,data):
         # print(filHead)
@@ -47,9 +48,11 @@ class Ui_MainWindow(object):
         self.cancleButton.setObjectName("cancleButton")
         self.gridLayout.addWidget(self.cancleButton, 0, 3, 1, 1)
         self.gridLayout_7.addLayout(self.gridLayout, 1, 0, 1, 1)
+        
         self.deleteButton = QtWidgets.QPushButton(self.centralwidget)
         self.deleteButton.setObjectName("deleteButton")
         self.deleteButton.clicked.connect(self.clickDeleteButton)
+        
         self.gridLayout_7.addWidget(self.deleteButton, 2, 0, 1, 1)
         
         
@@ -128,8 +131,6 @@ class Ui_MainWindow(object):
         self.atMostSlider.setInvertedAppearance(False)
         self.atMostSlider.setTickPosition(QtWidgets.QSlider.TicksBelow)
         self.atMostSlider.setObjectName("atMostSlider")
-        
-        self.atMostSlider.valueChanged.connect(self.valuechange)
         
         self.gridLayout_9.addWidget(self.atMostSlider, 0, 1, 1, 1)
         self.gridLayout_10.addLayout(self.gridLayout_9, 4, 0, 1, 1)
@@ -305,11 +306,11 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.atMostTab), _translate("MainWindow", "At most"))
 
 
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+# if __name__ == "__main__":
+#     import sys
+#     app = QtWidgets.QApplication(sys.argv)
+#     MainWindow = QtWidgets.QMainWindow()
+#     ui = Ui_MainWindow()
+#     ui.setupUi(MainWindow)
+#     MainWindow.show()
+#     sys.exit(app.exec_())

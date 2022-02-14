@@ -185,23 +185,16 @@ class Ui_MainWindow(object):
         filterItem = self.filterList.currentRow()
         strItem = self.filterList.item(filterItem)
         self.Window = QtWidgets.QMainWindow()
-        if strItem.text() in self.Measure :
-            self.WindowM = QtWidgets.QMainWindow()
-            fm = filterMes.Ui_MainWindow()
-            # fd.reffil = self.data
-            fm.setStart(strItem.text(),self.filDic,self.data)
-            fm.setupUi(self.WindowM)
-            self.WindowM.show()
+        if strItem in self.Measure :
+            self.uiM = filterMes.Ui_MainWindowM()
+            self.uiM.setupUi(self.Window)
             #fp.setupUi(filPage)
         else :
-            self.WindowD = QtWidgets.QMainWindow()
-            fd = filterDimen.Ui_MainWindow()
-            # fd.reffil = self.data
-            fd.setStart(strItem.text(),self.filDic,self.data)
-            fd.setupUi(self.WindowD)
-            self.WindowD.show()
+            self.uiD = filterDimen.Ui_MainWindow()
+            self.uiD.setupUi(self.Window)
+        self.Window.show()
             #fp.setupUi(filPage)
-            
+    
     def DropDup(self):
         itemsTextList =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
         self.RowChoose = itemsTextList
@@ -218,12 +211,8 @@ class Ui_MainWindow(object):
         #self.__init__(MainWindow)
         itemsTextList =  [str(self.FileListChoose.item(i).text()) for i in range(self.FileListChoose.count())]
         self.selectFile = itemsTextList
-        while (self.selectFile.count('')):
-            self.selectFile.remove('')
         itemsTextList =  [str(self.FileList.item(i).text()) for i in range(self.FileList.count())]
         self.fileNameList = itemsTextList
-        while (self.fileNameList.count('')):
-            self.fileNameList.remove('')
         self.RowChoose = []
         self.ColChoose = []
         if self.selectFile != []:
@@ -548,15 +537,10 @@ class Ui_MainWindow(object):
         self.FileListChoose.setProperty("isWrapping", False)
         self.FileListChoose.setWordWrap(False)
         self.FileListChoose.setObjectName("FileListChoose")
-        if self.selectFile != []:
-            if type(self.selectFile) != list:
-                self.selectFile = [self.selectFile]
-            while (self.selectFile.count('')):
-                self.selectFile.remove('')
-            for i in range(len(self.selectFile)):
-                item = QtWidgets.QListWidgetItem()
-                self.FileListChoose.addItem(item)
-            self.tabWidget.addTab(self.dataSourceTab, "Data Source")
+        for i in range(len(self.selectFile)):
+            item = QtWidgets.QListWidgetItem()
+            self.FileListChoose.addItem(item)
+        self.tabWidget.addTab(self.dataSourceTab, "Data Source")
         
         self.gridLayout_3.addWidget(self.FileListChoose, 3, 0, 1, 2)
         
@@ -565,7 +549,6 @@ class Ui_MainWindow(object):
         
         self.usedFileButton = QtWidgets.QPushButton(self.dataSourceTab)
         self.usedFileButton.setObjectName("usedFileButton")
-        self.usedFileButton.clicked.connect(self.updateList)
         
         self.gridLayout_2.addWidget(self.usedFileButton, 0, 0, 1, 1)
         self.gridLayout_3.addLayout(self.gridLayout_2, 2, 1, 1, 1)
