@@ -477,6 +477,7 @@ class Ui_MainWindow(object):
         
         self.saveButton = QtWidgets.QPushButton(self.dataSourceTab)
         self.saveButton.setObjectName("saveButton")
+        self.saveButton.clicked.connect(cm.savePandas)
         
         self.gridLayout_5.addWidget(self.saveButton, 0, 1, 1, 1)
         
