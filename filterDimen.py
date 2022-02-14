@@ -2,8 +2,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import csvManager
 cm = csvManager.csvManager()
 class Ui_MainWindow(object):
-    def __init__(self,parent=None):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
         self.filtered = {}
         self.head = ''
         self.sheet = ''
@@ -132,8 +132,9 @@ class Ui_MainWindow(object):
         __sortingEnabled = self.filterItemListWidget.isSortingEnabled()
         n=0
         for i in self.sheet[self.head].drop_duplicates():
+            # print(str(i))
             item = self.filterItemListWidget.item(n)
-            item.setText(_translate("MainWindow", i))
+            item.setText(_translate("MainWindow", str(i)))
             n+=1
         # self.filterItemListWidget.setSortingEnabled(False)
         # item = self.filterItemListWidget.item(0)

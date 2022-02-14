@@ -190,17 +190,22 @@ class Ui_MainWindow(object):
         # print(self.data)
         filterItem = self.filterList.currentRow()
         strItem = self.filterList.item(filterItem)
-        self.Window = QtWidgets.QMainWindow()
-        if strItem in self.Measure :
-            self.uiM = filterMes.Ui_MainWindowM()
-            self.uiM.setupUi(self.Window)
+        # print(strItem.text(),strItem in self.Measure)
+        if strItem.text() in self.Measure :
+            self.WindowM = QtWidgets.QMainWindow()
+            fm = filterMes.Ui_MainWindow()
+            # fd.reffil = self.data
+            fm.setStart(strItem.text(),self.filDic,self.data)
+            fm.setupUi(self.WindowM)
+            self.WindowM.show()
             #fp.setupUi(filPage)
         else :
+            self.WindowD = QtWidgets.QMainWindow()
             fd = filterDimen.Ui_MainWindow()
             # fd.reffil = self.data
             fd.setStart(strItem.text(),self.filDic,self.data)
-            fd.setupUi(self.Window)
-            self.Window.show()
+            fd.setupUi(self.WindowD)
+            self.WindowD.show()
             #fp.setupUi(filPage)
     
     def DropDup(self):
