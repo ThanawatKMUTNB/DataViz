@@ -120,6 +120,7 @@ class graphManager():
                     sx = str(fd+'('+column[0]+')')
                 else:
                     sx = str(column[0])                     #normal Dimension in Column
+            print(row,column,sx,sy)
             
             c = alt.Chart(self.df).mark_bar().encode(
                 x=sx,
@@ -127,6 +128,7 @@ class graphManager():
                 tooltip = [sy,sx]
             ).resolve_scale(x = 'independent',y = 'independent')
             self.Chart = c
+            return self.Chart
         else:
                                             #2 Dimension
             if type(row) == type('string') :               #2 Column (Dimension)
