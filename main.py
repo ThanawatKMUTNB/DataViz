@@ -360,30 +360,34 @@ class Ui_MainWindow(object):
         isInterCol = list(set.intersection(set(self.ColChoose),set(self.Measure)))
         # print("--------",self.RowChoose,self.ColChoose)
         print(str(self.chartTypeS))
-        
-        if  isInterRow != [] or isInterCol != []:
-            # print(self.chartType.currentText())
-            if isInterRow != [] and isInterCol == []:
-                gm = graphManager.graphManager()
-                '''for i in isInterRow:
-                    self.RowChoose.remove(i)
-                self.ColChoose = self.ColChoose + isInterRow'''
-                gm.setList(self.RowChoose,self.ColChoose,self.data)
-                self.Chart = gm.chooseChart(str(self.chartTypeS))
-                    #self.RowList.addItems(self.RowChoose)
-                    #self.ColList.addItems(self.ColChoose)
-                    #self.tab3(MainWindow)
-            
-            if isInterRow == [] and isInterCol != []:
-                gm = graphManager.graphManager()
-                '''for i in isInterCol:
-                    self.ColChoose.remove(i)
-                self.RowChoose = self.RowChoose + isInterCol'''
-                gm.setList(self.RowChoose,self.ColChoose,self.data)
-                self.Chart = gm.chooseChart(str(self.chartTypeS))
-                    #self.RowList.addItems(self.RowChoose)
-                    #self.ColList.addItems(self.ColChoose)
-                    #self.tab3(MainWindow)
+        if  isInterRow != [] and isInterCol != []:
+            self.chartType.clear()
+            self.chartType.addItems([""])
+        else :
+            if  isInterRow != [] or isInterCol != []:
+                # print(self.chartType.currentText())
+                if isInterRow != [] and isInterCol == []:
+                    gm = graphManager.graphManager()
+                    '''for i in isInterRow:
+                        self.RowChoose.remove(i)
+                    self.ColChoose = self.ColChoose + isInterRow'''
+                    gm.setList(self.RowChoose,self.ColChoose,self.data)
+                    self.Chart = gm.chooseChart(str(self.chartTypeS))
+                        #self.RowList.addItems(self.RowChoose)
+                        #self.ColList.addItems(self.ColChoose)
+                        #self.tab3(MainWindow)
+                
+                if isInterRow == [] and isInterCol != []:
+                    gm = graphManager.graphManager()
+                    '''for i in isInterCol:
+                        self.ColChoose.remove(i)
+                    self.RowChoose = self.RowChoose + isInterCol'''
+                    gm.setList(self.RowChoose,self.ColChoose,self.data)
+                    self.Chart = gm.chooseChart(str(self.chartTypeS))
+                        #self.RowList.addItems(self.RowChoose)
+                        #self.ColList.addItems(self.ColChoose)
+                        #self.tab3(MainWindow)
+                    
         self.tab2(MainWindow)
         self.tab3(MainWindow)
         
@@ -448,6 +452,12 @@ class Ui_MainWindow(object):
         self.data = cm.setAllDataByOneDimension(self.colHeader[index])
         self.model = TableModel(self.data)
         self.table.setModel(self.model)
+        
+        
+        
+        
+        
+        
         
     def setupUi(self, MainWindow):
         
