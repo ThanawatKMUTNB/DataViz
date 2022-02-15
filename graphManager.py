@@ -27,8 +27,12 @@ class graphManager():
         self.RowChoose = row
         self.ColChoose = col
         self.df = dataSheet
-        self.df['Order Date'] = pd.to_datetime(self.df['Order Date'],format='%d/%m/%Y')
-        self.df['Ship Date'] = pd.to_datetime(self.df['Ship Date'],format='%d/%m/%Y')
+        #self.df['Order Date'] = pd.to_datetime(self.df['Order Date'],format='%d/%m/%Y')
+        #self.df['Ship Date'] = pd.to_datetime(self.df['Ship Date'],format='%d/%m/%Y')
+        for d in ['Order Date','Ship Date']:
+            self.filterDate(d,'year')
+            self.filterDate(d,'month')
+            self.filterDate(d,'day')
     
     def chooseChart(self,chart):
         row = self.RowChoose
@@ -91,7 +95,7 @@ class graphManager():
     
     def filterDate(self,Dimension,typ): #Date inly
 
-        self.df[Dimension] = pd.to_datetime(self.df['Order Date'],format='%d/%m/%Y')
+        self.df[Dimension] = pd.to_datetime(self.df[Dimension],format='%d/%m/%Y')
 
         if typ == 'year':
             s = str(Dimension+' year')
@@ -105,6 +109,50 @@ class graphManager():
             s = str(Dimension+' day')
             self.df[s] = self.df[Dimension].dt.day
             return self.df[s]
+
+    def rangeScale(self,Di,Meas):
+        fil = Meas[1]
+        df = self.df
+        if len(Di) == 2:
+            if (type(Di[0]) == type(['list'])) and (type(Di[1]) == type(['list'])):
+                x = str(Di[1][0]+' '+Di[1][1])
+                col = str(Di[0][0]+' '+Di[0][1])
+            elif type(Di[0]) == type(['list']):
+                x = Di[1]
+                col = str(Di[0][0]+' '+Di[0][1])
+            elif type(Di[1]) == type(['list']):
+                x = str(Di[1][0]+' '+Di[1][1])
+                col = Di[0]
+            else:
+                x = Di[1]
+                col = Di[0]
+            
+            if fil == 'sum':
+                tmax = df.groupby([col,x], as_index=False)[Meas[0]].sum().max()[2]
+                tmin = df.groupby([col,x], as_index=False)[Meas[0]].sum().min()[2]
+            elif fil == 'average':
+                tmax = df.groupby([col,x], as_index=False)[Meas[0]].mean().max()[2]
+                tmin = df.groupby([col,x], as_index=False)[Meas[0]].mean().min()[2]
+            elif fil == 'median':
+                tmax = df.groupby([col,x], as_index=False)[Meas[0]].median().max()[2]
+                tmin = df.groupby([col,x], as_index=False)[Meas[0]].median().min()[2]
+            elif fil == 'count':
+                tmax = df.groupby([col,x], as_index=False)[Meas[0]].count().max()[2]
+                tmin = df.groupby([col,x], as_index=False)[Meas[0]].count().min()[2]
+            elif fil == 'max':
+                tmax = df.groupby([col,x], as_index=False)[Meas[0]].max().max()[2]
+                tmin = df.groupby([col,x], as_index=False)[Meas[0]].max().min()[2]
+            elif fil == 'min':
+                tmax = df.groupby([col,x], as_index=False)[Meas[0]].min().max()[2]
+                tmin = df.groupby([col,x], as_index=False)[Meas[0]].min().min()[2]
+            
+            if tmin > 0:
+                tmin = 0
+            elif tmax < 0 :
+                tmax = 0
+            
+            return [tmin,tmax]
+        return
 
     def plotBar(self,row,column,mes,dimen):
 
@@ -144,28 +192,31 @@ class graphManager():
                 Me = row[0]
                 fil = row[1]
 
-                if (type(Di[-1]) == type(['datetime'])) and (type(Di[-2]) == type(['datetime'])):
-                    scol = str(Di[-2][1]+'('+Di[-2][0]+')')           
-                    sx = str(Di[-1][1]+'('+Di[-1][0]+')')
+                if (type(Di[-1]) == type(['datetime'])) and (type(Di[-2]) == type(['datetime'])):   #index 0 is Dimension , index 1 is function
+                    Col = Di[-2][0]
+                    X = Di[-1][0]
+                    scol = str(Di[-2][1]+'('+Col+')')           
+                    sx = str(Di[-1][1]+'('+X+')')
                 elif type(Di[-2]) == type(['datetime']):
-                    scol = str(Di[-2][1]+'('+Di[-2][0]+')')           
+                    Col = Di[-2][0]
+                    scol = str(Di[-2][1]+'('+Col+')')           
                     sx = str(Di[-1])
                 elif type(Di[-1]) == type(['datetime']):
+                    X = Di[-1][0]
                     scol = str(Di[-2])
-                    sx = str(Di[-1][1]+'('+Di[-1][0]+')')
+                    sx = str(Di[-1][1]+'('+X+')')
                 else:
                     scol = str(Di[-2])                      #column > x
                     sx = str(Di[-1])
 
                 c = alt.Chart(df).mark_bar().encode(
                     x=sx,
-                    y=str(fil+'('+Me+')'),
+                    y=alt.Y(str(fil+'('+Me+')'),scale=alt.Scale(domain=self.rangeScale(Di,row))),
                     #color=scol,
                     tooltip = [sx,str(fil+'('+Me+')')]
                 ).facet(column=scol
                 ).resolve_scale(x = 'independent',y = 'independent')
                 self.Chart = c
-
             elif mes == 'column':                 #2 Row (Dimension)
                 Di = row    
                 Me = column[0]
@@ -184,14 +235,13 @@ class graphManager():
                     srow = str(Di[-2])
                     sy = str(Di[-1])
                 c = alt.Chart(df).mark_bar().encode(
-                    x=str(fil+'('+Me+')'),
+                    x=alt.X(str(fil+'('+Me+')'),scale=alt.Scale(domain=self.rangeScale(Di,column))),
                     y=sy,
                     #color=srow,
                     tooltip = [sy,str(fil+'('+Me+')')]
                 ).facet(row=srow
                 ).resolve_scale(y = 'independent',x = 'independent')
                 self.Chart = c
-
         elif dimen == 3:   #3 Dimension
             print('3 Dimension')
             if mes == 'row' :               #2 Column (Dimension)
@@ -233,13 +283,12 @@ class graphManager():
                     scolor = str(Di[-1])
                 c = alt.Chart(df).mark_bar().encode(
                     x=sx,
-                    y=str(fil+'('+Me+')'),
+                    y=alt.Y(str(fil+'('+Me+')'),scale=alt.Scale(domain=self.rangeScale([Di[1],Di[2]],row[0]))),
                     color=scolor,
                     tooltip = [scolor,sx,str(fil+'('+Me+')')]
                 ).facet(column=scol
                 ).resolve_scale(x = 'independent',y = 'independent')
                 self.Chart = c
-
             elif mes == 'column':                 #2 Row (Dimension)
                 Di = row    
                 Me = column[0][0]
@@ -278,7 +327,7 @@ class graphManager():
                     sy = str(Di[-2])
                     scolor = str(Di[-1])
                 c = alt.Chart(df).mark_bar().encode(
-                    x=str(fil+'('+Me+')'),
+                    x=alt.X(str(fil+'('+Me+')'),scale=alt.Scale(domain=self.rangeScale([Di[1],Di[2]],column[0]))),
                     y=sy,
                     color=scolor,
                     tooltip = [scolor,sy,str(fil+'('+Me+')')]
@@ -316,7 +365,7 @@ class graphManager():
                 self.Chart = ch
             elif Dimen == 2:
                 ch = alt.Chart(df).mark_line(point=True).encode(
-                    alt.X(str(fil+'('+Me+'):Q')),
+                    alt.X(str(fil+'('+Me+'):Q'),scale=alt.Scale(domain=self.rangeScale([row[0],row[1]],column))),
                     alt.Y(str(row[-1][1]+'('+row[-1][0]+'):T')),
                     row = str(row[-2][1]+'('+row[-2][0]+'):T'),
                     tooltip = [str(row[-1][1]+'('+row[-1][0]+'):T'),str(fil+'('+Me+')')]
@@ -342,7 +391,7 @@ class graphManager():
                 self.Chart = ch
             elif Dimen == 2:
                 ch = alt.Chart(df).mark_line(point=True).encode(
-                    alt.Y(str(fil+'('+Me+'):Q')),
+                    alt.Y(str(fil+'('+Me+'):Q'),scale=alt.Scale(domain=self.rangeScale([column[0],column[1]],row))),
                     alt.X(str(column[-1][1]+'('+column[-1][0]+'):T')),
                     column = str(column[-2][1]+'('+column[-2][0]+'):T'),
                     tooltip = [str(column[-1][1]+'('+column[-1][0]+'):T'),str(fil+'('+Me+')')]
