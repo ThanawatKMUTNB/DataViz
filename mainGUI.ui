@@ -24,7 +24,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="movable">
        <bool>false</bool>
@@ -491,7 +491,7 @@
              </widget>
             </item>
             <item row="1" column="1" rowspan="2">
-             <widget class="QListWidget" name="filterList">
+             <widget class="rowListClass" name="filterList">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
                 <horstretch>0</horstretch>
@@ -688,7 +688,7 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="colListClass" name="ColList">
+               <widget class="rowListClass" name="ColList">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -1608,11 +1608,6 @@
   </customwidget>
   <customwidget>
    <class>rowListClass</class>
-   <extends>QListWidget</extends>
-   <header>GUI.h</header>
-  </customwidget>
-  <customwidget>
-   <class>colListClass</class>
    <extends>QListWidget</extends>
    <header>GUI.h</header>
   </customwidget>

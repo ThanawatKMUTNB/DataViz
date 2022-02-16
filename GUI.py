@@ -8,37 +8,17 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import (QApplication,QMainWindow,QFileDialog,QTableWidget
                              ,QPushButton,QListWidget,QTableView,QMessageBox,QMenu)
 
-# SF =[]
-class colListClass(QtWidgets.QListWidget):
-    def __init__(self,parent=None):
-        super(colListClass, self).__init__(parent)
-        self.setAcceptDrops(True)
-    
-    def dragLeaveEvent(self,event) -> None:
-        if self.count():            
-            self.takeItem(self.currentRow())
-            self.clearSelection()
-        mainW.setplot()
-            
-    # def dragEnterEvent(self, event):
-    #     #if event.mimeData().hasUrls():
-    #     event.accept()
+class filterMesWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi("filterMes.ui",self)
+        self.show()
 
-    # def dragMoveEvent(self, event):
-    #     #if event.mimeData().hasUrls():
-    #     event.accept()
-
-    def dropEvent(self, QDropEvent):
-        source_Widget=QDropEvent.source()
-        items=source_Widget.selectedItems()
-        QDropEvent.setDropAction(QtCore.Qt.MoveAction)
-        for i in items:
-            source_Widget.takeItem(source_Widget.indexFromItem(i).row())
-            self.addItem(i)
-        mainW.setFileListDimension()
-        mainW.setplot()
-        # mainW.useFile()
-        # print('drop event Col')
+class filterDimenWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi("filterDimen.ui",self)
+        self.show()
         
 class rowListClass(QtWidgets.QListWidget):
     def __init__(self,parent=None):
@@ -52,6 +32,7 @@ class rowListClass(QtWidgets.QListWidget):
             self.takeItem(self.currentRow())
             self.clearSelection()
         mainW.setplot()
+        
     # def dragEnterEvent(self, event):
     #     #if event.mimeData().hasUrls():
     #     event.accept()
@@ -215,6 +196,8 @@ class mainWindow(QMainWindow):
         self.RowList  = self.findChild(QListWidget,"RowList")
         self.ColList  = self.findChild(QListWidget,"ColList")
         
+        self.filterList  = self.findChild(QListWidget,"filterList")
+        
         self.dataSourceTable = self.findChild(QTableView,"table")
         self.dataSourceTable.horizontalHeader().setStretchLastSection(True)
         self.dataSourceTable.resizeColumnsToContents()
@@ -230,24 +213,45 @@ class mainWindow(QMainWindow):
         # function
         self.openDirecButton.clicked.connect(self.launchDialog)
         self.dataSourceTable.horizontalHeader().sectionClicked.connect(self.on_header_doubleClicked)
-        
-        print(self.selectFile)
+        self.filterList.installEventFilter(self)
+        self.RowList.installEventFilter(self)
+        self.ColList.installEventFilter(self)
         self.show()
-        # self.FileListDimension.installEventFilter(self)
 
     def eventFilter(self, source, event):
-        if event.type() == QEvent.ContextMenu and source is self.FileListDimension:
+        if event.type() == QEvent.ContextMenu and (source is self.filterList or source is self.ColList or source is self.RowList):
             menu = QMenu()
-            menu.addAction('Action 1')
-            menu.addAction('Action 2')
-            menu.addAction('Action 3')
+            filterAc = menu.addAction('Filter')
+            # menu.addAction('Action 2')
+            # menu.addAction('Action 3')
 
-            if menu.exec_(event.globalPos()):
+            # if menu.exec_(event.globalPos()):
+                # action = menu.exec_(self.mapToGlobal())
+            if menu.exec_(event.globalPos()) == filterAc:
                 item = source.itemAt(event.pos())
-                # print(item.text())
+                if self.isMes(item.text()) :
+                    self.windowM()
+                else:
+                    self.windowD()
             return True
         return super().eventFilter(source, event)
     
+    def windowM(self):                                             # <===
+        self.w = filterMesWindow()
+        self.w.show()
+        # self.hide()
+    
+    def windowD(self):                                             # <===
+        self.w = filterDimenWindow()
+        self.w.show()
+        # self.hide()
+        
+    def isMes(self,dimen):
+        if dimen in self.Measure:
+            return True
+        else:
+            return False
+            
     def setplot(self):
         #print("--------",self.RowChoose,self.ColChoose)
         tmp = []
@@ -276,7 +280,7 @@ class mainWindow(QMainWindow):
                 self.sheetTable.setModel(self.model)
     
     def sheetPageRowAndCol(self,Row,Col):
-        print("Start",Row,Col,len(set(Row)),len(set(Col)))
+        # print("Start",Row,Col,len(set(Row)),len(set(Col)))
         if Row!=[] or Col!=[]:
             self.dataSheet = cm.setRowAndColumn(Row,Col)
             
@@ -439,17 +443,6 @@ class mainWindow(QMainWindow):
         if self.FileListMes != None:
             self.FileListMes.clear()
             self.FileListMes.addItems(self.Measure)
-class filterMesWindow(QMainWindow):
-    def __init__(self):
-        super(filterMesWindow,self).__init__()
-        uic.loadUi("filterMes.ui",self)
-        self.show()
-
-class filterDimenWindow(QMainWindow):
-    def __init__(self):
-        super(filterDimenWindow,self).__init__()
-        uic.loadUi("filterDimen.ui",self)
-        self.show()
 
 app = QApplication(sys.argv)
 # widget = QtWidgets.QStackedWidget()

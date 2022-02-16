@@ -18,7 +18,6 @@ from PySide2.QtWidgets import *
 import FileInDirec
 import FileChoose
 import rowListClass
-import colListClass
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -264,7 +263,7 @@ class Ui_MainWindow(object):
 
         self.gridLayout_10.addWidget(self.filterLabel, 0, 1, 1, 2)
 
-        self.filterList = QListWidget(self.SheetTab)
+        self.filterList = rowListClass(self.SheetTab)
         self.filterList.setObjectName(u"filterList")
         sizePolicy4.setHeightForWidth(self.filterList.sizePolicy().hasHeightForWidth())
         self.filterList.setSizePolicy(sizePolicy4)
@@ -342,7 +341,7 @@ class Ui_MainWindow(object):
 
         self.gridLayout_8.addWidget(self.RowLabel, 0, 0, 1, 1)
 
-        self.ColList = colListClass(self.SheetTab)
+        self.ColList = rowListClass(self.SheetTab)
         self.ColList.setObjectName(u"ColList")
         sizePolicy6.setHeightForWidth(self.ColList.sizePolicy().hasHeightForWidth())
         self.ColList.setSizePolicy(sizePolicy6)
@@ -705,7 +704,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
