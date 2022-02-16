@@ -5,7 +5,7 @@ import csvManager as cmpage
 from PyQt5 import uic,QtCore
 # from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import (QApplication,QMainWindow,QFileDialog,QTableWidget
+from PyQt5.QtWidgets import (QApplication,QMainWindow,QFileDialog,QTableWidget,QComboBox
                              ,QPushButton,QListWidget,QTableView,QMessageBox,QMenu)
 
 class filterMesWindow(QMainWindow):
@@ -33,6 +33,7 @@ class rowListClass(QtWidgets.QListWidget):
             self.clearSelection()
         mainW.filChangeD()
         mainW.rowcolChangeD()
+        mainW.setChart()
         mainW.setplot()
         
     # def dragEnterEvent(self, event):
@@ -53,6 +54,7 @@ class rowListClass(QtWidgets.QListWidget):
         mainW.setFileListDimension()
         mainW.filChange()
         mainW.rowcolChange()
+        mainW.setChart()
         mainW.setplot()
         # mainW.useFile()
         # print('drop event Row')
@@ -189,6 +191,8 @@ class mainWindow(QMainWindow):
         uic.loadUi("mainGUI.ui",self)
         # loadUi("mainGUI.ui",self)
         self.Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
+        self.typeChart = ['Bar','Line', 'Pie']
+        self.typeDate = ['Order Date','Ship Date']
         self.fileNameList = []
         self.selectFile = []
         self.dataSheet = ""
@@ -221,6 +225,9 @@ class mainWindow(QMainWindow):
         self.FileListMes_2 = self.findChild(QListWidget,"FileListMes_2")
         
         self.FileListChoose = self.findChild(FileChoose,"FileListChoose")
+        
+        self.chartType = self.findChild(QComboBox,"chartType")
+        self.chartType_2 = self.findChild(QComboBox,"chartType_2")
         
         # function
         self.openDirecButton.clicked.connect(self.launchDialog)
@@ -273,6 +280,40 @@ class mainWindow(QMainWindow):
         # print("--------",self.RowChoose,self.ColChoose)
         # self.plot()
     
+    def setChart(self):
+        print("--------R C",self.RowChoose,self.ColChoose)
+        # isInterRow = list(set.intersection(set(self.RowChoose),set(self.Measure)))
+        isInterRow = [value for value in self.RowChoose if value in self.Measure]
+        # isInterCol = list(set.intersection(set(self.ColChoose),set(self.Measure)))
+        isInterCol = [value for value in self.ColChoose if value in self.Measure]
+        print("--------IR IC",isInterRow,isInterCol)
+        self.typeChart = []
+        if (len(isInterRow)>0 and len(isInterCol)==0) or (len(isInterCol)>0 and len(isInterRow)==0):
+            # print("Have Mes")
+            if (self.RowChoose != [] and self.ColChoose == []) or (self.RowChoose == [] and self.ColChoose != []) :
+                if (len(self.RowChoose)-len(isInterRow) == 1 and len(isInterRow)>=1 and len(isInterCol)==0) or (len(self.ColChoose)-len(isInterCol) == 1 and len(isInterCol)>=1 and len(isInterRow)==0) :
+                    self.typeChart = ['Bar', 'Pie']
+                    print("1 di")
+                    for i in self.typeDate:
+                        if i in self.RowChoose + self.ColChoose:
+                            self.typeChart.append('Line')
+                if (len(self.RowChoose)-len(isInterRow) == 2 and len(isInterRow)>=1 and len(isInterCol)==0) or (len(self.ColChoose)-len(isInterCol) == 2 and len(isInterCol)>=1 and len(isInterRow)==0) :
+                    self.typeChart = ['Bar']
+                    print("2 di")
+                    for i in self.typeDate:
+                        if i in self.RowChoose + self.ColChoose:
+                            self.typeChart.append('Line')
+                if (len(self.RowChoose)-len(isInterRow) == 3 and len(isInterRow)>=1 and len(isInterCol)==0) or (len(self.ColChoose)-len(isInterCol) == 3 and len(isInterCol)>=1 and len(isInterRow)==0) :
+                    self.typeChart = ['Bar']
+                    print("3 di")
+        self.typeChart = list(set(self.typeChart))
+        print("--->",self.typeChart)
+        self.chartType.clear()
+        self.chartType_2.clear()
+        # print(self.chartType.itemText(0),self.chartType_2.itemText(0))
+        self.chartType.addItems(self.typeChart)
+        self.chartType_2.addItems(self.typeChart)
+                    
     def rowcolChangeD(self):
         tmpr = []
         tmpr =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
@@ -287,7 +328,7 @@ class mainWindow(QMainWindow):
         tmpc2 =  [str(self.ColList_2.item(i).text()) for i in range(self.ColList_2.count())]
         # self.ColChoose = tmp
         
-        # print(tmpr,tmpc,tmpr2,tmpc2)
+        print(tmpr,tmpc,tmpr2,tmpc2)
         
         while (tmpr.count('')): tmpr.remove('')
         while (tmpr2.count('')): tmpr2.remove('')
@@ -303,7 +344,6 @@ class mainWindow(QMainWindow):
             self.RowList_2.clear()
             self.RowList_2.addItems(tmpr2)
             self.RowChoose = tmpr2
-        
         while (tmpc.count('')): tmpc.remove('')
         while (tmpc2.count('')): tmpc2.remove('')
         if tmpc == tmpc2 or len(tmpc) < len(tmpc2):
@@ -311,14 +351,14 @@ class mainWindow(QMainWindow):
             self.ColList.addItems(tmpc)
             self.ColList_2.clear()
             self.ColList_2.addItems(tmpc)
-            self.RowChoose = tmpc
+            self.ColChoose = tmpc
         else:
             self.ColList.clear()
             self.ColList.addItems(tmpc2)
             self.ColList_2.clear()
             self.ColList_2.addItems(tmpc2)
             self.ColChoose = tmpc2
-            
+        
     def filChangeD(self):
         itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
         itemsTextList_2 =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]
@@ -354,8 +394,7 @@ class mainWindow(QMainWindow):
         tmpc2 = [] 
         tmpc2 =  [str(self.ColList_2.item(i).text()) for i in range(self.ColList_2.count())]
         # self.ColChoose = tmp
-        
-        print(tmpr,tmpc,tmpr2,tmpc2)
+        # print(tmpr,tmpc,tmpr2,tmpc2)
         
         while (tmpr.count('')): tmpr.remove('')
         while (tmpr2.count('')): tmpr2.remove('')
@@ -379,14 +418,14 @@ class mainWindow(QMainWindow):
             self.ColList.addItems(tmpc)
             self.ColList_2.clear()
             self.ColList_2.addItems(tmpc)
-            self.RowChoose = tmpc
+            self.ColChoose = tmpc
         else:
             self.ColList.clear()
             self.ColList.addItems(tmpc2)
             self.ColList_2.clear()
             self.ColList_2.addItems(tmpc2)
             self.ColChoose = tmpc2
-            
+        
     def filChange(self):
         itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
         itemsTextList_2 =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]

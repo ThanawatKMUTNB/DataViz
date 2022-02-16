@@ -518,13 +518,13 @@
                  </size>
                 </property>
                 <property name="mouseTracking">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <property name="contextMenuPolicy">
                  <enum>Qt::DefaultContextMenu</enum>
                 </property>
                 <property name="acceptDrops">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="layoutDirection">
                  <enum>Qt::LeftToRight</enum>
@@ -545,7 +545,7 @@
                  <bool>false</bool>
                 </property>
                 <property name="dragEnabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="dragDropOverwriteMode">
                  <bool>false</bool>
@@ -675,13 +675,13 @@
                  </size>
                 </property>
                 <property name="mouseTracking">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <property name="contextMenuPolicy">
                  <enum>Qt::DefaultContextMenu</enum>
                 </property>
                 <property name="acceptDrops">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="layoutDirection">
                  <enum>Qt::LeftToRight</enum>
@@ -699,7 +699,7 @@
                  <bool>false</bool>
                 </property>
                 <property name="dragEnabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="dragDropOverwriteMode">
                  <bool>false</bool>
@@ -1128,7 +1128,7 @@
                  <enum>Qt::DefaultContextMenu</enum>
                 </property>
                 <property name="acceptDrops">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="layoutDirection">
                  <enum>Qt::LeftToRight</enum>
@@ -1149,7 +1149,7 @@
                  <bool>false</bool>
                 </property>
                 <property name="dragEnabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="dragDropOverwriteMode">
                  <bool>false</bool>
@@ -1285,7 +1285,7 @@
                  <enum>Qt::DefaultContextMenu</enum>
                 </property>
                 <property name="acceptDrops">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="layoutDirection">
                  <enum>Qt::LeftToRight</enum>
@@ -1303,7 +1303,7 @@
                  <bool>false</bool>
                 </property>
                 <property name="dragEnabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="dragDropOverwriteMode">
                  <bool>false</bool>
