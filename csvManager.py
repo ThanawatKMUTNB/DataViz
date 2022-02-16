@@ -9,11 +9,18 @@ class csvManager:
         self.selectFile = ""
         self.path = ""
         self.df = ""
+        self.Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
     
     def setPath(self):
         pathBuf = os.path.join(self.path,self.selectFile) 
         self.df = self.readFile(pathBuf)
-        
+    
+    def isMeasure(self,di):
+        if (self.df.dtypes[di] == 'int64' or self.df.dtypes[di] == 'float64'):
+            return True
+        else :
+            return False
+    
     def readFile(self,path):
         isdir = os.path.isdir(path)
         if isdir == False:
