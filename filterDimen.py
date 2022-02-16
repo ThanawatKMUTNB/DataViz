@@ -7,6 +7,7 @@ class Ui_MainWindow(object):
         self.filtered = {}
         self.head = ''
         self.sheet = ''
+        self.setupUi(Ui_MainWindow)
     
     def setStart(self,filHead,dic,data):
         print("HHHHHHHH",filHead)
@@ -14,7 +15,6 @@ class Ui_MainWindow(object):
         self.head = filHead
         self.sheet = data
         # print("sheet ",self.sheet)
-        # self.setupUi(MainWindow)
     
     def setAll(self):
         print("kk")

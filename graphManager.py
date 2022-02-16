@@ -18,12 +18,13 @@ class graphManager():
 
     def __init__(self):
         self.df = None
-        self.Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
-        self.RowChoose = []
+        # self.Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
+        self.RowChoose = ["region",['Sales',"sum"]]
         self.ColChoose = []
         #self.Chart = None
 
-    def setList(self,row,col,dataSheet):
+    def setList(self,row,col,dataSheet,dic):
+        self.Measure = dic
         self.RowChoose = row
         self.ColChoose = col
         self.df = dataSheet

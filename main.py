@@ -1,6 +1,7 @@
 from email import header
 from msilib.schema import Class
 from operator import mod
+# from dialog import Ui_Dialog as Form
 import os
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -13,6 +14,7 @@ from io import StringIO
 from Altair_Graph.Bar_Chart import WebEngineView
 import csvManager as cmpage
 import filterMes
+from filterMes import Ui_MainWindow as Form
 import filterDimen
 from PyQt5.QtCore import Qt, QPointF
 from PyQt5 import QtCore, QtGui, QtWidgets , QtChart ,QtWebEngineWidgets
@@ -34,7 +36,7 @@ alt.data_transformers.disable_max_rows()
 altair_viewer._global_viewer._use_bundled_js = False
 alt.data_transformers.enable('data_server')
 
-#cm = cmpage.csvManager()
+# cm = cmpage.csvManager()
 class WebEngineView(QtWebEngineWidgets.QWebEngineView):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -163,7 +165,7 @@ class Ui_MainWindow(object):
         self.Chart = None
         self.filDic = {}
         self.chartTypeS = ''
-        self.setupUi(MainWindow)
+        # self.setupUi(MainWindow)
         #DimenForChoose = []
     def filChange(self):
         itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
@@ -184,14 +186,16 @@ class Ui_MainWindow(object):
     def openFilterPage(self):
         filterItem = self.filterList.currentRow()
         strItem = self.filterList.item(filterItem)
-        self.Window = QtWidgets.QMainWindow()
+        # self.Window = QtWidgets.QMainWindow()
         if strItem.text() in self.Measure :
-            self.WindowM = QtWidgets.QMainWindow()
-            fm = filterMes.Ui_MainWindow()
+            filterMes = QtWidgets.QMainWindow()
+            filterMes.ui = Form()
+            filterMes.ui.setupUi(filterMes)
+            # fm = filterMes.Ui_MainWindow(strItem.text(),self.filDic,self.data,self.WindowM)
             # fd.reffil = self.data
-            fm.setStart(strItem.text(),self.filDic,self.data)
-            fm.setupUi(self.WindowM)
-            self.WindowM.show()
+            # fm.setStart(strItem.text(),self.filDic,self.data)
+            # fm.setupUi(self.WindowM)
+            filterMes.show()
             #fp.setupUi(filPage)
         else :
             self.WindowD = QtWidgets.QMainWindow()
@@ -205,11 +209,17 @@ class Ui_MainWindow(object):
     def DropDup(self):
         itemsTextList =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
         self.RowChoose = itemsTextList
+        while (self.RowChoose.count('')):
+            self.RowChoose.remove('')
         itemsTextList =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
         self.ColChoose = itemsTextList
+        while (self.ColChoose.count('')):
+            self.ColChoose.remove('')
         itemsTextList =  [str(self.FileListDimension.item(i).text()) for i in range(self.FileListDimension.count())]
         itemsTextList = list(dict.fromkeys(itemsTextList))
         self.colHeader = itemsTextList
+        while (self.colHeader.count('')):
+            self.colHeader.remove('')
         '''print(self.RowChoose,self.ColChoose)
         print(self.selectFile)'''
         Ui_MainWindow.retranslateUi(self, MainWindow)
@@ -1329,7 +1339,7 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow(MainWindow)
-    #ui.setupUi(MainWindow)
+    ui.setupUi(MainWindow)
     cm = cmpage.csvManager()
     MainWindow.show()
     try:

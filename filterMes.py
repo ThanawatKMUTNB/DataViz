@@ -1,12 +1,13 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
-    def __init__(self):
+    def __init__(self,strItem,filDic,data,MainWindow):
         super().__init__()
-        self.filtered = {}
-        self.head = ''
-        self.sheet = ''
+        self.filtered = filDic
+        self.head = strItem
+        self.sheet = data
         self.min = ''
         self.max = ''
+        self.setupUi(MainWindow)
         # self.atMostSlider.valueChanged.connect(self.valuechange)
     
     def setStart(self,filHead,dic,data):
@@ -133,6 +134,7 @@ class Ui_MainWindow(object):
         self.atMostSlider.setObjectName("atMostSlider")
         
         self.gridLayout_9.addWidget(self.atMostSlider, 0, 1, 1, 1)
+        
         self.gridLayout_10.addLayout(self.gridLayout_9, 4, 0, 1, 1)
         spacerItem4 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout_10.addItem(spacerItem4, 6, 0, 1, 1)

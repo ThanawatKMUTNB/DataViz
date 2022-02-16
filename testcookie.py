@@ -1,72 +1,99 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QEvent,Qt
-from PyQt5.QtWidgets import *
-from PyQt5.QtChart import QChart, QChartView, QBarSet, QPercentBarSeries, QBarCategoryAxis, QLineSeries
+from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QTreeWidgetItem
 import sys
-class SecondWindow(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle('second window')
-        self.setFixedWidth(500)
-        self.setStyleSheet("""
-            QLineEdit{
-                font-size: 30px
-            }
-            QPushButton{
-                font-size: 30px
-            }
-            """)
-        mainLayout = QVBoxLayout()
 
-        self.input1 = QLineEdit()
-        self.input2 = QLineEdit()
-        mainLayout.addWidget(self.input1)
-        mainLayout.addWidget(self.input2)
+class Tree(QtWidgets.QTreeWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
-        self.closeButton = QPushButton('Close')
-        self.closeButton.clicked.connect(self.close)
-        mainLayout.addWidget(self.closeButton)
+        self.setDragDropMode(self.DragDrop)
+        self.setSelectionMode(self.ExtendedSelection)
+        self.setAcceptDrops(True)
 
-        self.setLayout(mainLayout)
+        for text in ['tree1','tree2','tree3']:
+            treeItem = QtWidgets.QTreeWidgetItem(self, [text])
+            treeItem.setFlags(treeItem.flags() & ~QtCore.Qt.ItemIsDropEnabled)
+            self.addTopLevelItem(treeItem)
 
-    def displayInfo(self):
-        self.show()
+    def dropEvent(self, event):
+        if event.source() == self:
+            event.setDropAction(QtCore.Qt.MoveAction)
+            super().dropEvent(event)
+        elif isinstance(event.source(), QtWidgets.QListWidget):
+            item = self.itemAt(event.pos())
+            ix = self.indexAt(event.pos())
+            col = 0 if item is None else ix.column()
+            item = self.invisibleRootItem() if item is None else item
+            ba = event.mimeData().data('application/x-qabstractitemmodeldatalist')
+            data_items = decode_data(ba)
+            for data_item in data_items:
+                it = QtWidgets.QTreeWidgetItem()
+                item.addChild(it)
+                for data in data_items:
+                    for r, v in data.items():
+                        it.setData(col, r, v)
 
-class MainWindow(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle('Main Window')
-        self.setFixedWidth(800)
 
-        self.secondWindow = SecondWindow()
+class List(QtWidgets.QListWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
-        mainLayout = QVBoxLayout()
-        self.setStyleSheet("""
-            QLineEdit{height: 40px; font-size: 30px}
-            QLabel{font-size: 30px}
-        """)
+        self.setDragDropMode(self.DragDrop)
+        self.setSelectionMode(self.ExtendedSelection)
+        self.setAcceptDrops(True)
 
-        self.name = QLineEdit()
-        self.age = QLineEdit()
-        mainLayout.addWidget(QLabel('Name:'))
-        mainLayout.addWidget(self.name)
-        mainLayout.addWidget(QLabel('Age:'))
-        mainLayout.addWidget(self.age)
+        for text in ['list1','list2','list3']:
+            self.addItem(text)
 
-        self.Confirm = QPushButton('Confirm')
-        self.Confirm.setStyleSheet('font-size: 30px')
-        self.Confirm.clicked.connect(self.passingInformation)
-        mainLayout.addWidget(self.Confirm)
+    def dropEvent(self, event):
+        if event.source() == self:
+            event.setDropAction(QtCore.Qt.MoveAction)
+            QtWidgets.QListWidget.dropEvent(self, event)
+        elif isinstance(event.source(), QtWidgets.QTreeWidget):
+            item = self.itemAt(event.pos())
+            row = self.row(item) if item else self.count()
+            ba = event.mimeData().data('application/x-qabstractitemmodeldatalist')
+            data_items = decode_data(ba)
+            for i, data_item in enumerate(data_items):
+                it = QtWidgets.QListWidgetItem()
+                self.insertItem(row+i, it)
+                for r, v in data_item.items():
+                    it.setData(r,v)
 
-        self.setLayout(mainLayout)
 
-    def passingInformation(self):
-        self.secondWindow.input1.setText(self.name.text())
-        self.secondWindow.input2.setText(self.age.text())
-        self.secondWindow.displayInfo()
+def decode_data(bytearray):
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    demo = MainWindow()
-    demo.show()
-    sys.exit(app.exec_())
+    data = []
+    item = {}
+
+    ds = QtCore.QDataStream(bytearray)
+    while not ds.atEnd():
+
+        row = ds.readInt32()
+        column = ds.readInt32()
+
+        map_items = ds.readInt32()
+        for i in range(map_items):
+            key = ds.readInt32()
+
+            value = QtCore.QVariant()
+            ds >> value
+            item[Qt.ItemDataRole(key)] = value
+
+        data.append(item)
+    return data
+
+if __name__=='__main__':
+
+    app = QtWidgets.QApplication(sys.argv)
+
+    layout = QtWidgets.QHBoxLayout()
+    layout.addWidget(Tree())
+    layout.addWidget(List())
+
+    container = QtWidgets.QWidget()
+    container.setLayout(layout)
+    container.show()
+
+    app.exec_()

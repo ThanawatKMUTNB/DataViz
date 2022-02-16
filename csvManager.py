@@ -67,11 +67,13 @@ class csvManager:
 
     def setAllDataByOneDimension(self,Dimension): #sort each column
         data = self.df
+        data = data.replace('',np.nan)
         #if data == data.sort_values(by=str(Dimension)):
         '''if oldDF == sorted(data[Dimension].tolist()):
             new = data.sort_values(by=str(Dimension),ascending=False)
         else :''' 
         new = data.sort_values(by=str(Dimension))
+        new = new.replace(np.nan,'')
         return new
 
     def setDimensionSort(self,Dimension):
@@ -117,6 +119,7 @@ class csvManager:
             df = self.readFile(pathBuf)
             li.append(df)
         frame = pd.concat(li, axis=0, ignore_index=True)
+        frame = frame.replace(np.nan, '')
         #frame.sort_values("Row ID", inplace = True)
 
         ##############################################
