@@ -13,7 +13,13 @@ class colListClass(QtWidgets.QListWidget):
     def __init__(self,parent=None):
         super(colListClass, self).__init__(parent)
         self.setAcceptDrops(True)
-        
+    
+    def dragLeaveEvent(self,event) -> None:
+        if self.count():            
+            self.takeItem(self.currentRow())
+            self.clearSelection()
+        mainW.setplot()
+            
     # def dragEnterEvent(self, event):
     #     #if event.mimeData().hasUrls():
     #     event.accept()
@@ -41,6 +47,11 @@ class rowListClass(QtWidgets.QListWidget):
         # self.setDragEnabled(True)
         self.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
         
+    def dragLeaveEvent(self,event) -> None:
+        if self.count():            
+            self.takeItem(self.currentRow())
+            self.clearSelection()
+        mainW.setplot()
     # def dragEnterEvent(self, event):
     #     #if event.mimeData().hasUrls():
     #     event.accept()
@@ -259,7 +270,10 @@ class mainWindow(QMainWindow):
         if self.selectFile != [] : 
             self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
             self.model = TableModel2(self.dataSheet)
-            self.sheetTable.setModel(self.model)
+            if self.RowChoose == [] and self.ColChoose == []:
+                self.sheetTable.setModel(None)
+            else:
+                self.sheetTable.setModel(self.model)
     
     def sheetPageRowAndCol(self,Row,Col):
         print("Start",Row,Col,len(set(Row)),len(set(Col)))
