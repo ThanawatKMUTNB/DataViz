@@ -28,9 +28,11 @@ class rowListClass(QtWidgets.QListWidget):
         self.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
         
     def dragLeaveEvent(self,event) -> None:
-        if self.count():            
+        if self.count():
             self.takeItem(self.currentRow())
             self.clearSelection()
+        mainW.filChangeD()
+        mainW.rowcolChangeD()
         mainW.setplot()
         
     # def dragEnterEvent(self, event):
@@ -49,6 +51,8 @@ class rowListClass(QtWidgets.QListWidget):
             source_Widget.takeItem(source_Widget.indexFromItem(i).row())
             self.addItem(i)
         mainW.setFileListDimension()
+        mainW.filChange()
+        mainW.rowcolChange()
         mainW.setplot()
         # mainW.useFile()
         # print('drop event Row')
@@ -189,14 +193,19 @@ class mainWindow(QMainWindow):
         self.selectFile = []
         self.dataSheet = ""
         self.data = ""
-        
+        self.filDic = {}
+        self.RowChoose = []
+        self.ColChoose = []
         # defind
         self.openDirecButton = self.findChild(QPushButton,"openDirecButton")
         
         self.RowList  = self.findChild(QListWidget,"RowList")
         self.ColList  = self.findChild(QListWidget,"ColList")
+        self.RowList_2 = self.findChild(QListWidget,"RowList_2")
+        self.ColList_2 = self.findChild(QListWidget,"ColList_2")
         
         self.filterList  = self.findChild(QListWidget,"filterList")
+        self.filterList_2  = self.findChild(QListWidget,"filterList_2")
         
         self.dataSourceTable = self.findChild(QTableView,"table")
         self.dataSourceTable.horizontalHeader().setStretchLastSection(True)
@@ -207,6 +216,9 @@ class mainWindow(QMainWindow):
         
         self.FileListDimension = self.findChild(QListWidget,"FileListDimension")
         self.FileListMes = self.findChild(QListWidget,"FileListMes")
+        
+        self.FileListDimension_2 = self.findChild(QListWidget,"FileListDimension_2")
+        self.FileListMes_2 = self.findChild(QListWidget,"FileListMes_2")
         
         self.FileListChoose = self.findChild(FileChoose,"FileListChoose")
         
@@ -224,7 +236,6 @@ class mainWindow(QMainWindow):
             filterAc = menu.addAction('Filter')
             # menu.addAction('Action 2')
             # menu.addAction('Action 3')
-
             # if menu.exec_(event.globalPos()):
                 # action = menu.exec_(self.mapToGlobal())
             if menu.exec_(event.globalPos()) == filterAc:
@@ -236,7 +247,7 @@ class mainWindow(QMainWindow):
             return True
         return super().eventFilter(source, event)
     
-    def windowM(self):                                             # <===
+    def windowM(self):
         self.w = filterMesWindow()
         self.w.show()
         # self.hide()
@@ -254,22 +265,151 @@ class mainWindow(QMainWindow):
             
     def setplot(self):
         #print("--------",self.RowChoose,self.ColChoose)
-        tmp = []
-        tmp =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
-        self.RowChoose = tmp
-        tmp = [] 
-        tmp =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
-        self.ColChoose = tmp
-        while (self.RowChoose.count('')):
-            self.RowChoose.remove('')
-        while (self.ColChoose.count('')):
-            self.ColChoose.remove('')
+        # self.rowcolChange()
+        # self.filChange()
         self.setSheetTable()
         # self.chartTypeS = self.chartType.currentText()#choose detect row column (recommend graph)
         # print(self.chartTypeS)
         # print("--------",self.RowChoose,self.ColChoose)
         # self.plot()
+    
+    def rowcolChangeD(self):
+        tmpr = []
+        tmpr =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
+        # self.RowChoose = tmp
+        tmpc = [] 
+        tmpc =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
+        # self.ColChoose = tmp
+        tmpr2 = []
+        tmpr2 =  [str(self.RowList_2.item(i).text()) for i in range(self.RowList_2.count())]
+        # self.RowChoose = tmp
+        tmpc2 = [] 
+        tmpc2 =  [str(self.ColList_2.item(i).text()) for i in range(self.ColList_2.count())]
+        # self.ColChoose = tmp
         
+        # print(tmpr,tmpc,tmpr2,tmpc2)
+        
+        while (tmpr.count('')): tmpr.remove('')
+        while (tmpr2.count('')): tmpr2.remove('')
+        if tmpr == tmpr2 or len(tmpr) < len(tmpr2):
+            self.RowList.clear()
+            self.RowList.addItems(tmpr)
+            self.RowList_2.clear()
+            self.RowList_2.addItems(tmpr)
+            self.RowChoose = tmpr
+        else:
+            self.RowList.clear()
+            self.RowList.addItems(tmpr2)
+            self.RowList_2.clear()
+            self.RowList_2.addItems(tmpr2)
+            self.RowChoose = tmpr2
+        
+        while (tmpc.count('')): tmpc.remove('')
+        while (tmpc2.count('')): tmpc2.remove('')
+        if tmpc == tmpc2 or len(tmpc) < len(tmpc2):
+            self.ColList.clear()
+            self.ColList.addItems(tmpc)
+            self.ColList_2.clear()
+            self.ColList_2.addItems(tmpc)
+            self.RowChoose = tmpc
+        else:
+            self.ColList.clear()
+            self.ColList.addItems(tmpc2)
+            self.ColList_2.clear()
+            self.ColList_2.addItems(tmpc2)
+            self.ColChoose = tmpc2
+            
+    def filChangeD(self):
+        itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
+        itemsTextList_2 =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]
+        # print(itemsTextList,itemsTextList_2)
+        while (itemsTextList.count('')):
+            itemsTextList.remove('')
+        while (itemsTextList_2.count('')):
+            itemsTextList_2.remove('')
+        if not(itemsTextList == [] and itemsTextList_2 == []):
+            if itemsTextList == itemsTextList_2 or len(itemsTextList) < len(itemsTextList_2):
+                self.filterList.clear()
+                self.filterList.addItems(itemsTextList)
+                self.filterList_2.clear()
+                self.filterList_2.addItems(itemsTextList)
+                self.filDic = dict.fromkeys(itemsTextList, "")
+            else:
+                self.filterList.clear()
+                self.filterList.addItems(itemsTextList_2)
+                self.filterList_2.clear()
+                self.filterList_2.addItems(itemsTextList_2)
+                self.filDic = dict.fromkeys(itemsTextList_2, "")
+                
+    def rowcolChange(self):
+        tmpr = []
+        tmpr =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
+        # self.RowChoose = tmp
+        tmpc = [] 
+        tmpc =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
+        # self.ColChoose = tmp
+        tmpr2 = []
+        tmpr2 =  [str(self.RowList_2.item(i).text()) for i in range(self.RowList_2.count())]
+        # self.RowChoose = tmp
+        tmpc2 = [] 
+        tmpc2 =  [str(self.ColList_2.item(i).text()) for i in range(self.ColList_2.count())]
+        # self.ColChoose = tmp
+        
+        print(tmpr,tmpc,tmpr2,tmpc2)
+        
+        while (tmpr.count('')): tmpr.remove('')
+        while (tmpr2.count('')): tmpr2.remove('')
+        if tmpr == tmpr2 or len(tmpr) > len(tmpr2):
+            self.RowList.clear()
+            self.RowList.addItems(tmpr)
+            self.RowList_2.clear()
+            self.RowList_2.addItems(tmpr)
+            self.RowChoose = tmpr
+        else:
+            self.RowList.clear()
+            self.RowList.addItems(tmpr2)
+            self.RowList_2.clear()
+            self.RowList_2.addItems(tmpr2)
+            self.RowChoose = tmpr2
+        
+        while (tmpc.count('')): tmpc.remove('')
+        while (tmpc2.count('')): tmpc2.remove('')
+        if tmpc == tmpc2 or len(tmpc) > len(tmpc2):
+            self.ColList.clear()
+            self.ColList.addItems(tmpc)
+            self.ColList_2.clear()
+            self.ColList_2.addItems(tmpc)
+            self.RowChoose = tmpc
+        else:
+            self.ColList.clear()
+            self.ColList.addItems(tmpc2)
+            self.ColList_2.clear()
+            self.ColList_2.addItems(tmpc2)
+            self.ColChoose = tmpc2
+            
+    def filChange(self):
+        itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
+        itemsTextList_2 =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]
+        # print(itemsTextList,itemsTextList_2)
+        while (itemsTextList.count('')):
+            itemsTextList.remove('')
+        while (itemsTextList_2.count('')):
+            itemsTextList_2.remove('')
+        if not(itemsTextList == [] and itemsTextList_2 == []):
+            if itemsTextList == itemsTextList_2 or len(itemsTextList) > len(itemsTextList_2):
+                self.filterList.clear()
+                self.filterList.addItems(itemsTextList)
+                self.filterList_2.clear()
+                self.filterList_2.addItems(itemsTextList)
+                self.filDic = dict.fromkeys(itemsTextList, "")
+            else:
+                self.filterList.clear()
+                self.filterList.addItems(itemsTextList_2)
+                self.filterList_2.clear()
+                self.filterList_2.addItems(itemsTextList_2)
+                self.filDic = dict.fromkeys(itemsTextList_2, "")
+        # print(itemsTextList,itemsTextList_2)
+        # print(self.filDic)
     def setSheetTable(self):
         if self.selectFile != [] : 
             self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
@@ -345,10 +485,18 @@ class mainWindow(QMainWindow):
         else: 
             self.colHeader = []
             self.dataSourceTable.reset()
+            
             self.FileListDimension.clear()
             self.FileListDimension.addItems(self.colHeader)
+            
             self.FileListMes.clear()
             self.FileListMes.addItems([])
+            
+            self.FileListDimension_2.clear()
+            self.FileListDimension_2.addItems(self.colHeader)
+            
+            self.FileListMes_2.clear()
+            self.FileListMes_2.addItems([])
         self.dataSource()
         
     def setTable(self):
@@ -437,12 +585,14 @@ class mainWindow(QMainWindow):
         # self.data = cm.getDataWithPandas()
         # Ui_MainWindow.setupUi(self, MainWindow)
     def setFileListDimension(self):
-        if self.FileListDimension != None:
-            self.FileListDimension.clear()
-            self.FileListDimension.addItems(self.colHeader)
-        if self.FileListMes != None:
-            self.FileListMes.clear()
-            self.FileListMes.addItems(self.Measure)
+        self.FileListDimension.clear()
+        self.FileListDimension.addItems(self.colHeader)
+        self.FileListDimension_2.clear()
+        self.FileListDimension_2.addItems(self.colHeader)
+        self.FileListMes_2.clear()
+        self.FileListMes_2.addItems(self.Measure)
+        self.FileListMes.clear()
+        self.FileListMes.addItems(self.Measure)
 
 app = QApplication(sys.argv)
 # widget = QtWidgets.QStackedWidget()

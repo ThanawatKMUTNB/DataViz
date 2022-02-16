@@ -161,10 +161,6 @@ class Ui_MainWindow(object):
         self.gridLayout_9.addItem(self.horizontalSpacer_2, 0, 0, 1, 1)
 
         self.chartType = QComboBox(self.SheetTab)
-        self.chartType.addItem(QString())
-        self.chartType.addItem(QString())
-        self.chartType.addItem(QString())
-        self.chartType.addItem(QString())
         self.chartType.setObjectName(u"chartType")
         sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy2.setHorizontalStretch(0)
@@ -175,16 +171,6 @@ class Ui_MainWindow(object):
 
         self.gridLayout_9.addWidget(self.chartType, 0, 1, 1, 1)
 
-        self.plotButton = QPushButton(self.SheetTab)
-        self.plotButton.setObjectName(u"plotButton")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.plotButton.sizePolicy().hasHeightForWidth())
-        self.plotButton.setSizePolicy(sizePolicy3)
-
-        self.gridLayout_9.addWidget(self.plotButton, 0, 2, 1, 1)
-
 
         self.gridLayout_11.addLayout(self.gridLayout_9, 1, 0, 1, 3)
 
@@ -194,6 +180,9 @@ class Ui_MainWindow(object):
         self.gridLayout_10.setSizeConstraint(QLayout.SetNoConstraint)
         self.DimensionValuesLabel = QLabel(self.SheetTab)
         self.DimensionValuesLabel.setObjectName(u"DimensionValuesLabel")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.DimensionValuesLabel.sizePolicy().hasHeightForWidth())
         self.DimensionValuesLabel.setSizePolicy(sizePolicy3)
         self.DimensionValuesLabel.setFont(font)
@@ -431,10 +420,6 @@ class Ui_MainWindow(object):
         self.gridLayout_16.addItem(self.horizontalSpacer_3, 0, 0, 1, 1)
 
         self.chartType_2 = QComboBox(self.chartTab)
-        self.chartType_2.addItem(QString())
-        self.chartType_2.addItem(QString())
-        self.chartType_2.addItem(QString())
-        self.chartType_2.addItem(QString())
         self.chartType_2.setObjectName(u"chartType_2")
         sizePolicy2.setHeightForWidth(self.chartType_2.sizePolicy().hasHeightForWidth())
         self.chartType_2.setSizePolicy(sizePolicy2)
@@ -442,171 +427,41 @@ class Ui_MainWindow(object):
 
         self.gridLayout_16.addWidget(self.chartType_2, 0, 1, 1, 1)
 
-        self.plotButton_2 = QPushButton(self.chartTab)
-        self.plotButton_2.setObjectName(u"plotButton_2")
-        sizePolicy3.setHeightForWidth(self.plotButton_2.sizePolicy().hasHeightForWidth())
-        self.plotButton_2.setSizePolicy(sizePolicy3)
-
-        self.gridLayout_16.addWidget(self.plotButton_2, 0, 2, 1, 1)
-
 
         self.gridLayout_15.addLayout(self.gridLayout_16, 1, 0, 1, 3)
 
         self.gridLayout_17 = QGridLayout()
+        self.gridLayout_17.setSpacing(10)
         self.gridLayout_17.setObjectName(u"gridLayout_17")
-        self.widget = QWidget(self.chartTab)
-        self.widget.setObjectName(u"widget")
-        sizePolicy7.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
-        self.widget.setSizePolicy(sizePolicy7)
-        self.widget.setMouseTracking(True)
-
-        self.gridLayout_17.addWidget(self.widget, 1, 0, 1, 1)
-
-        self.gridLayout_18 = QGridLayout()
-        self.gridLayout_18.setObjectName(u"gridLayout_18")
-        self.ColList_2 = QListWidget(self.chartTab)
-        brush = QBrush(QColor(238, 238, 238, 255))
-        brush.setStyle(Qt.Dense4Pattern)
-        __qlistwidgetitem = QListWidgetItem(self.ColList_2)
-        __qlistwidgetitem.setBackground(brush);
-        QListWidgetItem(self.ColList_2)
-        QListWidgetItem(self.ColList_2)
-        self.ColList_2.setObjectName(u"ColList_2")
-        sizePolicy6.setHeightForWidth(self.ColList_2.sizePolicy().hasHeightForWidth())
-        self.ColList_2.setSizePolicy(sizePolicy6)
-        self.ColList_2.setMinimumSize(QSize(0, 20))
-        self.ColList_2.setMaximumSize(QSize(16777215, 30))
-        self.ColList_2.setContextMenuPolicy(Qt.ActionsContextMenu)
-        self.ColList_2.setAcceptDrops(True)
-        self.ColList_2.setLayoutDirection(Qt.LeftToRight)
-        self.ColList_2.setAutoFillBackground(True)
-        self.ColList_2.setAutoScroll(True)
-        self.ColList_2.setAutoScrollMargin(5)
-        self.ColList_2.setDragEnabled(True)
-        self.ColList_2.setDragDropOverwriteMode(False)
-        self.ColList_2.setDragDropMode(QAbstractItemView.DragDrop)
-        self.ColList_2.setDefaultDropAction(Qt.MoveAction)
-        self.ColList_2.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.ColList_2.setTextElideMode(Qt.ElideRight)
-        self.ColList_2.setVerticalScrollMode(QAbstractItemView.ScrollPerItem)
-        self.ColList_2.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.ColList_2.setFlow(QListView.LeftToRight)
-        self.ColList_2.setProperty("isWrapping", False)
-        self.ColList_2.setSpacing(0)
-        self.ColList_2.setGridSize(QSize(100, 0))
-        self.ColList_2.setViewMode(QListView.ListMode)
-        self.ColList_2.setUniformItemSizes(False)
-        self.ColList_2.setWordWrap(True)
-        self.ColList_2.setSelectionRectVisible(False)
-        self.ColList_2.setSortingEnabled(False)
-
-        self.gridLayout_18.addWidget(self.ColList_2, 1, 1, 1, 1)
-
-        self.ColLabel_2 = QLabel(self.chartTab)
-        self.ColLabel_2.setObjectName(u"ColLabel_2")
-        sizePolicy8 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        sizePolicy8.setHorizontalStretch(0)
-        sizePolicy8.setVerticalStretch(0)
-        sizePolicy8.setHeightForWidth(self.ColLabel_2.sizePolicy().hasHeightForWidth())
-        self.ColLabel_2.setSizePolicy(sizePolicy8)
-        self.ColLabel_2.setFont(font)
-
-        self.gridLayout_18.addWidget(self.ColLabel_2, 1, 0, 1, 1)
-
-        self.RowLabel_2 = QLabel(self.chartTab)
-        self.RowLabel_2.setObjectName(u"RowLabel_2")
-        sizePolicy8.setHeightForWidth(self.RowLabel_2.sizePolicy().hasHeightForWidth())
-        self.RowLabel_2.setSizePolicy(sizePolicy8)
-        self.RowLabel_2.setFont(font)
-
-        self.gridLayout_18.addWidget(self.RowLabel_2, 0, 0, 1, 1)
-
-        self.RowList_2 = QListWidget(self.chartTab)
-        brush1 = QBrush(QColor(238, 238, 238, 255))
-        brush1.setStyle(Qt.Dense4Pattern)
-        __qlistwidgetitem1 = QListWidgetItem(self.RowList_2)
-        __qlistwidgetitem1.setBackground(brush1);
-        __qlistwidgetitem1.setFlags(Qt.ItemIsSelectable|Qt.ItemIsDragEnabled|Qt.ItemIsDropEnabled|Qt.ItemIsUserCheckable|Qt.ItemIsEnabled|Qt.ItemIsTristate);
-        QListWidgetItem(self.RowList_2)
-        QListWidgetItem(self.RowList_2)
-        self.RowList_2.setObjectName(u"RowList_2")
-        sizePolicy6.setHeightForWidth(self.RowList_2.sizePolicy().hasHeightForWidth())
-        self.RowList_2.setSizePolicy(sizePolicy6)
-        self.RowList_2.setMinimumSize(QSize(0, 20))
-        self.RowList_2.setMaximumSize(QSize(16777215, 30))
-        self.RowList_2.setContextMenuPolicy(Qt.ActionsContextMenu)
-        self.RowList_2.setAcceptDrops(True)
-        self.RowList_2.setLayoutDirection(Qt.LeftToRight)
-        self.RowList_2.setAutoFillBackground(True)
-        self.RowList_2.setAutoScroll(True)
-        self.RowList_2.setAutoScrollMargin(5)
-        self.RowList_2.setEditTriggers(QAbstractItemView.DoubleClicked|QAbstractItemView.EditKeyPressed|QAbstractItemView.SelectedClicked)
-        self.RowList_2.setDragEnabled(True)
-        self.RowList_2.setDragDropOverwriteMode(True)
-        self.RowList_2.setDragDropMode(QAbstractItemView.DragDrop)
-        self.RowList_2.setDefaultDropAction(Qt.MoveAction)
-        self.RowList_2.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.RowList_2.setTextElideMode(Qt.ElideRight)
-        self.RowList_2.setVerticalScrollMode(QAbstractItemView.ScrollPerItem)
-        self.RowList_2.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.RowList_2.setFlow(QListView.LeftToRight)
-        self.RowList_2.setProperty("isWrapping", False)
-        self.RowList_2.setSpacing(0)
-        self.RowList_2.setGridSize(QSize(100, 0))
-        self.RowList_2.setViewMode(QListView.ListMode)
-        self.RowList_2.setUniformItemSizes(False)
-        self.RowList_2.setWordWrap(True)
-        self.RowList_2.setSelectionRectVisible(False)
-        self.RowList_2.setSortingEnabled(False)
-
-        self.gridLayout_18.addWidget(self.RowList_2, 0, 1, 1, 1)
-
-
-        self.gridLayout_17.addLayout(self.gridLayout_18, 0, 0, 1, 1)
-
-
-        self.gridLayout_15.addLayout(self.gridLayout_17, 0, 2, 1, 1)
-
-        self.gridLayout_19 = QGridLayout()
-        self.gridLayout_19.setObjectName(u"gridLayout_19")
+        self.gridLayout_17.setSizeConstraint(QLayout.SetNoConstraint)
         self.DimensionValuesLabel_2 = QLabel(self.chartTab)
         self.DimensionValuesLabel_2.setObjectName(u"DimensionValuesLabel_2")
-        sizePolicy9 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
-        sizePolicy9.setHorizontalStretch(0)
-        sizePolicy9.setVerticalStretch(0)
-        sizePolicy9.setHeightForWidth(self.DimensionValuesLabel_2.sizePolicy().hasHeightForWidth())
-        self.DimensionValuesLabel_2.setSizePolicy(sizePolicy9)
+        sizePolicy3.setHeightForWidth(self.DimensionValuesLabel_2.sizePolicy().hasHeightForWidth())
+        self.DimensionValuesLabel_2.setSizePolicy(sizePolicy3)
         self.DimensionValuesLabel_2.setFont(font)
 
-        self.gridLayout_19.addWidget(self.DimensionValuesLabel_2, 0, 0, 1, 1)
+        self.gridLayout_17.addWidget(self.DimensionValuesLabel_2, 0, 0, 1, 1)
 
         self.FileListDimension_2 = QListWidget(self.chartTab)
-        QListWidgetItem(self.FileListDimension_2)
-        QListWidgetItem(self.FileListDimension_2)
-        QListWidgetItem(self.FileListDimension_2)
-        QListWidgetItem(self.FileListDimension_2)
-        QListWidgetItem(self.FileListDimension_2)
         self.FileListDimension_2.setObjectName(u"FileListDimension_2")
-        sizePolicy10 = QSizePolicy(QSizePolicy.Ignored, QSizePolicy.Expanding)
-        sizePolicy10.setHorizontalStretch(0)
-        sizePolicy10.setVerticalStretch(0)
-        sizePolicy10.setHeightForWidth(self.FileListDimension_2.sizePolicy().hasHeightForWidth())
-        self.FileListDimension_2.setSizePolicy(sizePolicy10)
-        self.FileListDimension_2.setMinimumSize(QSize(0, 100))
-        self.FileListDimension_2.setMaximumSize(QSize(16577215, 16777215))
+        sizePolicy4.setHeightForWidth(self.FileListDimension_2.sizePolicy().hasHeightForWidth())
+        self.FileListDimension_2.setSizePolicy(sizePolicy4)
+        self.FileListDimension_2.setMinimumSize(QSize(100, 0))
+        self.FileListDimension_2.setMaximumSize(QSize(100, 16777215))
         self.FileListDimension_2.setFocusPolicy(Qt.StrongFocus)
-        self.FileListDimension_2.setAcceptDrops(True)
+        self.FileListDimension_2.setAcceptDrops(False)
         self.FileListDimension_2.setEditTriggers(QAbstractItemView.AllEditTriggers)
         self.FileListDimension_2.setTabKeyNavigation(False)
+        self.FileListDimension_2.setProperty("showDropIndicator", False)
         self.FileListDimension_2.setDragEnabled(True)
         self.FileListDimension_2.setDragDropOverwriteMode(True)
-        self.FileListDimension_2.setDragDropMode(QAbstractItemView.InternalMove)
+        self.FileListDimension_2.setDragDropMode(QAbstractItemView.DragOnly)
         self.FileListDimension_2.setDefaultDropAction(Qt.CopyAction)
         self.FileListDimension_2.setBatchSize(100)
-        self.FileListDimension_2.setWordWrap(True)
+        self.FileListDimension_2.setWordWrap(False)
         self.FileListDimension_2.setSortingEnabled(True)
 
-        self.gridLayout_19.addWidget(self.FileListDimension_2, 1, 0, 2, 1)
+        self.gridLayout_17.addWidget(self.FileListDimension_2, 1, 0, 2, 1)
 
         self.MeasureValuesLabel_2 = QLabel(self.chartTab)
         self.MeasureValuesLabel_2.setObjectName(u"MeasureValuesLabel_2")
@@ -614,77 +469,159 @@ class Ui_MainWindow(object):
         self.MeasureValuesLabel_2.setSizePolicy(sizePolicy3)
         self.MeasureValuesLabel_2.setFont(font)
 
-        self.gridLayout_19.addWidget(self.MeasureValuesLabel_2, 3, 0, 1, 1)
-
-        self.filterLabel_2 = QLabel(self.chartTab)
-        self.filterLabel_2.setObjectName(u"filterLabel_2")
-        sizePolicy3.setHeightForWidth(self.filterLabel_2.sizePolicy().hasHeightForWidth())
-        self.filterLabel_2.setSizePolicy(sizePolicy3)
-        self.filterLabel_2.setMinimumSize(QSize(30, 30))
-        self.filterLabel_2.setFont(font)
-
-        self.gridLayout_19.addWidget(self.filterLabel_2, 0, 1, 1, 1)
+        self.gridLayout_17.addWidget(self.MeasureValuesLabel_2, 3, 0, 1, 1)
 
         self.FileListMes_2 = QListWidget(self.chartTab)
-        QListWidgetItem(self.FileListMes_2)
-        QListWidgetItem(self.FileListMes_2)
-        QListWidgetItem(self.FileListMes_2)
-        QListWidgetItem(self.FileListMes_2)
-        QListWidgetItem(self.FileListMes_2)
-        QListWidgetItem(self.FileListMes_2)
-        QListWidgetItem(self.FileListMes_2)
-        QListWidgetItem(self.FileListMes_2)
-        QListWidgetItem(self.FileListMes_2)
-        QListWidgetItem(self.FileListMes_2)
-        QListWidgetItem(self.FileListMes_2)
-        QListWidgetItem(self.FileListMes_2)
-        QListWidgetItem(self.FileListMes_2)
-        QListWidgetItem(self.FileListMes_2)
-        QListWidgetItem(self.FileListMes_2)
         self.FileListMes_2.setObjectName(u"FileListMes_2")
-        sizePolicy11 = QSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
-        sizePolicy11.setHorizontalStretch(0)
-        sizePolicy11.setVerticalStretch(0)
-        sizePolicy11.setHeightForWidth(self.FileListMes_2.sizePolicy().hasHeightForWidth())
-        self.FileListMes_2.setSizePolicy(sizePolicy11)
-        self.FileListMes_2.setMaximumSize(QSize(16577215, 16777215))
+        sizePolicy5.setHeightForWidth(self.FileListMes_2.sizePolicy().hasHeightForWidth())
+        self.FileListMes_2.setSizePolicy(sizePolicy5)
+        self.FileListMes_2.setMinimumSize(QSize(100, 0))
+        self.FileListMes_2.setMaximumSize(QSize(100, 16777215))
         self.FileListMes_2.setFocusPolicy(Qt.StrongFocus)
-        self.FileListMes_2.setAcceptDrops(True)
+        self.FileListMes_2.setAcceptDrops(False)
+        self.FileListMes_2.setProperty("showDropIndicator", False)
         self.FileListMes_2.setDragEnabled(True)
-        self.FileListMes_2.setDragDropOverwriteMode(True)
-        self.FileListMes_2.setDragDropMode(QAbstractItemView.InternalMove)
+        self.FileListMes_2.setDragDropOverwriteMode(False)
+        self.FileListMes_2.setDragDropMode(QAbstractItemView.DragOnly)
         self.FileListMes_2.setDefaultDropAction(Qt.CopyAction)
         self.FileListMes_2.setBatchSize(100)
         self.FileListMes_2.setWordWrap(True)
         self.FileListMes_2.setSortingEnabled(True)
 
-        self.gridLayout_19.addWidget(self.FileListMes_2, 4, 0, 1, 1)
+        self.gridLayout_17.addWidget(self.FileListMes_2, 4, 0, 1, 1)
 
-        self.filterButton_2 = QPushButton(self.chartTab)
-        self.filterButton_2.setObjectName(u"filterButton_2")
-        sizePolicy3.setHeightForWidth(self.filterButton_2.sizePolicy().hasHeightForWidth())
-        self.filterButton_2.setSizePolicy(sizePolicy3)
-        self.filterButton_2.setMinimumSize(QSize(30, 30))
+        self.filterLabel_2 = QLabel(self.chartTab)
+        self.filterLabel_2.setObjectName(u"filterLabel_2")
+        sizePolicy3.setHeightForWidth(self.filterLabel_2.sizePolicy().hasHeightForWidth())
+        self.filterLabel_2.setSizePolicy(sizePolicy3)
+        self.filterLabel_2.setMinimumSize(QSize(0, 0))
+        self.filterLabel_2.setFont(font)
 
-        self.gridLayout_19.addWidget(self.filterButton_2, 0, 2, 1, 1)
+        self.gridLayout_17.addWidget(self.filterLabel_2, 0, 1, 1, 2)
 
-        self.filterList_2 = QListWidget(self.chartTab)
-        QListWidgetItem(self.filterList_2)
-        QListWidgetItem(self.filterList_2)
-        QListWidgetItem(self.filterList_2)
+        self.filterList_2 = rowListClass(self.chartTab)
         self.filterList_2.setObjectName(u"filterList_2")
-        sizePolicy10.setHeightForWidth(self.filterList_2.sizePolicy().hasHeightForWidth())
-        self.filterList_2.setSizePolicy(sizePolicy10)
-        self.filterList_2.setMinimumSize(QSize(70, 100))
-        self.filterList_2.setMaximumSize(QSize(16577215, 16777215))
+        sizePolicy4.setHeightForWidth(self.filterList_2.sizePolicy().hasHeightForWidth())
+        self.filterList_2.setSizePolicy(sizePolicy4)
+        self.filterList_2.setMinimumSize(QSize(100, 0))
+        self.filterList_2.setMaximumSize(QSize(100, 16777215))
         self.filterList_2.setAcceptDrops(True)
+        self.filterList_2.setProperty("showDropIndicator", False)
         self.filterList_2.setDragDropMode(QAbstractItemView.DragDrop)
         self.filterList_2.setDefaultDropAction(Qt.MoveAction)
 
-        self.gridLayout_19.addWidget(self.filterList_2, 1, 1, 2, 2)
+        self.gridLayout_17.addWidget(self.filterList_2, 1, 1, 2, 1)
 
 
-        self.gridLayout_15.addLayout(self.gridLayout_19, 0, 0, 1, 1)
+        self.gridLayout_15.addLayout(self.gridLayout_17, 0, 0, 1, 2)
+
+        self.gridLayout_18 = QGridLayout()
+        self.gridLayout_18.setObjectName(u"gridLayout_18")
+        self.gridLayout_19 = QGridLayout()
+        self.gridLayout_19.setObjectName(u"gridLayout_19")
+        self.RowList_2 = rowListClass(self.chartTab)
+        self.RowList_2.setObjectName(u"RowList_2")
+        sizePolicy6.setHeightForWidth(self.RowList_2.sizePolicy().hasHeightForWidth())
+        self.RowList_2.setSizePolicy(sizePolicy6)
+        self.RowList_2.setMinimumSize(QSize(0, 40))
+        self.RowList_2.setMaximumSize(QSize(16777215, 40))
+        self.RowList_2.setMouseTracking(True)
+        self.RowList_2.setContextMenuPolicy(Qt.DefaultContextMenu)
+        self.RowList_2.setAcceptDrops(False)
+        self.RowList_2.setLayoutDirection(Qt.LeftToRight)
+        self.RowList_2.setAutoFillBackground(True)
+        self.RowList_2.setAutoScroll(True)
+        self.RowList_2.setAutoScrollMargin(5)
+        self.RowList_2.setEditTriggers(QAbstractItemView.DoubleClicked|QAbstractItemView.EditKeyPressed|QAbstractItemView.SelectedClicked)
+        self.RowList_2.setProperty("showDropIndicator", False)
+        self.RowList_2.setDragEnabled(False)
+        self.RowList_2.setDragDropOverwriteMode(False)
+        self.RowList_2.setDragDropMode(QAbstractItemView.DragDrop)
+        self.RowList_2.setDefaultDropAction(Qt.MoveAction)
+        self.RowList_2.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.RowList_2.setTextElideMode(Qt.ElideMiddle)
+        self.RowList_2.setVerticalScrollMode(QAbstractItemView.ScrollPerItem)
+        self.RowList_2.setHorizontalScrollMode(QAbstractItemView.ScrollPerItem)
+        self.RowList_2.setFlow(QListView.LeftToRight)
+        self.RowList_2.setProperty("isWrapping", False)
+        self.RowList_2.setResizeMode(QListView.Adjust)
+        self.RowList_2.setSpacing(0)
+        self.RowList_2.setGridSize(QSize(100, 0))
+        self.RowList_2.setViewMode(QListView.ListMode)
+        self.RowList_2.setModelColumn(0)
+        self.RowList_2.setUniformItemSizes(False)
+        self.RowList_2.setWordWrap(False)
+        self.RowList_2.setSelectionRectVisible(False)
+        self.RowList_2.setSortingEnabled(False)
+
+        self.gridLayout_19.addWidget(self.RowList_2, 0, 1, 1, 1)
+
+        self.ColLabel_2 = QLabel(self.chartTab)
+        self.ColLabel_2.setObjectName(u"ColLabel_2")
+        sizePolicy2.setHeightForWidth(self.ColLabel_2.sizePolicy().hasHeightForWidth())
+        self.ColLabel_2.setSizePolicy(sizePolicy2)
+        self.ColLabel_2.setMinimumSize(QSize(0, 30))
+        self.ColLabel_2.setFont(font)
+
+        self.gridLayout_19.addWidget(self.ColLabel_2, 1, 0, 1, 1)
+
+        self.RowLabel_2 = QLabel(self.chartTab)
+        self.RowLabel_2.setObjectName(u"RowLabel_2")
+        sizePolicy2.setHeightForWidth(self.RowLabel_2.sizePolicy().hasHeightForWidth())
+        self.RowLabel_2.setSizePolicy(sizePolicy2)
+        self.RowLabel_2.setMinimumSize(QSize(0, 30))
+        self.RowLabel_2.setFont(font)
+
+        self.gridLayout_19.addWidget(self.RowLabel_2, 0, 0, 1, 1)
+
+        self.ColList_2 = rowListClass(self.chartTab)
+        self.ColList_2.setObjectName(u"ColList_2")
+        sizePolicy6.setHeightForWidth(self.ColList_2.sizePolicy().hasHeightForWidth())
+        self.ColList_2.setSizePolicy(sizePolicy6)
+        self.ColList_2.setMinimumSize(QSize(0, 40))
+        self.ColList_2.setMaximumSize(QSize(16777215, 40))
+        self.ColList_2.setMouseTracking(True)
+        self.ColList_2.setContextMenuPolicy(Qt.DefaultContextMenu)
+        self.ColList_2.setAcceptDrops(False)
+        self.ColList_2.setLayoutDirection(Qt.LeftToRight)
+        self.ColList_2.setAutoFillBackground(True)
+        self.ColList_2.setAutoScroll(True)
+        self.ColList_2.setAutoScrollMargin(5)
+        self.ColList_2.setProperty("showDropIndicator", False)
+        self.ColList_2.setDragEnabled(False)
+        self.ColList_2.setDragDropOverwriteMode(False)
+        self.ColList_2.setDragDropMode(QAbstractItemView.DragDrop)
+        self.ColList_2.setDefaultDropAction(Qt.MoveAction)
+        self.ColList_2.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.ColList_2.setTextElideMode(Qt.ElideMiddle)
+        self.ColList_2.setVerticalScrollMode(QAbstractItemView.ScrollPerItem)
+        self.ColList_2.setHorizontalScrollMode(QAbstractItemView.ScrollPerItem)
+        self.ColList_2.setFlow(QListView.LeftToRight)
+        self.ColList_2.setProperty("isWrapping", False)
+        self.ColList_2.setResizeMode(QListView.Adjust)
+        self.ColList_2.setSpacing(0)
+        self.ColList_2.setGridSize(QSize(100, 0))
+        self.ColList_2.setViewMode(QListView.ListMode)
+        self.ColList_2.setModelColumn(0)
+        self.ColList_2.setUniformItemSizes(False)
+        self.ColList_2.setWordWrap(False)
+        self.ColList_2.setSelectionRectVisible(False)
+        self.ColList_2.setSortingEnabled(False)
+
+        self.gridLayout_19.addWidget(self.ColList_2, 1, 1, 1, 1)
+
+
+        self.gridLayout_18.addLayout(self.gridLayout_19, 0, 0, 1, 1)
+
+        self.widget = QWidget(self.chartTab)
+        self.widget.setObjectName(u"widget")
+        sizePolicy7.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
+        self.widget.setSizePolicy(sizePolicy7)
+
+        self.gridLayout_18.addWidget(self.widget, 1, 0, 1, 1)
+
+
+        self.gridLayout_15.addLayout(self.gridLayout_18, 0, 2, 1, 1)
 
 
         self.gridLayout_20.addLayout(self.gridLayout_15, 0, 0, 1, 1)
@@ -704,7 +641,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -718,113 +655,17 @@ class Ui_MainWindow(object):
         self.openDirecButton.setText(QCoreApplication.translate("MainWindow", u"Directory", None))
         self.usedFileLabel.setText(QCoreApplication.translate("MainWindow", u"Union File", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.dataSourceTab), QCoreApplication.translate("MainWindow", u"Data Source", None))
-        self.chartType.setItemText(0, QCoreApplication.translate("MainWindow", u"New Item5555555555", None))
-        self.chartType.setItemText(1, QCoreApplication.translate("MainWindow", u"New Item", None))
-        self.chartType.setItemText(2, QCoreApplication.translate("MainWindow", u"New Item", None))
-        self.chartType.setItemText(3, QCoreApplication.translate("MainWindow", u"New Item", None))
-
-        self.plotButton.setText(QCoreApplication.translate("MainWindow", u"PLOT", None))
         self.DimensionValuesLabel.setText(QCoreApplication.translate("MainWindow", u"Dimension", None))
         self.MeasureValuesLabel.setText(QCoreApplication.translate("MainWindow", u"Measure Values", None))
         self.filterLabel.setText(QCoreApplication.translate("MainWindow", u"Filter", None))
         self.ColLabel.setText(QCoreApplication.translate("MainWindow", u"Column", None))
         self.RowLabel.setText(QCoreApplication.translate("MainWindow", u"Row", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.SheetTab), QCoreApplication.translate("MainWindow", u"Sheet", None))
-        self.chartType_2.setItemText(0, QCoreApplication.translate("MainWindow", u"New Item5555555555", None))
-        self.chartType_2.setItemText(1, QCoreApplication.translate("MainWindow", u"New Item", None))
-        self.chartType_2.setItemText(2, QCoreApplication.translate("MainWindow", u"New Item", None))
-        self.chartType_2.setItemText(3, QCoreApplication.translate("MainWindow", u"New Item", None))
-
-        self.plotButton_2.setText(QCoreApplication.translate("MainWindow", u"PLOT", None))
-
-        __sortingEnabled = self.ColList_2.isSortingEnabled()
-        self.ColList_2.setSortingEnabled(False)
-        ___qlistwidgetitem = self.ColList_2.item(0)
-        ___qlistwidgetitem.setText(QCoreApplication.translate("MainWindow", u"1", None));
-        ___qlistwidgetitem1 = self.ColList_2.item(1)
-        ___qlistwidgetitem1.setText(QCoreApplication.translate("MainWindow", u"2", None));
-        ___qlistwidgetitem2 = self.ColList_2.item(2)
-        ___qlistwidgetitem2.setText(QCoreApplication.translate("MainWindow", u"3", None));
-        self.ColList_2.setSortingEnabled(__sortingEnabled)
-
-        self.ColLabel_2.setText(QCoreApplication.translate("MainWindow", u"Column", None))
-        self.RowLabel_2.setText(QCoreApplication.translate("MainWindow", u"Row", None))
-
-        __sortingEnabled1 = self.RowList_2.isSortingEnabled()
-        self.RowList_2.setSortingEnabled(False)
-        ___qlistwidgetitem3 = self.RowList_2.item(0)
-        ___qlistwidgetitem3.setText(QCoreApplication.translate("MainWindow", u"1111111111", None));
-        ___qlistwidgetitem4 = self.RowList_2.item(1)
-        ___qlistwidgetitem4.setText(QCoreApplication.translate("MainWindow", u"2", None));
-        ___qlistwidgetitem5 = self.RowList_2.item(2)
-        ___qlistwidgetitem5.setText(QCoreApplication.translate("MainWindow", u"3", None));
-        self.RowList_2.setSortingEnabled(__sortingEnabled1)
-
         self.DimensionValuesLabel_2.setText(QCoreApplication.translate("MainWindow", u"Dimension", None))
-
-        __sortingEnabled2 = self.FileListDimension_2.isSortingEnabled()
-        self.FileListDimension_2.setSortingEnabled(False)
-        ___qlistwidgetitem6 = self.FileListDimension_2.item(0)
-        ___qlistwidgetitem6.setText(QCoreApplication.translate("MainWindow", u"2", None));
-        ___qlistwidgetitem7 = self.FileListDimension_2.item(1)
-        ___qlistwidgetitem7.setText(QCoreApplication.translate("MainWindow", u"5", None));
-        ___qlistwidgetitem8 = self.FileListDimension_2.item(2)
-        ___qlistwidgetitem8.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem9 = self.FileListDimension_2.item(3)
-        ___qlistwidgetitem9.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem10 = self.FileListDimension_2.item(4)
-        ___qlistwidgetitem10.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        self.FileListDimension_2.setSortingEnabled(__sortingEnabled2)
-
         self.MeasureValuesLabel_2.setText(QCoreApplication.translate("MainWindow", u"Measure Values", None))
         self.filterLabel_2.setText(QCoreApplication.translate("MainWindow", u"Filter", None))
-
-        __sortingEnabled3 = self.FileListMes_2.isSortingEnabled()
-        self.FileListMes_2.setSortingEnabled(False)
-        ___qlistwidgetitem11 = self.FileListMes_2.item(0)
-        ___qlistwidgetitem11.setText(QCoreApplication.translate("MainWindow", u"10", None));
-        ___qlistwidgetitem12 = self.FileListMes_2.item(1)
-        ___qlistwidgetitem12.setText(QCoreApplication.translate("MainWindow", u"5", None));
-        ___qlistwidgetitem13 = self.FileListMes_2.item(2)
-        ___qlistwidgetitem13.setText(QCoreApplication.translate("MainWindow", u"9", None));
-        ___qlistwidgetitem14 = self.FileListMes_2.item(3)
-        ___qlistwidgetitem14.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem15 = self.FileListMes_2.item(4)
-        ___qlistwidgetitem15.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem16 = self.FileListMes_2.item(5)
-        ___qlistwidgetitem16.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem17 = self.FileListMes_2.item(6)
-        ___qlistwidgetitem17.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem18 = self.FileListMes_2.item(7)
-        ___qlistwidgetitem18.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem19 = self.FileListMes_2.item(8)
-        ___qlistwidgetitem19.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem20 = self.FileListMes_2.item(9)
-        ___qlistwidgetitem20.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem21 = self.FileListMes_2.item(10)
-        ___qlistwidgetitem21.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem22 = self.FileListMes_2.item(11)
-        ___qlistwidgetitem22.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem23 = self.FileListMes_2.item(12)
-        ___qlistwidgetitem23.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem24 = self.FileListMes_2.item(13)
-        ___qlistwidgetitem24.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem25 = self.FileListMes_2.item(14)
-        ___qlistwidgetitem25.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        self.FileListMes_2.setSortingEnabled(__sortingEnabled3)
-
-        self.filterButton_2.setText(QCoreApplication.translate("MainWindow", u" Filter ", None))
-
-        __sortingEnabled4 = self.filterList_2.isSortingEnabled()
-        self.filterList_2.setSortingEnabled(False)
-        ___qlistwidgetitem26 = self.filterList_2.item(0)
-        ___qlistwidgetitem26.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        ___qlistwidgetitem27 = self.filterList_2.item(1)
-        ___qlistwidgetitem27.setText(QCoreApplication.translate("MainWindow", u"22", None));
-        ___qlistwidgetitem28 = self.filterList_2.item(2)
-        ___qlistwidgetitem28.setText(QCoreApplication.translate("MainWindow", u"New Item", None));
-        self.filterList_2.setSortingEnabled(__sortingEnabled4)
-
+        self.ColLabel_2.setText(QCoreApplication.translate("MainWindow", u"Column", None))
+        self.RowLabel_2.setText(QCoreApplication.translate("MainWindow", u"Row", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.chartTab), QCoreApplication.translate("MainWindow", u"Chart", None))
     # retranslateUi
 
