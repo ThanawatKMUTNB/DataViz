@@ -23,8 +23,8 @@ class graphManager():
         self.ColChoose = []
         #self.Chart = None
 
-    def setList(self,row,col,dataSheet,dic):
-        self.Measure = dic
+    def setList(self,row,col,dataSheet):
+        # self.Measure = dic
         self.RowChoose = row
         self.ColChoose = col
         self.df = dataSheet

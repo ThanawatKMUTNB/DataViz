@@ -613,12 +613,12 @@ class Ui_MainWindow(object):
 
         self.gridLayout_18.addLayout(self.gridLayout_19, 0, 0, 1, 1)
 
-        self.widget = QWidget(self.chartTab)
-        self.widget.setObjectName(u"widget")
-        sizePolicy7.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
-        self.widget.setSizePolicy(sizePolicy7)
+        self.frame = QFrame(self.chartTab)
+        self.frame.setObjectName(u"frame")
+        sizePolicy7.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
+        self.frame.setSizePolicy(sizePolicy7)
 
-        self.gridLayout_18.addWidget(self.widget, 1, 0, 1, 1)
+        self.gridLayout_18.addWidget(self.frame, 1, 0, 1, 1)
 
 
         self.gridLayout_15.addLayout(self.gridLayout_18, 0, 2, 1, 1)

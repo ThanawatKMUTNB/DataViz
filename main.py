@@ -173,7 +173,7 @@ class Ui_MainWindow(object):
         for j in itemsTextList:
             self.filterList_2.addItem(j)
         self.filDic = dict.fromkeys(itemsTextList, "")
-        print(self.filDic)
+        # print(self.filDic)
         
     def filChange_2(self):
         itemsTextList =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]
@@ -930,10 +930,12 @@ class Ui_MainWindow(object):
         self.gridLayout_17 = QtWidgets.QGridLayout()
         self.gridLayout_17.setObjectName("gridLayout_17")
         
-        self.view = WebEngineView(self.chartTab)
+        self.view = WebEngineView()
         if self.Chart != None :
-            print("Chart not none")
+            # print("Chart not none")
             self.view.updateChart(self.Chart)
+            # vbox.addWidget(self.webview)
+            # widget.setLayout(vbox)
             self.view.show()
                   
         self.gridLayout_17.addWidget(self.view, 1, 0, 1, 1)
