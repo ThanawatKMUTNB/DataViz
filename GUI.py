@@ -55,10 +55,12 @@ class filterDimenWindow(QMainWindow):
         self.filterItemListWidget.doubleClicked.connect(self.reverseCheck)
         self.setUp()
         self.setList()
+        self.resetBut()
     
     def ApplyBut(self):
         self.filtered[self.dimen] = self.checkedList
         mainW.filDic = self.filtered
+        mainW.setSheetTable()
         self.close()
         
     def cancleBut(self):
@@ -111,8 +113,10 @@ class filterDimenWindow(QMainWindow):
         self.dimen = mainW.diForFil
         self.sheet = mainW.data
         self.filtered = mainW.filDic
+        print("BF--------",self.filtered,self.filtered[self.dimen])
         if self.filtered[self.dimen] == "":
-            self.filtered[self.dimen] = self.sheet[self.dimen].drop_duplicates().tolist()
+            self.filtered[self.dimen] = list(set(self.sheet[self.dimen].values))
+        print(self.filtered)
     
     def setList(self):
         _translate = QtCore.QCoreApplication.translate
@@ -173,7 +177,8 @@ class rowListClass(QtWidgets.QListWidget):
         
     def dragLeaveEvent(self,event) -> None:
         if self.count():
-            mainW.filJustAdd = self.item(self.currentRow()).text()
+            if self.item(self.currentRow()) != None:
+                mainW.filJustAdd = self.item(self.currentRow()).text()
             self.takeItem(self.currentRow())
             self.clearSelection()
         mainW.filChangeD()
@@ -548,7 +553,7 @@ class mainWindow(QMainWindow):
         
     def filChangeD(self):
         # print("Just D ",self.filJustAdd)
-        self.filDic.pop[self.filJustAdd]
+        # print(self.filDic)
         itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
         itemsTextList_2 =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]
         itemsTextList =  list(set(itemsTextList))
@@ -571,6 +576,9 @@ class mainWindow(QMainWindow):
                 self.filterList_2.clear()
                 self.filterList_2.addItems(itemsTextList_2)
             
+            if self.filJustAdd in self.filDic.keys():
+                del self.filDic[self.filJustAdd]
+         
     def rowcolChange(self):
         tmpr = []
         tmpr =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
@@ -614,7 +622,7 @@ class mainWindow(QMainWindow):
         self.setChart()
         
     def filChange(self):
-        # print("Last ",self.filJustAdd)
+        # print(self.filDic)
         itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
         itemsTextList_2 =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]
         itemsTextList =  list(set(itemsTextList))
@@ -656,6 +664,8 @@ class mainWindow(QMainWindow):
     def sheetPageRowAndCol(self,Row,Col):
         # print("Start",Row,Col,len(set(Row)),len(set(Col)))
         if Row!=[] or Col!=[]:
+            cm.filter = self.filDic
+            print("BF table",self.filDic)
             self.dataSheet = cm.setRowAndColumn(Row,Col)
           
     def on_header_doubleClicked(self,index):
@@ -738,7 +748,8 @@ class mainWindow(QMainWindow):
     
     def setFileChoose(self):
         print("bf",self.selectFile)
-        self.FileListChoose.clear()
+        if self.FileListChoose != None :
+            self.FileListChoose.clear()
         if type(self.selectFile) != list:
             self.selectFile = [self.selectFile]
         if self.selectFile != []:

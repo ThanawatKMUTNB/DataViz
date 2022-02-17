@@ -10,6 +10,7 @@ class csvManager:
         self.path = ""
         self.df = ""
         self.Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
+        self.filter = {}
     
     def setPath(self):
         pathBuf = os.path.join(self.path,self.selectFile) 
@@ -146,20 +147,42 @@ class csvManager:
                 tmp.append(i)
         return len(tmp)
     Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
+    
+    def setDataFilter(self,Row,Col):
+        for i in list(self.filter.keys()):
+            if i not in Row+Col:
+                self.filter.pop(i)
+        for i in Row+Col:
+            if i not in list(self.filter.keys()):
+                self.filter[i] = ""
+        for i in list(self.filter.keys()):
+            if self.filter[i] == "":
+                self.filter[i] = list(self.df[i].values)
+        self.dfFil = self.df
+        for i in self.filter.keys():
+            self.dfFil = self.dfFil[self.dfFil[i].isin(self.filter[i])]
+        # print(self.dfFil)
+        
+                
     def setRowAndColumn(self,Row,Col):
+        usedata = self.df
+        if self.filter != {}:
+            self.setDataFilter(Row,Col)
+            usedata = self.dfFil
+        # self.df = pd.DataFrame({'col1': [0, 1, 2], 'col2': [10, 11, 12]})
         isInterRow = list(set.intersection(set(Row),set(self.Measure)))
         isInterCol = list(set.intersection(set(Col),set(self.Measure)))
         #print(isInterRow,isInterCol)
         if isInterRow == [] and isInterCol == []:
             if Row != [] and Col == []:
-                    rowList = self.getDataWithPandasByHead(Row)
+                    rowList = usedata[Row]
                     packDf = [rowList]
             if Row == [] and Col != []:
-                colList = self.getDataWithPandasByHead(Col)
+                colList = usedata[Col]
                 packDf = [colList]
             if Row != [] and Col != []:
-                rowList = self.getDataWithPandasByHead(Row)
-                colList = self.getDataWithPandasByHead(Col)
+                rowList = usedata[Row]
+                colList = usedata[Col]
                 packDf = [rowList,colList]
             results = pd.concat(packDf, axis=1,ignore_index=True)
             results[" "] = "abc"
@@ -189,7 +212,7 @@ class csvManager:
             packDf = []
             if Row == [] and Col == []:
                 #print(Row,Col)
-                colList = self.getDataWithPandasByHead(intersec)
+                colList = usedata[intersec]
                 colList = colList.sum().round(0)
                 #print(colList.sum().round(0))
                 if intersecAt == 'Row':
@@ -206,15 +229,15 @@ class csvManager:
             else:
                 #print(Row,Col)
                 if Row != [] and Col == []:
-                    rowList = self.getDataWithPandasByHead(Row)
-                    colList = self.getDataWithPandasByHead(Col+intersec)
+                    rowList = usedata[Row]
+                    colList = usedata[Col+intersec]
                     packDf = [rowList,colList]
                 if Row == [] and Col != []:
-                    colList = self.getDataWithPandasByHead(Col+intersec)
+                    colList = usedata[Col+intersec]
                     packDf = [colList]
                 if Row != [] and Col != []:
-                    rowList = self.getDataWithPandasByHead(Row)
-                    colList = self.getDataWithPandasByHead(Col+intersec)
+                    rowList = usedata[Row]
+                    colList = usedata[Col+intersec]
                     packDf = [rowList,colList]
                 #print(packDf)
                 #print(intersecAt,intersec)
