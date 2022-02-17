@@ -342,9 +342,10 @@ class mainWindow(QMainWindow):
         super(mainWindow,self).__init__()
         uic.loadUi("mainGUI.ui",self)
         # loadUi("mainGUI.ui",self)
-        self.Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
+        self.MeasureKey = ['Sales', 'Quantity', 'Discount', 'Profit']
+        self.Measure = [['Sales',"sum"], ['Quantity',"sum"], ['Discount',"sum"], ['Profit',"sum"]]
         self.typeChart = ['Bar','Line', 'Pie']
-        self.typeDate = ['Order Date','Ship Date']
+        self.typeDate = [['Order Date',"month"],['Ship Date',"month"]]
         self.fileNameList = []
         self.selectFile = []
         self.dataSheet = ""
@@ -432,7 +433,7 @@ class mainWindow(QMainWindow):
         
     def selectFil(self,dimen):
         self.diForFil = dimen
-        if dimen in self.Measure:
+        if dimen in self.MeasureKey:
             self.windowM()
         else:
             self.windowD()
@@ -443,8 +444,8 @@ class mainWindow(QMainWindow):
     def setChart(self):
         print("set chart")
         # print("--------R C",self.RowChoose,self.ColChoose)
-        isInterRow = [value for value in self.RowChoose if value in self.Measure]
-        isInterCol = [value for value in self.ColChoose if value in self.Measure]
+        isInterRow = [value for value in self.RowChoose if value in self.MeasureKey]
+        isInterCol = [value for value in self.ColChoose if value in self.MeasureKey]
         print("--------IR IC",isInterRow,isInterCol)
         self.typeChart = []
         if (len(isInterRow)>0 and len(isInterCol)==0) or (len(isInterCol)>0 and len(isInterRow)==0):
@@ -478,9 +479,10 @@ class mainWindow(QMainWindow):
     def showChart(self):
         vbox = QVBoxLayout()
         self.chartTypeS = self.chartType.currentText()
-        print(self.chartTypeS)
+        # print(self.chartTypeS)
         if self.chartTypeS != "": 
             # if self.chartTypeS != "":
+            gm.setList(self.RowChoose,self.ColChoose,self.data)
             self.Chart = gm.chooseChart(str(self.chartTypeS))
             self.view = WebEngineView()
             # self.widget.setLayout(self.view)
@@ -533,8 +535,8 @@ class mainWindow(QMainWindow):
             # self.ColList_2.addItems(tmpc2)
             self.ColChoose = tmpc2
             
-        isInterRow = [value for value in self.RowChoose if value in self.Measure]
-        isInterCol = [value for value in self.ColChoose if value in self.Measure]
+        isInterRow = [value for value in self.RowChoose if value in self.MeasureKey]
+        isInterCol = [value for value in self.ColChoose if value in self.MeasureKey]
         
         new_list = [i for i in self.RowChoose if i not in isInterRow]
         
@@ -652,8 +654,8 @@ class mainWindow(QMainWindow):
         # print(self.filDic)
         
     def setSheetTable(self):
-        isInterRow = list(set.intersection(set(self.RowChoose),set(self.Measure)))
-        isInterCol = list(set.intersection(set(self.ColChoose),set(self.Measure)))
+        isInterRow = list(set.intersection(set(self.RowChoose),set(self.MeasureKey)))
+        isInterCol = list(set.intersection(set(self.ColChoose),set(self.MeasureKey)))
         if self.selectFile != [] : 
             self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
             self.model = TableModel2(self.dataSheet)
@@ -788,7 +790,7 @@ class mainWindow(QMainWindow):
         cm.setPath()
         # print(cm.df)
         self.colHeader = cm.getHead()
-        for i in self.Measure:
+        for i in self.MeasureKey:
             if i in self.colHeader:
                 self.colHeader.remove(i)
         self.setFileListDimension()
@@ -803,9 +805,9 @@ class mainWindow(QMainWindow):
         self.FileListDimension_2.clear()
         self.FileListDimension_2.addItems(self.colHeader)
         self.FileListMes_2.clear()
-        self.FileListMes_2.addItems(self.Measure)
+        self.FileListMes_2.addItems(self.MeasureKey)
         self.FileListMes.clear()
-        self.FileListMes.addItems(self.Measure)
+        self.FileListMes.addItems(self.MeasureKey)
 
 app = QApplication(sys.argv)
 # widget = QtWidgets.QStackedWidget()

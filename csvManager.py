@@ -194,6 +194,8 @@ class csvManager:
                 k = k.to_frame()
             if Row != [] and Col != []:
                 k = k.T
+            if Row == [] and Col != []:
+                k = k.T
             #print(Row,Col)
             #print(type(k))
         else: # Have Mes

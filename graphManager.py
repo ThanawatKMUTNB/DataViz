@@ -21,7 +21,7 @@ class graphManager():
         # self.Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
         self.RowChoose = ["region",['Sales',"sum"]]
         self.ColChoose = []
-        #self.Chart = None
+        self.Chart = None
 
     def setList(self,row,col,dataSheet):
         # self.Measure = dic
