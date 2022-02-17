@@ -33,7 +33,7 @@ class graphManager():
             
         for i in range(len(self.RowChoose)):
             tmp = []
-            print("------>",i,self.RowChoose[i])
+            # print("------>",i,self.RowChoose[i])
             if self.RowChoose[i] in list(self.MeasureDic.keys()):
                 tmp.append(self.RowChoose[i])
                 tmp.append(self.MeasureDic[self.RowChoose[i]])
@@ -46,8 +46,6 @@ class graphManager():
                 tmp.append(self.MeasureDic[self.ColChoose[i]])
                 self.ColChoose[i] = tmp
 
-            
-        
     def setList(self,row,col,mes,dataSheet):
         self.MeasureDic = mes
         self.RowChoose = row
@@ -423,6 +421,7 @@ class graphManager():
         return self.Chart
 
     def plotPie(self,row,column,mes):
+        print(row,column)
         if mes == 'row':
             Mes = row[0]
             fil = row[1]

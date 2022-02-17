@@ -469,7 +469,8 @@ class mainWindow(QMainWindow):
                 # print("3 di")
         
         self.typeChart = list(set(self.typeChart))
-        print("--->",self.typeChart)
+        self.typeChart = sorted(self.typeChart)
+        # print("--->",self.typeChart)
         self.chartType.clear()
         self.chartType_2.clear()
         self.chartType.addItems(self.typeChart)
@@ -484,6 +485,7 @@ class mainWindow(QMainWindow):
             # if self.chartTypeS != "":
             gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data)
             self.Chart = gm.chooseChart(str(self.chartTypeS))
+            
             self.view = WebEngineView()
             # self.widget.setLayout(self.view)
             if self.Chart != None:
