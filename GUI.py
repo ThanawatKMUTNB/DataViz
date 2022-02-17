@@ -30,6 +30,106 @@ class filterDimenWindow(QMainWindow):
         super().__init__()
         uic.loadUi("filterDimen.ui",self)
         self.show()
+        self.dimen = ''
+        self.sheet = ''
+        self.filtered = {}
+        self.checkedList = []
+        # defind
+        self.allButton = self.findChild(QPushButton,"allButton")
+        self.filterItemListWidget = self.findChild(QListWidget,"filterItemListWidget")
+        self.noneButton = self.findChild(QPushButton,"noneButton")
+        self.fieldLabel = self.findChild(QLabel,"fieldLabel")
+        self.selectionLabel = self.findChild(QLabel,"selectionLabel")
+        self.selectionLabel = self.findChild(QLabel,"selectionLabel")
+        self.resetButton = self.findChild(QPushButton,"resetButton")
+        self.cancleButton = self.findChild(QPushButton,"cancleButton")
+        self.okButton = self.findChild(QPushButton,"okButton")
+        #  func
+        self.allButton.clicked.connect(self.allBut)
+        self.noneButton.clicked.connect(self.noneBut)
+        self.resetButton.clicked.connect(self.resetBut)
+        self.cancleButton.clicked.connect(self.cancleBut)
+        self.okButton.clicked.connect(self.ApplyBut)
+        
+        self.filterItemListWidget.itemChanged.connect(self.checked)
+        self.filterItemListWidget.doubleClicked.connect(self.reverseCheck)
+        self.setUp()
+        self.setList()
+    
+    def ApplyBut(self):
+        self.filtered[self.dimen] = self.checkedList
+        mainW.filDic = self.filtered
+        self.close()
+        
+    def cancleBut(self):
+        self.close()
+        
+    def resetBut(self):
+        for i in range(self.filterItemListWidget.count()):
+            if self.filterItemListWidget.item(i).text() in self.filtered[self.dimen]:
+                self.filterItemListWidget.item(i).setCheckState(QtCore.Qt.Checked)
+            else:
+                self.filterItemListWidget.item(i).setCheckState(QtCore.Qt.Unchecked)
+            
+    def reverseCheck(self):
+        filterItem = self.filterItemListWidget.currentRow()
+        strItem = self.filterItemListWidget.item(filterItem)
+        if strItem.checkState() == 2:
+            strItem.setCheckState(QtCore.Qt.Unchecked)
+        else:
+            strItem.setCheckState(QtCore.Qt.Checked)
+        self.checked()
+            
+    def allBut(self):
+        for i in range(self.filterItemListWidget.count()):
+            self.filterItemListWidget.item(i).setCheckState(QtCore.Qt.Checked)
+        self.checked()
+    
+    def noneBut(self):
+        for i in range(self.filterItemListWidget.count()):
+            self.filterItemListWidget.item(i).setCheckState(QtCore.Qt.Unchecked)
+        self.checked()
+        
+    def checked(self):
+        self.fieldLabel.setText("Field : "+ str(self.dimen))
+
+        filterItem = self.filterItemListWidget.currentRow()
+        strItem = self.filterItemListWidget.item(filterItem)
+        itemsTextList =  [str(self.filterItemListWidget.item(i).text()) for i in range(self.filterItemListWidget.count())]
+        self.checkedList = []
+        for i in range(self.filterItemListWidget.count()):
+            if self.filterItemListWidget.item(i).checkState() == 2:
+                self.checkedList.append(self.filterItemListWidget.item(i).text())
+        
+        self.selectionLabel.setText("Selection : "+ str(len(self.checkedList))+" of "+str(len(self.filtered[self.dimen]))+" values.")
+        
+        #     print(i)
+        #     print(self.filterItemListWidget.item(i).checkState())
+        #     print(self.filterItemListWidget.item(i).text())
+        
+    def setUp(self):
+        self.dimen = mainW.diForFil
+        self.sheet = mainW.data
+        self.filtered = mainW.filDic
+        if self.filtered[self.dimen] == "":
+            self.filtered[self.dimen] = self.sheet[self.dimen].drop_duplicates().tolist()
+    
+    def setList(self):
+        _translate = QtCore.QCoreApplication.translate
+        for i in self.sheet[self.dimen].drop_duplicates():
+            # print(type(self.filtered[self.dimen]))
+            item = QtWidgets.QListWidgetItem()
+            if i in self.filtered[self.dimen] :
+                item.setCheckState(QtCore.Qt.Checked) #2
+            else:
+                item.setCheckState(QtCore.Qt.Unchecked) #0
+            self.filterItemListWidget.addItem(item)
+        n=0
+        for i in self.sheet[self.dimen].drop_duplicates():
+            # print(str(i))
+            item = self.filterItemListWidget.item(n)
+            item.setText(_translate("MainWindow", str(i)))
+            n+=1
 
 class WebEngineView(QtWebEngineWidgets.QWebEngineView):
     def __init__(self, parent=None):
@@ -73,6 +173,7 @@ class rowListClass(QtWidgets.QListWidget):
         
     def dragLeaveEvent(self,event) -> None:
         if self.count():
+            mainW.filJustAdd = self.item(self.currentRow()).text()
             self.takeItem(self.currentRow())
             self.clearSelection()
         mainW.filChangeD()
@@ -96,6 +197,8 @@ class rowListClass(QtWidgets.QListWidget):
             source_Widget.takeItem(source_Widget.indexFromItem(i).row())
             self.addItem(i)
         mainW.setFileListDimension()
+        # if self.item(self.currentRow()) != None:
+        #     mainW.filJustAdd = self.item(self.currentRow()).text()
         mainW.filChange()
         mainW.rowcolChange()
         # mainW.setChart()
@@ -246,6 +349,8 @@ class mainWindow(QMainWindow):
         self.ColChoose = []
         self.Chart = None
         self.chartTypeS = ""
+        self.diForFil = ''
+        self.filJustAdd = ''
         
         # defind
         self.openDirecButton = self.findChild(QPushButton,"openDirecButton")
@@ -321,6 +426,7 @@ class mainWindow(QMainWindow):
         # self.hide()
         
     def selectFil(self,dimen):
+        self.diForFil = dimen
         if dimen in self.Measure:
             self.windowM()
         else:
@@ -441,6 +547,8 @@ class mainWindow(QMainWindow):
         self.ColList_2.addItems(new_list)
         
     def filChangeD(self):
+        # print("Just D ",self.filJustAdd)
+        self.filDic.pop[self.filJustAdd]
         itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
         itemsTextList_2 =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]
         itemsTextList =  list(set(itemsTextList))
@@ -456,14 +564,13 @@ class mainWindow(QMainWindow):
                 self.filterList.addItems(itemsTextList)
                 self.filterList_2.clear()
                 self.filterList_2.addItems(itemsTextList)
-                self.filDic = dict.fromkeys(itemsTextList, "")
+                
             else:
                 self.filterList.clear()
                 self.filterList.addItems(itemsTextList_2)
                 self.filterList_2.clear()
                 self.filterList_2.addItems(itemsTextList_2)
-                self.filDic = dict.fromkeys(itemsTextList_2, "")
-                
+            
     def rowcolChange(self):
         tmpr = []
         tmpr =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
@@ -507,6 +614,7 @@ class mainWindow(QMainWindow):
         self.setChart()
         
     def filChange(self):
+        # print("Last ",self.filJustAdd)
         itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
         itemsTextList_2 =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]
         itemsTextList =  list(set(itemsTextList))
@@ -522,13 +630,17 @@ class mainWindow(QMainWindow):
                 self.filterList.addItems(itemsTextList)
                 self.filterList_2.clear()
                 self.filterList_2.addItems(itemsTextList)
-                self.filDic = dict.fromkeys(itemsTextList, "")
+                for i in itemsTextList:
+                    if i not in list(self.filDic.keys()):
+                        self.filDic[i] = ""
             else:
                 self.filterList.clear()
                 self.filterList.addItems(itemsTextList_2)
                 self.filterList_2.clear()
                 self.filterList_2.addItems(itemsTextList_2)
-                self.filDic = dict.fromkeys(itemsTextList_2, "")
+                for i in itemsTextList_2:
+                    if i not in list(self.filDic.keys()):
+                        self.filDic[i] = ""
         # print(itemsTextList,itemsTextList_2)
         # print(self.filDic)
         
