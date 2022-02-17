@@ -450,23 +450,23 @@ class mainWindow(QMainWindow):
         self.typeChart = []
         if (len(isInterRow)>0 and len(isInterCol)==0) or (len(isInterCol)>0 and len(isInterRow)==0):
             # print("Have Mes")
-            # if (self.RowChoose != [] and self.ColChoose == []) or (self.RowChoose == [] and self.ColChoose != []) :
+            if (self.RowChoose != [] and self.ColChoose == []) or (self.RowChoose == [] and self.ColChoose != []) :
             
-            if (len(self.RowChoose)-len(isInterRow) == 1 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) or (len(self.ColChoose)-len(isInterCol) == 1 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
-                self.typeChart = ['Bar', 'Pie']
-                # print("1 di")
-                for i in self.typeDate:
-                    if i in self.RowChoose + self.ColChoose:
-                        self.typeChart.append('Line')
-            if (len(self.RowChoose)-len(isInterRow) == 2 and (len(isInterRow)>=1 or len(isInterCol)>=1)) or (len(self.ColChoose)-len(isInterCol) == 2 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
-                self.typeChart = ['Bar']
-                # print("2 di")
-                for i in self.typeDate:
-                    if i in self.RowChoose + self.ColChoose:
-                        self.typeChart.append('Line')
-            if (len(self.RowChoose)-len(isInterRow) == 3 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) or (len(self.ColChoose)-len(isInterCol) == 3 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
-                self.typeChart = ['Bar']
-                # print("3 di")
+                if (len(self.RowChoose)-len(isInterRow) == 1 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) or (len(self.ColChoose)-len(isInterCol) == 1 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
+                    self.typeChart = ['Bar', 'Pie']
+                    # print("1 di")
+                    for i in self.typeDate:
+                        if i in self.RowChoose + self.ColChoose:
+                            self.typeChart.append('Line')
+                if (len(self.RowChoose)-len(isInterRow) == 2 and (len(isInterRow)>=1 or len(isInterCol)>=1)) or (len(self.ColChoose)-len(isInterCol) == 2 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
+                    self.typeChart = ['Bar']
+                    # print("2 di")
+                    for i in self.typeDate:
+                        if i in self.RowChoose + self.ColChoose:
+                            self.typeChart.append('Line')
+                if (len(self.RowChoose)-len(isInterRow) == 3 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) or (len(self.ColChoose)-len(isInterCol) == 3 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
+                    self.typeChart = ['Bar']
+                    # print("3 di")
         
         self.typeChart = list(set(self.typeChart))
         self.typeChart = sorted(self.typeChart)
@@ -591,7 +591,7 @@ class mainWindow(QMainWindow):
         tmpr2 =  [str(self.RowList_2.item(i).text()) for i in range(self.RowList_2.count())]
         tmpc2 = [] 
         tmpc2 =  [str(self.ColList_2.item(i).text()) for i in range(self.ColList_2.count())]
-        # print(tmpr,tmpc,tmpr2,tmpc2)
+        print(tmpr,tmpc,tmpr2,tmpc2)
         
         while (tmpr.count('')): tmpr.remove('')
         while (tmpr2.count('')): tmpr2.remove('')
@@ -656,8 +656,9 @@ class mainWindow(QMainWindow):
         # print(self.filDic)
         
     def setSheetTable(self):
-        isInterRow = list(set.intersection(set(self.RowChoose), set(self.Measure.keys()) ))
-        isInterCol = list(set.intersection(set(self.ColChoose), set(self.Measure.keys()) ))
+        print(self.ColChoose,self.RowChoose)
+        isInterRow = list(set.intersection(set(self.RowChoose), set( self.Measure.keys() ) ))
+        isInterCol = list(set.intersection(set(self.ColChoose), set( self.Measure.keys() ) ))
         if self.selectFile != [] : 
             self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
             self.model = TableModel2(self.dataSheet)
@@ -693,8 +694,7 @@ class mainWindow(QMainWindow):
         self.fileNameList = itemsTextList
         while (self.fileNameList.count('')):
             self.fileNameList.remove('')
-        self.RowChoose = []
-        self.ColChoose = []
+            
         if self.selectFile != []:
             self.colHeader = cm.getHead()
             self.setFileListDimension()
@@ -733,6 +733,13 @@ class mainWindow(QMainWindow):
                 print("Union")
                 self.data = cm.unionFile(self.selectFile)
                 self.colHeader = cm.getHead()
+                
+                for i in list(self.Measure.keys()):
+                    if i in self.colHeader:
+                        self.colHeader.remove(i)
+                self.setFileListDimension()
+                self.model = TableModel(self.data)
+                self.dataSourceTable.setModel(self.model)
             else:
                 print("Not Union")
                 cm.path =self.folderpath
@@ -796,6 +803,7 @@ class mainWindow(QMainWindow):
         for i in list(self.Measure.keys()):
             if i in self.colHeader:
                 self.colHeader.remove(i)
+                
         self.setFileListDimension()
         self.setFileInDirectory()
         self.setFileChoose()
