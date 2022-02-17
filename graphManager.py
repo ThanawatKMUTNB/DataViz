@@ -33,7 +33,7 @@ class graphManager():
             
         for i in range(len(self.RowChoose)):
             tmp = []
-            # print("------>",i,self.RowChoose[i])
+            print("------>",i,self.RowChoose[i])
             if self.RowChoose[i] in list(self.MeasureDic.keys()):
                 tmp.append(self.RowChoose[i])
                 tmp.append(self.MeasureDic[self.RowChoose[i]])
@@ -46,6 +46,8 @@ class graphManager():
                 tmp.append(self.MeasureDic[self.ColChoose[i]])
                 self.ColChoose[i] = tmp
 
+            
+        
     def setList(self,row,col,mes,dataSheet):
         self.MeasureDic = mes
         self.RowChoose = row
@@ -74,7 +76,6 @@ class graphManager():
                 else:
                     return False
         if chart == 'Bar':
-            #print("RC",row,column)
             if checkMeasure(row,column):    #row is measure
                 print('row is measurement')
                 if len(column) > 2:
@@ -95,7 +96,6 @@ class graphManager():
                 return alt.hconcat(*chart)
 
         elif chart == 'Pie':
-            #print(row,column)
             if checkMeasure(row,column):    #row is measure
                 print('row is measurement')
                 chart = []
@@ -350,7 +350,6 @@ class graphManager():
                 ).facet(row=srow
                 ).resolve_scale(y = 'independent',x = 'independent')
                 self.Chart = c
-        print('chart')
         return self.Chart
     
     def exam(self):
@@ -421,7 +420,6 @@ class graphManager():
         return self.Chart
 
     def plotPie(self,row,column,mes):
-        print(row,column)
         if mes == 'row':
             Mes = row[0]
             fil = row[1]
