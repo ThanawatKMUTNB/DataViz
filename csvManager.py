@@ -157,7 +157,7 @@ class csvManager:
                 self.filter[i] = ""
         for i in list(self.filter.keys()):
             if self.filter[i] == "":
-                self.filter[i] = list(self.df[i].values)
+                self.filter[i] = list(set(self.df[i].values))
         self.dfFil = self.df
         for i in self.filter.keys():
             self.dfFil = self.dfFil[self.dfFil[i].isin(self.filter[i])]
@@ -173,10 +173,10 @@ class csvManager:
         isInterRow = list(set.intersection(set(Row),set(self.Measure)))
         isInterCol = list(set.intersection(set(Col),set(self.Measure)))
         #print(isInterRow,isInterCol)
-        if isInterRow == [] and isInterCol == []:
+        if isInterRow == [] and isInterCol == []: #No Mes
             if Row != [] and Col == []:
-                    rowList = usedata[Row]
-                    packDf = [rowList]
+                rowList = usedata[Row]
+                packDf = [rowList]
             if Row == [] and Col != []:
                 colList = usedata[Col]
                 packDf = [colList]
@@ -192,11 +192,11 @@ class csvManager:
             k = k.replace(np.nan, '')
             if type(k) == pd.Series :
                 k = k.to_frame()
-            if Row == [] and Col != []:
+            if Row != [] and Col != []:
                 k = k.T
             #print(Row,Col)
             #print(type(k))
-        else:
+        else: # Have Mes
             intersecAt = ''
             filterChoose = "sum"
             if isInterRow != []:

@@ -113,10 +113,10 @@ class filterDimenWindow(QMainWindow):
         self.dimen = mainW.diForFil
         self.sheet = mainW.data
         self.filtered = mainW.filDic
-        print("BF--------",self.filtered,self.filtered[self.dimen])
+        # print("BF--------",self.filtered,self.filtered[self.dimen])
         if self.filtered[self.dimen] == "":
             self.filtered[self.dimen] = list(set(self.sheet[self.dimen].values))
-        print(self.filtered)
+        # print(self.filtered)
     
     def setList(self):
         _translate = QtCore.QCoreApplication.translate
@@ -492,21 +492,18 @@ class mainWindow(QMainWindow):
     def rowcolChangeD(self):
         tmpr = []
         tmpr =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
-        # self.RowChoose = tmp
         tmpc = [] 
         tmpc =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
-        # self.ColChoose = tmp
         tmpr2 = []
         tmpr2 =  [str(self.RowList_2.item(i).text()) for i in range(self.RowList_2.count())]
-        # self.RowChoose = tmp
         tmpc2 = [] 
         tmpc2 =  [str(self.ColList_2.item(i).text()) for i in range(self.ColList_2.count())]
-        # self.ColChoose = tmp
         
         # print(tmpr,tmpc,tmpr2,tmpc2)
         
         while (tmpr.count('')): tmpr.remove('')
         while (tmpr2.count('')): tmpr2.remove('')
+        
         if tmpr == tmpr2 or len(tmpr) < len(tmpr2):
             # self.RowList.clear()
             # self.RowList.addItems(tmpr)
@@ -653,10 +650,12 @@ class mainWindow(QMainWindow):
         # print(self.filDic)
         
     def setSheetTable(self):
+        isInterRow = list(set.intersection(set(self.RowChoose),set(self.Measure)))
+        isInterCol = list(set.intersection(set(self.ColChoose),set(self.Measure)))
         if self.selectFile != [] : 
             self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
             self.model = TableModel2(self.dataSheet)
-            if self.RowChoose == [] and self.ColChoose == []:
+            if (self.RowChoose == [] and self.ColChoose == []) or (isInterRow != [] and isInterCol != []):
                 self.sheetTable.setModel(None)
             else:
                 self.sheetTable.setModel(self.model)
@@ -665,7 +664,7 @@ class mainWindow(QMainWindow):
         # print("Start",Row,Col,len(set(Row)),len(set(Col)))
         if Row!=[] or Col!=[]:
             cm.filter = self.filDic
-            print("BF table",self.filDic)
+            # print("BF table",self.filDic)
             self.dataSheet = cm.setRowAndColumn(Row,Col)
           
     def on_header_doubleClicked(self,index):
@@ -711,11 +710,11 @@ class mainWindow(QMainWindow):
         self.dataSource()
         
     def setTable(self):
-        print("set data")
-        print(self.selectFile)
+        # print("set data")
+        # print(self.selectFile)
         if self.selectFile != [] : 
             self.dataSource()
-            print(self.data)
+            # print(self.data)
             self.model = TableModel(self.data)
             self.dataSourceTable.setModel(self.model)
             
