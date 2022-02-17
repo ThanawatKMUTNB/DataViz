@@ -19,7 +19,7 @@ class graphManager():
     def __init__(self):
         self.df = None
         # self.Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
-        self.RowChoose = ["region",['Sales',"sum"]]
+        self.RowChoose = []
         self.ColChoose = []
         self.Chart = None
 
@@ -48,7 +48,7 @@ class graphManager():
                 else:
                     return False
         if chart == 'Bar':
-            print('chart',chart)
+            #print(row,column)
             if checkMeasure(row,column):    #row is measure
                 print('row is measurement')
                 if len(column) > 2:
@@ -69,7 +69,7 @@ class graphManager():
                 return alt.hconcat(*chart)
 
         elif chart == 'Pie':
-            print('chart',chart)
+            #print('chart',chart)
             if checkMeasure(row,column):    #row is measure
                 print('row is measurement')
                 chart = []
