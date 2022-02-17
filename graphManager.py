@@ -18,16 +18,17 @@ class graphManager():
 
     def __init__(self):
         self.df = None
-        # self.Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
+        self.Measure = []
         self.RowChoose = []
         self.ColChoose = []
         self.Chart = None
 
-    def setList(self,row,col,dataSheet):
-        # self.Measure = dic
+    def setList(self,row,col,mes,dataSheet):
+        self.Measure = mes
         self.RowChoose = row
         self.ColChoose = col
         self.df = dataSheet
+        print()
         #self.df['Order Date'] = pd.to_datetime(self.df['Order Date'],format='%d/%m/%Y')
         #self.df['Ship Date'] = pd.to_datetime(self.df['Ship Date'],format='%d/%m/%Y')
         for d in ['Order Date','Ship Date']:
@@ -48,7 +49,7 @@ class graphManager():
                 else:
                     return False
         if chart == 'Bar':
-            #print(row,column)
+            print(row,column)
             if checkMeasure(row,column):    #row is measure
                 print('row is measurement')
                 if len(column) > 2:
@@ -69,7 +70,7 @@ class graphManager():
                 return alt.hconcat(*chart)
 
         elif chart == 'Pie':
-            #print('chart',chart)
+            print(row,column)
             if checkMeasure(row,column):    #row is measure
                 print('row is measurement')
                 chart = []

@@ -482,7 +482,7 @@ class mainWindow(QMainWindow):
         # print(self.chartTypeS)
         if self.chartTypeS != "": 
             # if self.chartTypeS != "":
-            gm.setList(self.RowChoose,self.ColChoose,self.data)
+            gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data)
             self.Chart = gm.chooseChart(str(self.chartTypeS))
             self.view = WebEngineView()
             # self.widget.setLayout(self.view)
