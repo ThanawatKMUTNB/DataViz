@@ -18,16 +18,17 @@ class graphManager():
 
     def __init__(self):
         self.df = None
-        # self.Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
-        self.RowChoose = ["region",['Sales',"sum"]]
+        self.Measure = []
+        self.RowChoose = []
         self.ColChoose = []
         self.Chart = None
 
-    def setList(self,row,col,dataSheet):
-        # self.Measure = dic
+    def setList(self,row,col,mes,dataSheet):
+        self.Measure = mes
         self.RowChoose = row
         self.ColChoose = col
         self.df = dataSheet
+        print()
         #self.df['Order Date'] = pd.to_datetime(self.df['Order Date'],format='%d/%m/%Y')
         #self.df['Ship Date'] = pd.to_datetime(self.df['Ship Date'],format='%d/%m/%Y')
         for d in ['Order Date','Ship Date']:
