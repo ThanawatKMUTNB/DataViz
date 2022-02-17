@@ -449,22 +449,24 @@ class mainWindow(QMainWindow):
         self.typeChart = []
         if (len(isInterRow)>0 and len(isInterCol)==0) or (len(isInterCol)>0 and len(isInterRow)==0):
             # print("Have Mes")
-            if (self.RowChoose != [] and self.ColChoose == []) or (self.RowChoose == [] and self.ColChoose != []) :
-                if (len(self.RowChoose)-len(isInterRow) == 1 and len(isInterRow)>=1 and len(isInterCol)==0) or (len(self.ColChoose)-len(isInterCol) == 1 and len(isInterCol)>=1 and len(isInterRow)==0) :
-                    self.typeChart = ['Bar', 'Pie']
-                    # print("1 di")
-                    for i in self.typeDate:
-                        if i in self.RowChoose + self.ColChoose:
-                            self.typeChart.append('Line')
-                if (len(self.RowChoose)-len(isInterRow) == 2 and len(isInterRow)>=1 and len(isInterCol)==0) or (len(self.ColChoose)-len(isInterCol) == 2 and len(isInterCol)>=1 and len(isInterRow)==0) :
-                    self.typeChart = ['Bar']
-                    # print("2 di")
-                    for i in self.typeDate:
-                        if i in self.RowChoose + self.ColChoose:
-                            self.typeChart.append('Line')
-                if (len(self.RowChoose)-len(isInterRow) == 3 and len(isInterRow)>=1 and len(isInterCol)==0) or (len(self.ColChoose)-len(isInterCol) == 3 and len(isInterCol)>=1 and len(isInterRow)==0) :
-                    self.typeChart = ['Bar']
-                    # print("3 di")
+            # if (self.RowChoose != [] and self.ColChoose == []) or (self.RowChoose == [] and self.ColChoose != []) :
+            
+            if (len(self.RowChoose)-len(isInterRow) == 1 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) or (len(self.ColChoose)-len(isInterCol) == 1 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
+                self.typeChart = ['Bar', 'Pie']
+                # print("1 di")
+                for i in self.typeDate:
+                    if i in self.RowChoose + self.ColChoose:
+                        self.typeChart.append('Line')
+            if (len(self.RowChoose)-len(isInterRow) == 2 and (len(isInterRow)>=1 or len(isInterCol)>=1)) or (len(self.ColChoose)-len(isInterCol) == 2 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
+                self.typeChart = ['Bar']
+                # print("2 di")
+                for i in self.typeDate:
+                    if i in self.RowChoose + self.ColChoose:
+                        self.typeChart.append('Line')
+            if (len(self.RowChoose)-len(isInterRow) == 3 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) or (len(self.ColChoose)-len(isInterCol) == 3 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
+                self.typeChart = ['Bar']
+                # print("3 di")
+        
         self.typeChart = list(set(self.typeChart))
         print("--->",self.typeChart)
         self.chartType.clear()
