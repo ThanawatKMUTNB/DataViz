@@ -656,8 +656,8 @@ class mainWindow(QMainWindow):
         # print(self.filDic)
         
     def setSheetTable(self):
-        isInterRow = list(set.intersection(set(self.RowChoose),set(list(self.Measure.keys()))))
-        isInterCol = list(set.intersection(set(self.ColChoose),set(list(self.Measure.keys()))))
+        isInterRow = list(set.intersection(set(self.RowChoose), set(self.Measure.keys()) ))
+        isInterCol = list(set.intersection(set(self.ColChoose), set(self.Measure.keys()) ))
         if self.selectFile != [] : 
             self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
             self.model = TableModel2(self.dataSheet)
