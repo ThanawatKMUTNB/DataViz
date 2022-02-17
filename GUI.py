@@ -342,8 +342,8 @@ class mainWindow(QMainWindow):
         super(mainWindow,self).__init__()
         uic.loadUi("mainGUI.ui",self)
         # loadUi("mainGUI.ui",self)
-        self.MeasureKey = ['Sales', 'Quantity', 'Discount', 'Profit']
-        self.Measure = [['Sales',"sum"], ['Quantity',"sum"], ['Discount',"sum"], ['Profit',"sum"]]
+        self.Measure = {'Sales':"sum",'Quantity':"sum",'Discount':"sum",'Profit':"sum"}
+        
         self.typeChart = ['Bar','Line', 'Pie']
         self.typeDate = [['Order Date',"month"],['Ship Date',"month"]]
         self.fileNameList = []
@@ -433,7 +433,7 @@ class mainWindow(QMainWindow):
         
     def selectFil(self,dimen):
         self.diForFil = dimen
-        if dimen in self.MeasureKey:
+        if dimen in list(self.Measure.keys()):
             self.windowM()
         else:
             self.windowD()
@@ -444,8 +444,8 @@ class mainWindow(QMainWindow):
     def setChart(self):
         print("set chart")
         # print("--------R C",self.RowChoose,self.ColChoose)
-        isInterRow = [value for value in self.RowChoose if value in self.MeasureKey]
-        isInterCol = [value for value in self.ColChoose if value in self.MeasureKey]
+        isInterRow = [value for value in self.RowChoose if value in list(self.Measure.keys())]
+        isInterCol = [value for value in self.ColChoose if value in list(self.Measure.keys())]
         print("--------IR IC",isInterRow,isInterCol)
         self.typeChart = []
         if (len(isInterRow)>0 and len(isInterCol)==0) or (len(isInterCol)>0 and len(isInterRow)==0):
@@ -535,8 +535,8 @@ class mainWindow(QMainWindow):
             # self.ColList_2.addItems(tmpc2)
             self.ColChoose = tmpc2
             
-        isInterRow = [value for value in self.RowChoose if value in self.MeasureKey]
-        isInterCol = [value for value in self.ColChoose if value in self.MeasureKey]
+        isInterRow = [value for value in self.RowChoose if value in list(self.Measure.keys())]
+        isInterCol = [value for value in self.ColChoose if value in list(self.Measure.keys())]
         
         new_list = [i for i in self.RowChoose if i not in isInterRow]
         
@@ -654,8 +654,8 @@ class mainWindow(QMainWindow):
         # print(self.filDic)
         
     def setSheetTable(self):
-        isInterRow = list(set.intersection(set(self.RowChoose),set(self.MeasureKey)))
-        isInterCol = list(set.intersection(set(self.ColChoose),set(self.MeasureKey)))
+        isInterRow = list(set.intersection(set(self.RowChoose),set(list(self.Measure.keys()))))
+        isInterCol = list(set.intersection(set(self.ColChoose),set(list(self.Measure.keys()))))
         if self.selectFile != [] : 
             self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
             self.model = TableModel2(self.dataSheet)
@@ -781,7 +781,8 @@ class mainWindow(QMainWindow):
         self.selectFile = os.path.split(response[0])
         # print(self.selectFile)
         self.selectFile = list(self.selectFile)[1]
-        tmp.remove(self.selectFile)
+        if self.selectFile in tmp:
+            tmp.remove(self.selectFile)
         #print(tmp)
         self.fileNameList = tmp
         self.path = os.path.join(self.folderpath,self.selectFile)
@@ -790,7 +791,7 @@ class mainWindow(QMainWindow):
         cm.setPath()
         # print(cm.df)
         self.colHeader = cm.getHead()
-        for i in self.MeasureKey:
+        for i in list(self.Measure.keys()):
             if i in self.colHeader:
                 self.colHeader.remove(i)
         self.setFileListDimension()
@@ -805,9 +806,9 @@ class mainWindow(QMainWindow):
         self.FileListDimension_2.clear()
         self.FileListDimension_2.addItems(self.colHeader)
         self.FileListMes_2.clear()
-        self.FileListMes_2.addItems(self.MeasureKey)
+        self.FileListMes_2.addItems(list(self.Measure.keys()))
         self.FileListMes.clear()
-        self.FileListMes.addItems(self.MeasureKey)
+        self.FileListMes.addItems(list(self.Measure.keys()))
 
 app = QApplication(sys.argv)
 # widget = QtWidgets.QStackedWidget()
