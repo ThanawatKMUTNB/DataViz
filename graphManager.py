@@ -48,6 +48,7 @@ class graphManager():
                 else:
                     return False
         if chart == 'Bar':
+            print('chart',chart)
             if checkMeasure(row,column):    #row is measure
                 print('row is measurement')
                 if len(column) > 2:
@@ -68,6 +69,7 @@ class graphManager():
                 return alt.hconcat(*chart)
 
         elif chart == 'Pie':
+            print('chart',chart)
             if checkMeasure(row,column):    #row is measure
                 print('row is measurement')
                 chart = []
@@ -128,25 +130,12 @@ class graphManager():
                 x = Di[1]
                 col = Di[0]
             
-            if fil == 'sum':
-                tmax = df.groupby([col,x], as_index=False)[Meas[0]].sum().max()[2]
-                tmin = df.groupby([col,x], as_index=False)[Meas[0]].sum().min()[2]
-            elif fil == 'average':
-                tmax = df.groupby([col,x], as_index=False)[Meas[0]].mean().max()[2]
-                tmin = df.groupby([col,x], as_index=False)[Meas[0]].mean().min()[2]
-            elif fil == 'median':
-                tmax = df.groupby([col,x], as_index=False)[Meas[0]].median().max()[2]
-                tmin = df.groupby([col,x], as_index=False)[Meas[0]].median().min()[2]
-            elif fil == 'count':
-                tmax = df.groupby([col,x], as_index=False)[Meas[0]].count().max()[2]
-                tmin = df.groupby([col,x], as_index=False)[Meas[0]].count().min()[2]
-            elif fil == 'max':
-                tmax = df.groupby([col,x], as_index=False)[Meas[0]].max().max()[2]
-                tmin = df.groupby([col,x], as_index=False)[Meas[0]].max().min()[2]
-            elif fil == 'min':
-                tmax = df.groupby([col,x], as_index=False)[Meas[0]].min().max()[2]
-                tmin = df.groupby([col,x], as_index=False)[Meas[0]].min().min()[2]
-            
+            if fil == 'average':
+                fil = 'mean'
+
+            tmax = df.groupby([col,x], as_index=False)[Meas[0]].agg(fil).max()[2]
+            tmin = df.groupby([col,x], as_index=False)[Meas[0]].agg(fil).min()[2]
+        
             if tmin > 0:
                 tmin = 0
             elif tmax < 0 :
