@@ -74,7 +74,7 @@ class graphManager():
                 else:
                     return False
         if chart == 'Bar':
-            print('chart',chart)
+            #print("RC",row,column)
             if checkMeasure(row,column):    #row is measure
                 print('row is measurement')
                 if len(column) > 2:
@@ -95,7 +95,7 @@ class graphManager():
                 return alt.hconcat(*chart)
 
         elif chart == 'Pie':
-            print('chart',chart)
+            #print(row,column)
             if checkMeasure(row,column):    #row is measure
                 print('row is measurement')
                 chart = []
@@ -350,6 +350,7 @@ class graphManager():
                 ).facet(row=srow
                 ).resolve_scale(y = 'independent',x = 'independent')
                 self.Chart = c
+        print('chart')
         return self.Chart
     
     def exam(self):
