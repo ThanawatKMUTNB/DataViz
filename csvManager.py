@@ -198,36 +198,55 @@ class csvManager:
                 k = k.T
             #print(Row,Col)
             #print(type(k))
-        else: # Have Mes
+        else: # Have Mes 
             intersecAt = ''
             filterChoose = "sum"
+            
+            
             if isInterRow != []:
                 for i in isInterRow:
                     Row.remove(i)
                 intersecAt = 'Row'
                 intersec = isInterRow
-            else:
+            if isInterCol != []:
                 for i in isInterCol:
                     Col.remove(i)
                 intersecAt = 'Col'
                 intersec = isInterCol
+                
             packDf = []
             if Row == [] and Col == []:
                 #print(Row,Col)
                 colList = usedata[intersec]
-                colList = colList.sum().round(0)
+                if filterChoose == "sum":
+                    colList = colList.sum().round(0)
                 #print(colList.sum().round(0))
+                
                 if intersecAt == 'Row':
                     colList = colList.to_frame()
                     k = colList
+                    # k = k.rename({0:"sum"})
+                    k = k[list(k.columns)].astype(str)
+                    # if filterChoose == "sum":
+                    #     k.rename(in)
                     if type(k) == pd.Series :
                         k = k.to_frame()
+                    changname = zip(list(k.columns), [filterChoose*len(list(k.columns))])
+                    # print(dict(k.columns))
                 else:
                     colList = colList.to_frame()
                     k = colList
+                    k = k[list(k.columns)].astype(str)
                     if type(k) == pd.Series :
                         k = k.to_frame()
                     k = colList.T
+                    # print(k.index)
+                    changname = zip(list(k.index), [filterChoose*len(list(k.index))])
+                
+                changname = (dict(changname))
+                
+                k = k.rename(columns=changname,index=changname)
+                print("--------------------K\n",k)
             else:
                 #print(Row,Col)
                 if Row != [] and Col == []:
@@ -273,7 +292,7 @@ class csvManager:
         
         #print(list_of_lists)
         #print(len(k))
-        #print(k)
+        # print(type(k))
         '''tmp = [list(ele) for ele in k.index]
         eachList = []
         for j in range(len(tmp[0])):
@@ -291,5 +310,7 @@ ex = csvManager()
 ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
 #ex.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
 #ex.setDimensionSort(["Region","Segment","Region","Region"])
-ex.setRowAndColumn(["Segment","Sales","Profit"],["Segment","Region","Region"])
+# ex.setRowAndColumn(["Segment","Sales","Profit"],["Segment","Region","Region"])
 #ex.setRowAndColumn(["Region","Region","Segment"],["Region","Sales","Profit"])
+# ex.setRowAndColumn(["Sales"],[])
+ex.setRowAndColumn([],["Sales"])

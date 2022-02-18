@@ -379,8 +379,10 @@ class mainWindow(QMainWindow):
         self.dataSourceTable.horizontalHeader().sectionClicked.connect(self.on_header_doubleClicked)
         self.filterList.installEventFilter(self)
         self.filterList.doubleClicked.connect(self.whichClicked)
-        self.RowList.installEventFilter(self)
-        self.ColList.installEventFilter(self)
+        if self.RowList != None:
+            self.RowList.installEventFilter(self)
+        if self.ColList != None:
+            self.ColList.installEventFilter(self)
         self.chartType.activated.connect(self.showChart)
         self.showMaximized()
         
@@ -424,11 +426,11 @@ class mainWindow(QMainWindow):
         self.setSheetTable()
     
     def setChart(self):
-        print("set chart")
+        # print("set chart")
         # print("--------R C",self.RowChoose,self.ColChoose)
         isInterRow = [value for value in self.RowChoose if value in list(self.Measure.keys())]
         isInterCol = [value for value in self.ColChoose if value in list(self.Measure.keys())]
-        print("--------IR IC",isInterRow,isInterCol)
+        # print("--------IR IC",isInterRow,isInterCol)
         self.typeChart = []
         if (len(isInterRow)>0 and len(isInterCol)==0) or (len(isInterCol)>0 and len(isInterRow)==0):
             # print("Have Mes")
@@ -483,13 +485,12 @@ class mainWindow(QMainWindow):
         tmpc = [] 
         tmpc =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
         
-        # print(tmpr,tmpc)
+        print("Before",tmpr,tmpc)
         
         while (tmpr.count('')): tmpr.remove('')
         while (tmpc.count('')): tmpc.remove('')
         
         self.RowChoose = tmpr
-        
         self.ColChoose = tmpc
 
         isInterRow = [value for value in self.RowChoose if value in list(self.Measure.keys())]
@@ -505,13 +506,20 @@ class mainWindow(QMainWindow):
                 tmpc.remove(i)
         tmpc += isInterCol
         
+        # for i in range(len(tmpr)):
+        #     self.RowList.item(i)
+            
         self.ColList.clear()
         self.ColList.addItems(tmpc)
         
         self.RowList.clear()
         self.RowList.addItems(tmpr)
+        
+        self.RowChoose = tmpr
+        self.ColChoose = tmpc
+        
+        # print("After",tmpr,tmpc)
         self.setChart()
-        # print(tmpr,tmpc)
         
     def filChangeD(self):
         # print("Just D ",self.filJustAdd)
@@ -573,17 +581,18 @@ class mainWindow(QMainWindow):
         
     def setSheetTable(self):
         # print(self.ColChoose,self.RowChoose)
-        isInterRow = list(set.intersection(set(self.RowChoose), set( self.Measure.keys() ) ))
-        isInterCol = list(set.intersection(set(self.ColChoose), set( self.Measure.keys() ) ))
         if self.selectFile != [] : 
-            self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
-            print(self.dataSheet)
-            self.model = TableModel2(self.dataSheet)
-            if (self.RowChoose == [] and self.ColChoose == []) or (isInterRow != [] and isInterCol != []):
+            print(not(self.RowChoose == [] and self.ColChoose == []))
+            if self.RowChoose == [] and self.ColChoose == []:
                 self.sheetTable.setModel(None)
             else:
+                self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
+                self.model = TableModel2(self.dataSheet)
+                print("in")
+                print(type(self.model))
+                print(self.model)
                 self.sheetTable.setModel(self.model)
-    
+                
     def sheetPageRowAndCol(self,Row,Col):
         # print("Start",Row,Col,len(set(Row)),len(set(Col)))
         if Row!=[] or Col!=[]:
