@@ -1,10 +1,9 @@
 import os
 import sys
 from PyQt5.QtCore import Qt,QEvent
-from matplotlib import widgets
 import csvManager as cmpage
 from PyQt5.QtWebEngineWidgets import *
-from PyQt5 import uic,QtCore,QtWebEngineWidgets
+from PyQt5 import uic,QtCore,QtWebEngineWidgets,QtGui
 # from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
@@ -24,7 +23,55 @@ class filterMesWindow(QMainWindow):
         super().__init__()
         uic.loadUi("filterMes.ui",self)
         self.show()
-
+        self.mes = ''
+        self.minVa = ''
+        self.maxVa = ''
+        self.sheet = ''
+        self.filtered = {}
+        self.checkedList = []
+        
+        # defind
+        self.rangeMax = self.findChild(QLineEdit,"rangeMax")
+        self.rangeMin = self.findChild(QLineEdit,"rangeMin")
+        self.atLeastMax = self.findChild(QLineEdit,"atLeastMax")
+        self.atLeastMin = self.findChild(QLineEdit,"atLeastMin")
+        self.atMostMax = self.findChild(QLineEdit,"atMostMax")
+        self.atMosttMin = self.findChild(QLineEdit,"atMostMin")
+        self.atLeastValueLabel = self.findChild(QLabel,"atLeastValueLabel")
+        self.atMostValueLabel = self.findChild(QLabel,"atMostValueLabel")
+        self.atLeastValueLabel_2 = self.findChild(QLabel,"atLeastValueLabel_2")
+        self.atMostValueLabel_2 = self.findChild(QLabel,"atMostValueLabel_2")
+        self.atLeastValueLabel_3 = self.findChild(QLabel,"atLeastValueLabel_3")
+        self.atMostValueLabel_3 = self.findChild(QLabel,"atMostValueLabel_3")
+        
+        self.setUp()
+        
+    def setUp(self):
+        self.dimen = mainW.diForFil
+        self.sheet = mainW.data
+        self.filtered = mainW.filDic
+        if self.filtered[self.dimen] == "":
+            self.filtered[self.dimen] = list(set(self.sheet[self.dimen].values))
+        self.maxVa = str(self.sheet[self.dimen].max())
+        self.minVa = str(self.sheet[self.dimen].min())
+        self.setValues()
+    
+    def setValues(self):
+        print(self.minVa,self.maxVa)
+        self.rangeMin.setText(self.minVa)
+        self.rangeMax.setText(self.maxVa)
+        self.atLeastMax.setText(self.maxVa)
+        self.atLeastMin.setText(self.minVa)
+        self.atMostMax.setText(self.maxVa)
+        self.atMosttMin.setText(self.minVa)
+        self.atLeastValueLabel.setText(self.minVa)
+        self.atMostValueLabel.setText(self.maxVa)
+        self.atLeastValueLabel_2.setText(self.minVa)
+        self.atMostValueLabel_2.setText(self.maxVa)
+        self.atLeastValueLabel_3.setText(self.minVa)
+        self.atMostValueLabel_3.setText(self.maxVa)
+        
+        
 class filterDimenWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -34,12 +81,12 @@ class filterDimenWindow(QMainWindow):
         self.sheet = ''
         self.filtered = {}
         self.checkedList = []
+        
         # defind
         self.allButton = self.findChild(QPushButton,"allButton")
         self.filterItemListWidget = self.findChild(QListWidget,"filterItemListWidget")
         self.noneButton = self.findChild(QPushButton,"noneButton")
         self.fieldLabel = self.findChild(QLabel,"fieldLabel")
-        self.selectionLabel = self.findChild(QLabel,"selectionLabel")
         self.selectionLabel = self.findChild(QLabel,"selectionLabel")
         self.resetButton = self.findChild(QPushButton,"resetButton")
         self.cancleButton = self.findChild(QPushButton,"cancleButton")
@@ -103,7 +150,7 @@ class filterDimenWindow(QMainWindow):
             if self.filterItemListWidget.item(i).checkState() == 2:
                 self.checkedList.append(self.filterItemListWidget.item(i).text())
         
-        self.selectionLabel.setText("Selection : "+ str(len(self.checkedList))+" of "+str(len(self.filtered[self.dimen]))+" values.")
+        self.selectionLabel.setText("Selection : "+ str(len(self.checkedList))+" of "+str(len(mainW.data[self.dimen].drop_duplicates))+" values.")
         
         #     print(i)
         #     print(self.filterItemListWidget.item(i).checkState())
@@ -113,7 +160,7 @@ class filterDimenWindow(QMainWindow):
         self.dimen = mainW.diForFil
         self.sheet = mainW.data
         self.filtered = mainW.filDic
-        print("BF--------",self.filtered,self.filtered[self.dimen])
+        # print("BF--------",self.filtered,self.filtered[self.dimen])
         if self.filtered[self.dimen] == "":
             self.filtered[self.dimen] = list(set(self.sheet[self.dimen].values))
         # print(self.filtered)
@@ -351,7 +398,7 @@ class mainWindow(QMainWindow):
         # defind
         self.openDirecButton = self.findChild(QPushButton,"openDirecButton")
         
-        self.RowList  = self.findChild(rowListClass,"RowList")
+        self.RowList = self.findChild(rowListClass,"RowList")
         self.ColList  = self.findChild(rowListClass,"ColList")
         
         self.filterList  = self.findChild(QListWidget,"filterList")
@@ -401,6 +448,12 @@ class mainWindow(QMainWindow):
                 # action = menu.exec_(self.mapToGlobal())
             if menu.exec_(event.globalPos()) == filterAc:
                 item = source.itemAt(event.pos())
+                if item.text() not in list(self.filDic.keys()):
+                    tmpr =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
+                    tmpr.append(item.text())
+                    self.filterList.addItems(tmpr)
+                    self.filDic[item.text()] = ""
+                    print(self.filDic)
                 self.selectFil(item.text())
             return True
         return super().eventFilter(source, event)
@@ -505,9 +558,6 @@ class mainWindow(QMainWindow):
             if i in tmpc:
                 tmpc.remove(i)
         tmpc += isInterCol
-        
-        # for i in range(len(tmpr)):
-        #     self.RowList.item(i)
             
         self.ColList.clear()
         self.ColList.addItems(tmpc)
@@ -515,6 +565,20 @@ class mainWindow(QMainWindow):
         self.RowList.clear()
         self.RowList.addItems(tmpr)
         
+        for i in range(len(tmpr)):
+            self.RowList.item(i).setForeground(QtGui.QColor('white'))
+            if str(self.RowList.item(i).text()) in list(self.Measure.keys()):
+                self.RowList.item(i).setBackground(QtGui.QColor('green'))
+            else: 
+                self.RowList.item(i).setBackground(QtGui.QColor('blue'))
+            
+        for i in range(len(tmpc)):
+            self.ColList.item(i).setForeground(QtGui.QColor('white'))
+            if str(self.ColList.item(i).text()) in list(self.Measure.keys()):
+                self.ColList.item(i).setBackground(QtGui.QColor('green'))
+            else: 
+                self.ColList.item(i).setBackground(QtGui.QColor('blue'))
+                
         self.RowChoose = tmpr
         self.ColChoose = tmpc
         
@@ -522,61 +586,27 @@ class mainWindow(QMainWindow):
         self.setChart()
         
     def filChangeD(self):
-        # print("Just D ",self.filJustAdd)
-        # print(self.filDic)
-        itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
-        # itemsTextList_2 =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]
-        itemsTextList =  list(set(itemsTextList))
-        # itemsTextList_2 =  list(set(itemsTextList_2))
-        # print(itemsTextList,itemsTextList_2)
-        while (itemsTextList.count('')):
-            itemsTextList.remove('')
-        # while (itemsTextList_2.count('')):
-        #     itemsTextList_2.remove('')
-        if itemsTextList != []:
-            # if itemsTextList == itemsTextList_2 or len(itemsTextList) < len(itemsTextList_2):
-            self.filterList.clear()
-            self.filterList.addItems(itemsTextList)
-                # self.filterList_2.clear()
-                # self.filterList_2.addItems(itemsTextList)
-                
-            # else:
-            #     self.filterList.clear()
-            #     self.filterList.addItems(itemsTextList_2)
-            #     self.filterList_2.clear()
-            #     self.filterList_2.addItems(itemsTextList_2)
-            
-            if self.filJustAdd in self.filDic.keys():
-                del self.filDic[self.filJustAdd]
+        if self.filJustAdd in self.filDic.keys():
+            del self.filDic[self.filJustAdd]
+        self.filChange()
         
     def filChange(self):
+        
         #print(self.filDic)
         itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
-        # itemsTextList_2 =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]
         itemsTextList =  list(set(itemsTextList))
-        # itemsTextList_2 =  list(set(itemsTextList_2))
-        # print(itemsTextList,itemsTextList_2)
+        # print(itemsTextList)
+        
         while (itemsTextList.count('')):
             itemsTextList.remove('')
-        # while (itemsTextList_2.count('')):
-        #     itemsTextList_2.remove('')
+            
         if itemsTextList != []:
                 self.filterList.clear()
                 self.filterList.addItems(itemsTextList)
-                # self.filterList_2.clear()
-                # self.filterList_2.addItems(itemsTextList)
+                
                 for i in itemsTextList:
                     if i not in list(self.filDic.keys()):
                         self.filDic[i] = ""
-        # else:
-        #     self.filterList.clear()
-        #     self.filterList.addItems(itemsTextList_2)
-        #     self.filterList_2.clear()
-        #     self.filterList_2.addItems(itemsTextList_2)
-        #     for i in itemsTextList_2:
-        #         if i not in list(self.filDic.keys()):
-        #             self.filDic[i] = ""
-        # print(itemsTextList,itemsTextList_2)
         # print(self.filDic)
         
     def setSheetTable(self):
@@ -704,6 +734,7 @@ class mainWindow(QMainWindow):
             filter=file_filter,
             initialFilter='Excel File (*.xlsx *.xls *.csv)' #defult filter
         )
+        print(response)
         # self.selectFile = response
         self.folderpath = os.getcwd()
         filename = os.listdir(self.folderpath)
@@ -723,18 +754,19 @@ class mainWindow(QMainWindow):
         cm.path = self.folderpath
         cm.selectFile = self.selectFile
         cm.setPath()
-        # print(cm.df)
-        self.colHeader = cm.getHead()
-        for i in list(self.Measure.keys()):
-            if i in self.colHeader:
-                self.colHeader.remove(i)
+        print(self.selectFile,self.data)
+        # print(response[0])
+        if response[0] != "":
+            self.dataSource()
+            self.colHeader = cm.getHead()
+            for i in list(self.Measure.keys()):
+                if i in self.colHeader:
+                    self.colHeader.remove(i)
                 
-        self.setFileListDimension()
-        self.setFileInDirectory()
-        self.setFileChoose()
-        self.dataSource()
-        # self.data = cm.getDataWithPandas()
-        # Ui_MainWindow.setupUi(self, MainWindow)
+            self.setFileListDimension()
+            self.setFileInDirectory()
+            self.setFileChoose()
+        
     def setFileListDimension(self):
         self.FileListDimension.clear()
         self.FileListDimension.addItems(self.colHeader)

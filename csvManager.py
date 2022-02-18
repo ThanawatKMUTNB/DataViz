@@ -36,7 +36,8 @@ class csvManager:
             return df
     
     def getHead(self):
-       return list(self.df.columns)
+        return list(self.df.columns)
+        
 
     def getDataWithPandas(self):
         return self.df
