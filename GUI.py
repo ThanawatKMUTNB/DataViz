@@ -113,7 +113,7 @@ class filterDimenWindow(QMainWindow):
         self.dimen = mainW.diForFil
         self.sheet = mainW.data
         self.filtered = mainW.filDic
-        # print("BF--------",self.filtered,self.filtered[self.dimen])
+        print("BF--------",self.filtered,self.filtered[self.dimen])
         if self.filtered[self.dimen] == "":
             self.filtered[self.dimen] = list(set(self.sheet[self.dimen].values))
         # print(self.filtered)
@@ -182,7 +182,7 @@ class rowListClass(QtWidgets.QListWidget):
             self.takeItem(self.currentRow())
             self.clearSelection()
         mainW.filChangeD()
-        mainW.rowcolChangeD()
+        mainW.rowcolChange()
         # mainW.setChart()
         mainW.setplot()
         
@@ -202,14 +202,9 @@ class rowListClass(QtWidgets.QListWidget):
             source_Widget.takeItem(source_Widget.indexFromItem(i).row())
             self.addItem(i)
         mainW.setFileListDimension()
-        # if self.item(self.currentRow()) != None:
-        #     mainW.filJustAdd = self.item(self.currentRow()).text()
         mainW.filChange()
         mainW.rowcolChange()
-        # mainW.setChart()
         mainW.setplot()
-        # mainW.useFile()
-        # print('drop event Row')
             
 class TableModel2(QtCore.QAbstractTableModel):
     data = ""
@@ -273,11 +268,7 @@ class FileChoose(QtWidgets.QListWidget):
             source_Widget.takeItem(source_Widget.indexFromItem(i).row())
             self.addItem(i)
         mainW.useFile()
-        print('drop event')
-        
-    def Clicked(self,item):
-          QMessageBox.information(self, "ListWidget", "You clicked: "+item.text())
-            
+          
 class FileInDirec(QtWidgets.QListWidget):
     def __init__(self,parent=None):
         super(FileInDirec, self).__init__(parent)
@@ -307,7 +298,6 @@ class FileInDirec(QtWidgets.QListWidget):
             source_Widget.takeItem(source_Widget.indexFromItem(i).row())
             self.addItem(i)
         mainW.useFile()
-        print('drop event2')
 
 class TableModel(QtCore.QAbstractTableModel):
     def __init__(self, data):
@@ -361,13 +351,10 @@ class mainWindow(QMainWindow):
         # defind
         self.openDirecButton = self.findChild(QPushButton,"openDirecButton")
         
-        self.RowList  = self.findChild(QListWidget,"RowList")
-        self.ColList  = self.findChild(QListWidget,"ColList")
-        self.RowList_2 = self.findChild(QListWidget,"RowList_2")
-        self.ColList_2 = self.findChild(QListWidget,"ColList_2")
+        self.RowList  = self.findChild(rowListClass,"RowList")
+        self.ColList  = self.findChild(rowListClass,"ColList")
         
         self.filterList  = self.findChild(QListWidget,"filterList")
-        self.filterList_2  = self.findChild(QListWidget,"filterList_2")
         
         self.dataSourceTable = self.findChild(QTableView,"table")
         self.dataSourceTable.horizontalHeader().setStretchLastSection(True)
@@ -379,16 +366,12 @@ class mainWindow(QMainWindow):
         self.FileListDimension = self.findChild(QListWidget,"FileListDimension")
         self.FileListMes = self.findChild(QListWidget,"FileListMes")
         
-        self.FileListDimension_2 = self.findChild(QListWidget,"FileListDimension_2")
-        self.FileListMes_2 = self.findChild(QListWidget,"FileListMes_2")
         
         self.FileListChoose = self.findChild(FileChoose,"FileListChoose")
         
         self.chartType = self.findChild(QComboBox,"chartType")
-        self.chartType_2 = self.findChild(QComboBox,"chartType_2")
         
         self.chartTab = self.findChild(QTabWidget,"chartTab")
-        # QtWidgets.QMainWindow
         self.frame = self.findChild(QFrame,"frame")
         
         # function
@@ -398,9 +381,8 @@ class mainWindow(QMainWindow):
         self.filterList.doubleClicked.connect(self.whichClicked)
         self.RowList.installEventFilter(self)
         self.ColList.installEventFilter(self)
-        self.chartType_2.activated.connect(self.showChart)
         self.chartType.activated.connect(self.showChart)
-        self.show()
+        self.showMaximized()
         
     def whichClicked(self):
         filterItem = self.filterList.currentRow()
@@ -472,9 +454,9 @@ class mainWindow(QMainWindow):
         self.typeChart = sorted(self.typeChart)
         # print("--->",self.typeChart)
         self.chartType.clear()
-        self.chartType_2.clear()
+        # self.chartType_2.clear()
         self.chartType.addItems(self.typeChart)
-        self.chartType_2.addItems(self.typeChart)
+        # self.chartType_2.addItems(self.typeChart)
         #self.showChart()
     
     def showChart(self):
@@ -495,172 +477,107 @@ class mainWindow(QMainWindow):
                 self.frame.setLayout(vbox)
                 self.frame.show()
             
-    def rowcolChangeD(self):
-        tmpr = []
-        tmpr =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
-        tmpc = [] 
-        tmpc =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
-        tmpr2 = []
-        tmpr2 =  [str(self.RowList_2.item(i).text()) for i in range(self.RowList_2.count())]
-        tmpc2 = [] 
-        tmpc2 =  [str(self.ColList_2.item(i).text()) for i in range(self.ColList_2.count())]
-        
-        print(tmpr,tmpc,tmpr2,tmpc2)
-        
-        while (tmpr.count('')): tmpr.remove('')
-        while (tmpr2.count('')): tmpr2.remove('')
-        
-        if tmpr == tmpr2 or len(tmpr) < len(tmpr2):
-            # self.RowList.clear()
-            # self.RowList.addItems(tmpr)
-            # self.RowList_2.clear()
-            # self.RowList_2.addItems(tmpr)
-            self.RowChoose = tmpr
-        else:
-            # self.RowList.clear()
-            # self.RowList.addItems(tmpr2)
-            # self.RowList_2.clear()
-            # self.RowList_2.addItems(tmpr2)
-            self.RowChoose = tmpr2
-        while (tmpc.count('')): tmpc.remove('')
-        while (tmpc2.count('')): tmpc2.remove('')
-        if tmpc == tmpc2 or len(tmpc) < len(tmpc2):
-            # self.ColList.clear()
-            # self.ColList.addItems(tmpc)
-            # self.ColList_2.clear()
-            # self.ColList_2.addItems(tmpc)
-            self.ColChoose = tmpc
-        else:
-            # self.ColList.clear()
-            # self.ColList.addItems(tmpc2)
-            # self.ColList_2.clear()
-            # self.ColList_2.addItems(tmpc2)
-            self.ColChoose = tmpc2
-            
-        isInterRow = [value for value in self.RowChoose if value in list(self.Measure.keys())]
-        isInterCol = [value for value in self.ColChoose if value in list(self.Measure.keys())]
-        
-        new_list = [i for i in self.RowChoose if i not in isInterRow]
-        
-        self.RowList.clear()
-        self.RowList.addItems(new_list)
-        self.RowList_2.clear()
-        self.RowList_2.addItems(new_list)
-        
-        new_list = [i for i in self.ColChoose if i not in isInterCol]
-        
-        self.ColList.clear()
-        self.ColList.addItems(new_list)
-        self.ColList_2.clear()
-        self.ColList_2.addItems(new_list)
-        
-    def filChangeD(self):
-        # print("Just D ",self.filJustAdd)
-        # print(self.filDic)
-        itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
-        itemsTextList_2 =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]
-        itemsTextList =  list(set(itemsTextList))
-        itemsTextList_2 =  list(set(itemsTextList_2))
-        # print(itemsTextList,itemsTextList_2)
-        while (itemsTextList.count('')):
-            itemsTextList.remove('')
-        while (itemsTextList_2.count('')):
-            itemsTextList_2.remove('')
-        if not(itemsTextList == [] and itemsTextList_2 == []):
-            if itemsTextList == itemsTextList_2 or len(itemsTextList) < len(itemsTextList_2):
-                self.filterList.clear()
-                self.filterList.addItems(itemsTextList)
-                self.filterList_2.clear()
-                self.filterList_2.addItems(itemsTextList)
-                
-            else:
-                self.filterList.clear()
-                self.filterList.addItems(itemsTextList_2)
-                self.filterList_2.clear()
-                self.filterList_2.addItems(itemsTextList_2)
-            
-            if self.filJustAdd in self.filDic.keys():
-                del self.filDic[self.filJustAdd]
-         
     def rowcolChange(self):
         tmpr = []
         tmpr =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
         tmpc = [] 
         tmpc =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
-        tmpr2 = []
-        tmpr2 =  [str(self.RowList_2.item(i).text()) for i in range(self.RowList_2.count())]
-        tmpc2 = [] 
-        tmpc2 =  [str(self.ColList_2.item(i).text()) for i in range(self.ColList_2.count())]
-        print(tmpr,tmpc,tmpr2,tmpc2)
+        
+        # print(tmpr,tmpc)
         
         while (tmpr.count('')): tmpr.remove('')
-        while (tmpr2.count('')): tmpr2.remove('')
-        if tmpr == tmpr2 or len(tmpr) > len(tmpr2):
-            self.RowList.clear()
-            self.RowList.addItems(tmpr)
-            self.RowList_2.clear()
-            self.RowList_2.addItems(tmpr)
-            self.RowChoose = tmpr
-        else:
-            self.RowList.clear()
-            self.RowList.addItems(tmpr2)
-            self.RowList_2.clear()
-            self.RowList_2.addItems(tmpr2)
-            self.RowChoose = tmpr2
-        
         while (tmpc.count('')): tmpc.remove('')
-        while (tmpc2.count('')): tmpc2.remove('')
-        if tmpc == tmpc2 or len(tmpc) > len(tmpc2):
-            self.ColList.clear()
-            self.ColList.addItems(tmpc)
-            self.ColList_2.clear()
-            self.ColList_2.addItems(tmpc)
-            self.ColChoose = tmpc
-        else:
-            self.ColList.clear()
-            self.ColList.addItems(tmpc2)
-            self.ColList_2.clear()
-            self.ColList_2.addItems(tmpc2)
-            self.ColChoose = tmpc2
+        
+        self.RowChoose = tmpr
+        
+        self.ColChoose = tmpc
+
+        isInterRow = [value for value in self.RowChoose if value in list(self.Measure.keys())]
+        isInterCol = [value for value in self.ColChoose if value in list(self.Measure.keys())]
+        
+        for i in isInterRow:
+            if i in tmpr:
+                tmpr.remove(i)
+        tmpr += isInterRow
+        
+        for i in isInterCol:
+            if i in tmpc:
+                tmpc.remove(i)
+        tmpc += isInterCol
+        
+        self.ColList.clear()
+        self.ColList.addItems(tmpc)
+        
+        self.RowList.clear()
+        self.RowList.addItems(tmpr)
         self.setChart()
+        # print(tmpr,tmpc)
+        
+    def filChangeD(self):
+        # print("Just D ",self.filJustAdd)
+        # print(self.filDic)
+        itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
+        # itemsTextList_2 =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]
+        itemsTextList =  list(set(itemsTextList))
+        # itemsTextList_2 =  list(set(itemsTextList_2))
+        # print(itemsTextList,itemsTextList_2)
+        while (itemsTextList.count('')):
+            itemsTextList.remove('')
+        # while (itemsTextList_2.count('')):
+        #     itemsTextList_2.remove('')
+        if itemsTextList != []:
+            # if itemsTextList == itemsTextList_2 or len(itemsTextList) < len(itemsTextList_2):
+            self.filterList.clear()
+            self.filterList.addItems(itemsTextList)
+                # self.filterList_2.clear()
+                # self.filterList_2.addItems(itemsTextList)
+                
+            # else:
+            #     self.filterList.clear()
+            #     self.filterList.addItems(itemsTextList_2)
+            #     self.filterList_2.clear()
+            #     self.filterList_2.addItems(itemsTextList_2)
+            
+            if self.filJustAdd in self.filDic.keys():
+                del self.filDic[self.filJustAdd]
         
     def filChange(self):
         #print(self.filDic)
         itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
-        itemsTextList_2 =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]
+        # itemsTextList_2 =  [str(self.filterList_2.item(i).text()) for i in range(self.filterList_2.count())]
         itemsTextList =  list(set(itemsTextList))
-        itemsTextList_2 =  list(set(itemsTextList_2))
+        # itemsTextList_2 =  list(set(itemsTextList_2))
         # print(itemsTextList,itemsTextList_2)
         while (itemsTextList.count('')):
             itemsTextList.remove('')
-        while (itemsTextList_2.count('')):
-            itemsTextList_2.remove('')
-        if not(itemsTextList == [] and itemsTextList_2 == []):
-            if itemsTextList == itemsTextList_2 or len(itemsTextList) > len(itemsTextList_2):
+        # while (itemsTextList_2.count('')):
+        #     itemsTextList_2.remove('')
+        if itemsTextList != []:
                 self.filterList.clear()
                 self.filterList.addItems(itemsTextList)
-                self.filterList_2.clear()
-                self.filterList_2.addItems(itemsTextList)
+                # self.filterList_2.clear()
+                # self.filterList_2.addItems(itemsTextList)
                 for i in itemsTextList:
                     if i not in list(self.filDic.keys()):
                         self.filDic[i] = ""
-            else:
-                self.filterList.clear()
-                self.filterList.addItems(itemsTextList_2)
-                self.filterList_2.clear()
-                self.filterList_2.addItems(itemsTextList_2)
-                for i in itemsTextList_2:
-                    if i not in list(self.filDic.keys()):
-                        self.filDic[i] = ""
+        # else:
+        #     self.filterList.clear()
+        #     self.filterList.addItems(itemsTextList_2)
+        #     self.filterList_2.clear()
+        #     self.filterList_2.addItems(itemsTextList_2)
+        #     for i in itemsTextList_2:
+        #         if i not in list(self.filDic.keys()):
+        #             self.filDic[i] = ""
         # print(itemsTextList,itemsTextList_2)
-        print(self.filDic)
+        # print(self.filDic)
         
     def setSheetTable(self):
-        print(self.ColChoose,self.RowChoose)
+        # print(self.ColChoose,self.RowChoose)
         isInterRow = list(set.intersection(set(self.RowChoose), set( self.Measure.keys() ) ))
         isInterCol = list(set.intersection(set(self.ColChoose), set( self.Measure.keys() ) ))
         if self.selectFile != [] : 
             self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
+            print(self.dataSheet)
             self.model = TableModel2(self.dataSheet)
             if (self.RowChoose == [] and self.ColChoose == []) or (isInterRow != [] and isInterCol != []):
                 self.sheetTable.setModel(None)
@@ -708,11 +625,6 @@ class mainWindow(QMainWindow):
             self.FileListMes.clear()
             self.FileListMes.addItems([])
             
-            self.FileListDimension_2.clear()
-            self.FileListDimension_2.addItems(self.colHeader)
-            
-            self.FileListMes_2.clear()
-            self.FileListMes_2.addItems([])
         self.dataSource()
         
     def setTable(self):
@@ -749,6 +661,10 @@ class mainWindow(QMainWindow):
                 self.model = TableModel(self.data)
                 self.dataSourceTable.setModel(self.model)
         else:
+            self.RowList.clear()
+            self.ColList.clear()
+            self.RowChoose = []
+            self.ColChoose = []
             self.dataSourceTable.reset()
             self.dataSourceTable.setModel(None)
             #print(self.data)
@@ -813,10 +729,10 @@ class mainWindow(QMainWindow):
     def setFileListDimension(self):
         self.FileListDimension.clear()
         self.FileListDimension.addItems(self.colHeader)
-        self.FileListDimension_2.clear()
-        self.FileListDimension_2.addItems(self.colHeader)
-        self.FileListMes_2.clear()
-        self.FileListMes_2.addItems(list(self.Measure.keys()))
+        # self.FileListDimension_2.clear()
+        # self.FileListDimension_2.addItems(self.colHeader)
+        # self.FileListMes_2.clear()
+        # self.FileListMes_2.addItems(list(self.Measure.keys()))
         self.FileListMes.clear()
         self.FileListMes.addItems(list(self.Measure.keys()))
 
