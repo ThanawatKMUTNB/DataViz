@@ -13,6 +13,7 @@ import graphManager
 
 import altair as alt
 import altair_viewer
+from vega_datasets import data
 
 alt.data_transformers.disable_max_rows()
 altair_viewer._global_viewer._use_bundled_js = False
@@ -23,7 +24,7 @@ class filterMesWindow(QMainWindow):
         super().__init__()
         uic.loadUi("filterMes.ui",self)
         self.show()
-        self.mes = ''
+        self.dimen = ''
         self.minVa = ''
         self.maxVa = ''
         self.sheet = ''
@@ -31,12 +32,18 @@ class filterMesWindow(QMainWindow):
         self.checkedList = []
         
         # defind
+        self.atLeatSlider = self.findChild(QSlider,"atLeatSlider")
+        self.atMostSlider = self.findChild(QSlider,"atMostSlider")
+        self.atLeatSlider_2 = self.findChild(QSlider,"atLeatSlider_2")
+        self.atMostSlider_2 = self.findChild(QSlider,"atMostSlider_2")
+        
         self.rangeMax = self.findChild(QLineEdit,"rangeMax")
         self.rangeMin = self.findChild(QLineEdit,"rangeMin")
         self.atLeastMax = self.findChild(QLineEdit,"atLeastMax")
         self.atLeastMin = self.findChild(QLineEdit,"atLeastMin")
         self.atMostMax = self.findChild(QLineEdit,"atMostMax")
         self.atMosttMin = self.findChild(QLineEdit,"atMostMin")
+        
         self.atLeastValueLabel = self.findChild(QLabel,"atLeastValueLabel")
         self.atMostValueLabel = self.findChild(QLabel,"atMostValueLabel")
         self.atLeastValueLabel_2 = self.findChild(QLabel,"atLeastValueLabel_2")
@@ -51,27 +58,27 @@ class filterMesWindow(QMainWindow):
         self.sheet = mainW.data
         self.filtered = mainW.filDic
         if self.filtered[self.dimen] == "":
-            self.filtered[self.dimen] = list(set(self.sheet[self.dimen].values))
+            self.filtered[self.dimen] = [self.sheet[self.dimen].min(),self.sheet[self.dimen].max()]
         self.maxVa = str(self.sheet[self.dimen].max())
         self.minVa = str(self.sheet[self.dimen].min())
         self.setValues()
     
     def setValues(self):
-        print(self.minVa,self.maxVa)
-        self.rangeMin.setText(self.minVa)
-        self.rangeMax.setText(self.maxVa)
-        self.atLeastMax.setText(self.maxVa)
-        self.atLeastMin.setText(self.minVa)
-        self.atMostMax.setText(self.maxVa)
-        self.atMosttMin.setText(self.minVa)
+        # print(self.minVa,self.maxVa)
+        self.rangeMin.setText(str(self.filtered[self.dimen][0]))
+        self.rangeMax.setText(str(self.filtered[self.dimen][1]))
+        self.atLeastMax.setText(str(self.filtered[self.dimen][1]))
+        self.atLeastMin.setText(str(self.filtered[self.dimen][0]))
+        self.atMostMax.setText(str(self.filtered[self.dimen][1]))
+        self.atMosttMin.setText(str(self.filtered[self.dimen][0]))
+        
         self.atLeastValueLabel.setText(self.minVa)
         self.atMostValueLabel.setText(self.maxVa)
         self.atLeastValueLabel_2.setText(self.minVa)
         self.atMostValueLabel_2.setText(self.maxVa)
         self.atLeastValueLabel_3.setText(self.minVa)
         self.atMostValueLabel_3.setText(self.maxVa)
-        
-        
+                
 class filterDimenWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -233,6 +240,7 @@ class rowListClass(QtWidgets.QListWidget):
         # mainW.setChart()
         mainW.setplot()
         
+        
     # def dragEnterEvent(self, event):
     #     #if event.mimeData().hasUrls():
     #     event.accept()
@@ -251,6 +259,7 @@ class rowListClass(QtWidgets.QListWidget):
         mainW.setFileListDimension()
         mainW.filChange()
         mainW.rowcolChange()
+        # mainW.setChart()
         mainW.setplot()
             
 class TableModel2(QtCore.QAbstractTableModel):
@@ -418,7 +427,8 @@ class mainWindow(QMainWindow):
         
         self.chartType = self.findChild(QComboBox,"chartType")
         
-        self.chartTab = self.findChild(QTabWidget,"chartTab")
+        self.tabWidget_2 = self.findChild(QTabWidget,"tabWidget_2")
+        
         self.frame = self.findChild(QFrame,"frame")
         
         # function
@@ -477,6 +487,8 @@ class mainWindow(QMainWindow):
             
     def setplot(self):
         self.setSheetTable()
+        # self.setChart()
+        # self.showChart()
     
     def setChart(self):
         # print("set chart")
@@ -485,52 +497,55 @@ class mainWindow(QMainWindow):
         isInterCol = [value for value in self.ColChoose if value in list(self.Measure.keys())]
         # print("--------IR IC",isInterRow,isInterCol)
         self.typeChart = []
-        if (len(isInterRow)>0 and len(isInterCol)==0) or (len(isInterCol)>0 and len(isInterRow)==0):
+        if len(isInterRow)>0 or len(isInterCol)>0 :
+            if (len(isInterRow)>0 and len(isInterCol)==0) or (len(isInterCol)>0 and len(isInterRow)==0):
+                self.typeChart = ['Bar']
             # print("Have Mes")
-            if (self.RowChoose != [] and self.ColChoose == []) or (self.RowChoose == [] and self.ColChoose != []) :
+            # if (self.RowChoose != [] and self.ColChoose == []) or (self.RowChoose == [] and self.ColChoose != []) :
             
-                if (len(self.RowChoose)-len(isInterRow) == 1 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) or (len(self.ColChoose)-len(isInterCol) == 1 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
-                    self.typeChart = ['Bar', 'Pie']
-                    # print("1 di")
-                    for i in self.typeDate:
-                        if i in self.RowChoose + self.ColChoose:
-                            self.typeChart.append('Line')
-                if (len(self.RowChoose)-len(isInterRow) == 2 and (len(isInterRow)>=1 or len(isInterCol)>=1)) or (len(self.ColChoose)-len(isInterCol) == 2 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
-                    self.typeChart = ['Bar']
-                    # print("2 di")
-                    for i in self.typeDate:
-                        if i in self.RowChoose + self.ColChoose:
-                            self.typeChart.append('Line')
-                if (len(self.RowChoose)-len(isInterRow) == 3 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) or (len(self.ColChoose)-len(isInterCol) == 3 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
-                    self.typeChart = ['Bar']
-                    # print("3 di")
+            #     if (len(self.RowChoose)-len(isInterRow) == 1 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) or (len(self.ColChoose)-len(isInterCol) == 1 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
+            #         self.typeChart = ['Bar', 'Pie']
+            #         # print("1 di")
+            #         for i in self.typeDate:
+            #             if i in self.RowChoose + self.ColChoose:
+            #                 self.typeChart.append('Line')
+            #     if (len(self.RowChoose)-len(isInterRow) == 2 and (len(isInterRow)>=1 or len(isInterCol)>=1)) or (len(self.ColChoose)-len(isInterCol) == 2 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
+            #         self.typeChart = ['Bar']
+            #         # print("2 di")
+            #         for i in self.typeDate:
+            #             if i in self.RowChoose + self.ColChoose:
+            #                 self.typeChart.append('Line')
+            #     if (len(self.RowChoose)-len(isInterRow) == 3 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) or (len(self.ColChoose)-len(isInterCol) == 3 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
+            #         self.typeChart = ['Bar']
+            #         # print("3 di")
         
         self.typeChart = list(set(self.typeChart))
         self.typeChart = sorted(self.typeChart)
         # print("--->",self.typeChart)
         self.chartType.clear()
-        # self.chartType_2.clear()
         self.chartType.addItems(self.typeChart)
         # self.chartType_2.addItems(self.typeChart)
-        #self.showChart()
+        if self.typeChart != []:
+            self.showChart()
     
     def showChart(self):
-        vbox = QVBoxLayout()
+        # vbox = QtWidgets.QVBoxLayout(self)
+        # vbox.setContentsMargins(0, 0, 0, 0)
         self.chartTypeS = self.chartType.currentText()
-        # print(self.chartTypeS)
-        if self.chartTypeS != "": 
-            # if self.chartTypeS != "":
-            gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data)
-            self.Chart = gm.chooseChart(str(self.chartTypeS))
+        print(self.chartTypeS)
+        
+        # if self.chartTypeS != "": 
+        #     # if self.chartTypeS != "":
+        #     gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data)
+        #     self.Chart = gm.chooseChart(str(self.chartTypeS))
             
-            self.view = WebEngineView()
-            # self.widget.setLayout(self.view)
-            if self.Chart != None:
-                self.view.updateChart(self.Chart)
-                # self.view.show()
-                vbox.addWidget(self.view)
-                self.frame.setLayout(vbox)
-                self.frame.show()
+        #     self.view = WebEngineView(self.tabWidget_2)
+        #     # self.widget.setLayout(self.view)
+        #     if self.Chart != None:
+        #         print(type(self.Chart))
+        #         self.view.updateChart(self.Chart)
+        #         self.view.show()
+        #         # vbox.addWidget(self.view)
             
     def rowcolChange(self):
         tmpr = []
@@ -583,7 +598,7 @@ class mainWindow(QMainWindow):
         self.ColChoose = tmpc
         
         # print("After",tmpr,tmpc)
-        self.setChart()
+        # self.setChart()
         
     def filChangeD(self):
         if self.filJustAdd in self.filDic.keys():
@@ -610,18 +625,23 @@ class mainWindow(QMainWindow):
         # print(self.filDic)
         
     def setSheetTable(self):
+        isInterRow = [value for value in self.RowChoose if value in list(self.Measure.keys())]
+        isInterCol = [value for value in self.ColChoose if value in list(self.Measure.keys())]
         # print(self.ColChoose,self.RowChoose)
         if self.selectFile != [] : 
-            print(not(self.RowChoose == [] and self.ColChoose == []))
+            # print(not(self.RowChoose == [] and self.ColChoose == []))
             if self.RowChoose == [] and self.ColChoose == []:
                 self.sheetTable.setModel(None)
             else:
                 self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
                 self.model = TableModel2(self.dataSheet)
-                print("in")
-                print(type(self.model))
-                print(self.model)
-                self.sheetTable.setModel(self.model)
+                # print("in")
+                # print(type(self.model))
+                # print(self.model)
+                if isInterRow != [] and isInterCol !=[]:
+                    self.sheetTable.setModel(None)
+                else:
+                    self.sheetTable.setModel(self.model)
                 
     def sheetPageRowAndCol(self,Row,Col):
         # print("Start",Row,Col,len(set(Row)),len(set(Col)))

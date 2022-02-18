@@ -202,8 +202,6 @@ class csvManager:
         else: # Have Mes 
             intersecAt = ''
             filterChoose = "sum"
-            
-            
             if isInterRow != []:
                 for i in isInterRow:
                     Row.remove(i)
@@ -214,9 +212,9 @@ class csvManager:
                     Col.remove(i)
                 intersecAt = 'Col'
                 intersec = isInterCol
-                
             packDf = []
-            if Row == [] and Col == []:
+            
+            if Row == [] and Col == []: #Only mes
                 #print(Row,Col)
                 colList = usedata[intersec]
                 if filterChoose == "sum":
@@ -247,8 +245,8 @@ class csvManager:
                 changname = (dict(changname))
                 
                 k = k.rename(columns=changname,index=changname)
-                print("--------------------K\n",k)
-            else:
+                # print("--------------------K\n",k)
+            else: # di mes
                 #print(Row,Col)
                 if Row != [] and Col == []:
                     rowList = usedata[Row]
@@ -261,30 +259,66 @@ class csvManager:
                     rowList = usedata[Row]
                     colList = usedata[Col+intersec]
                     packDf = [rowList,colList]
-                #print(packDf)
-                #print(intersecAt,intersec)
-
-                #DiList = self.getDataWithPandasByHead(intersec)
+                    
                 results = pd.concat(packDf, axis=1,ignore_index=True)
                 results = results.sort_values(by=results.columns.tolist())
-                #print(intersec)
-                #print(results)
                 colNum = results.columns.tolist()
                 beforMesual = (-1)*len(intersec)
-                '''DiList = results.groupby(colNum[:beforMesual])[colNum[beforMesual:]].sum()
-                print(DiList)'''
-                #print("-----------",colNum[beforMesual:])
-                if isInterRow != []:
+                
+                if isInterRow != []: #mes in row
+                    print("meas in row")
                     k = pd.pivot_table(results,index = colNum[len(Row):beforMesual], columns = colNum[:len(Row)],values = colNum[beforMesual:],aggfunc=np.sum)
                     k = k.round(0)
                     k=k.T
-                    #k.columns.names = Col
-                    #k.index.names = [None]+Row
-                else:
+                    # print(isInterRow)
+                    # print(k.index)
+                    if len(isInterRow) > 1and len(Row) > 1:
+                        changname = dict(k.index)
+                        for i,j in zip(list(changname.keys()),isInterRow):
+                            changname[i] = j 
+                        # k.columns.names = isInterCol
+                        k = k.rename(index=changname)
+                        # k = k.stack()
+                    else:
+                        if len(k.index.names)>1:
+                            k.index.names = [None]+Row
+                        else:
+                            k.columns = isInterRow
+                    
+                else: #mes in col
+                    print("mes in col")
                     k = pd.pivot_table(results,columns = colNum[len(Row):beforMesual], index= colNum[:len(Row)],values = colNum[beforMesual:],aggfunc=np.sum)
                     k = k.round(0)
-                    #k.columns.names = [None]+Col
+                    if len(isInterRow) == 0 and len(Row) == 0: 
+                        print("Only col")
+                        print(k)              
+                        if len(k.index)>1:
+                            k.index = isInterCol
+                        k = k.unstack()
+                        # print(type(k))
+                        # print(type(k))
+                    # print(colNum[:len(Row)])
+                    # print(isInterCol)
+                    # print(dict(k.columns))
+                    # changname = zip(list(k.index), [filterChoose*len(list(k.index))])
+                    elif len(isInterCol) > 1 and len(Col) > 1:
+                        # print("1")
+                        # print(k)
+                        # print(k.index)
+                        changname = dict(k.columns)
+                        # print(changname)
+                        for i,j in zip(list(changname.keys()),isInterCol):
+                            changname[i] = j 
+                        # k.columns.names = isInterCol
+                        k = k.rename(columns=changname)
+                    else:
+                        # print(k.index)
+                        if len(k.columns.names)>1:
+                            k.columns.names = [None]+Col
+                        else:
+                            k.index = isInterCol
                     #k.index.names = Row
+                    
                 k = k.replace(np.nan, '')
         #print(type(k))
         #print(k.index.tolist())
@@ -305,13 +339,15 @@ class csvManager:
         changIndex = pd.MultiIndex.from_arrays(eachList, names=k.index.names)
         k.index = changIndex
         print(k)'''
+        print(k)
         return k
 
 ex = csvManager()
 ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
 #ex.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
 #ex.setDimensionSort(["Region","Segment","Region","Region"])
-# ex.setRowAndColumn(["Segment","Sales","Profit"],["Segment","Region","Region"])
-#ex.setRowAndColumn(["Region","Region","Segment"],["Region","Sales","Profit"])
+# ex.setRowAndColumn(["Segment","Sales","Profit"],["Segment","Region"])
+# ex.setRowAndColumn(["Region","Segment"],["Region","Sales","Profit"])
 # ex.setRowAndColumn(["Sales"],[])
-ex.setRowAndColumn([],["Sales"])
+ex.setRowAndColumn(["Segment","Region","Sales","Profit"],[])
+# ex.setRowAndColumn([],["Segment","Profit","Sales"])

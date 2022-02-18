@@ -93,7 +93,7 @@ class graphManager():
                 chart = []
                 for c in column:
                     chart.append(self.plotBar(row,c,'column',len(row)))
-                return alt.hconcat(*chart)
+                return alt.hconcat(*chart).configure_view
 
         elif chart == 'Pie':
             if checkMeasure(row,column):    #row is measure
