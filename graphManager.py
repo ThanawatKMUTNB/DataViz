@@ -18,42 +18,40 @@ class graphManager():
 
     def __init__(self):
         self.df = None
-        # self.Measure = []
+        self.Measure = []
         self.MeasureDic = {}
         self.RowChoose = []
         self.ColChoose = []
         self.Chart = None
 
-    # def setMes(self):
-    #     for i in list(self.MeasureDic.keys()):
-    #         tmp = []
-    #         tmp.append(i)
-    #         tmp.append(self.MeasureDic[i])
-    #         self.Measure.append(tmp)
+    def setMes(self):
+        for i in list(self.MeasureDic.keys()):
+            tmp = []
+            tmp.append(i)
+            tmp.append(self.MeasureDic[i])
+            self.Measure.append(tmp)
             
-    #     for i in range(len(self.RowChoose)):
-    #         tmp = []
-    #         print("------>",i,self.RowChoose[i])
-    #         if self.RowChoose[i] in list(self.MeasureDic.keys()):
-    #             tmp.append(self.RowChoose[i])
-    #             tmp.append(self.MeasureDic[self.RowChoose[i]])
-    #             self.RowChoose[i] = tmp
+        for i in range(len(self.RowChoose)):
+            tmp = []
+            print("------>",i,self.RowChoose[i])
+            if self.RowChoose[i] in list(self.MeasureDic.keys()):
+                tmp.append(self.RowChoose[i])
+                tmp.append(self.MeasureDic[self.RowChoose[i]])
+                self.RowChoose[i] = tmp
                 
-    #     for i in range(len(self.ColChoose)):
-    #         tmp = []
-    #         if self.ColChoose[i] in list(self.MeasureDic.keys()):
-    #             tmp.append(self.ColChoose[i])
-    #             tmp.append(self.MeasureDic[self.ColChoose[i]])
-    #             self.ColChoose[i] = tmp
-
-            
+        for i in range(len(self.ColChoose)):
+            tmp = []
+            if self.ColChoose[i] in list(self.MeasureDic.keys()):
+                tmp.append(self.ColChoose[i])
+                tmp.append(self.MeasureDic[self.ColChoose[i]])
+                self.ColChoose[i] = tmp
         
     def setList(self,row,col,mes,dataSheet):
         self.MeasureDic = mes
         self.RowChoose = row
         self.ColChoose = col
-        self.Measure = list(self.MeasureDic.keys())
-        # self.setMes()
+        # self.Measure = list(self.MeasureDic.keys())
+        self.setMes()
         self.df = dataSheet
         print("Graph")
         print(self.MeasureDic,self.Measure,self.RowChoose,self.ColChoose)

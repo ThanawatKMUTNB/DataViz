@@ -15,10 +15,6 @@ import altair as alt
 import altair_viewer
 from vega_datasets import data
 
-alt.data_transformers.disable_max_rows()
-altair_viewer._global_viewer._use_bundled_js = False
-alt.data_transformers.enable('data_server')
-
 class filterMesWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -192,10 +188,16 @@ class filterDimenWindow(QMainWindow):
             n+=1
 
 class WebEngineView(QtWebEngineWidgets.QWebEngineView):
+    # Disabling MaxRowsError
+    alt.data_transformers.disable_max_rows()
+    altair_viewer._global_viewer._use_bundled_js = False
+    alt.data_transformers.enable('data_server')
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.page().profile().downloadRequested.connect(self.onDownloadRequested)
-        # self.windows = win
+        self.windows = []
+        # self.setZoomFactor(1.24) # 0.25 to 5
 
     @QtCore.pyqtSlot(QtWebEngineWidgets.QWebEngineDownloadItem)
     def onDownloadRequested(self, download):
@@ -214,14 +216,14 @@ class WebEngineView(QtWebEngineWidgets.QWebEngineView):
         if type_ == QtWebEngineWidgets.QWebEnginePage.WebBrowserTab:
             window = QtWidgets.QMainWindow(self)
             view = QtWebEngineWidgets.QWebEngineView(window)
-            window.resize(500, 500)
+            window.resize(640, 480)
             window.setCentralWidget(view)
-            window.showMaximized()
+            window.show()
             return view
 
     def updateChart(self, chart, **kwargs):
         output = StringIO()
-        chart.save(output, "html", **kwargs)
+        chart.save(output,'html', embed_options={'renderer':'svg'})
         self.setHtml(output.getvalue())
         
 class colListClass(QtWidgets.QListWidget):
