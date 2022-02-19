@@ -223,7 +223,8 @@ class WebEngineView(QtWebEngineWidgets.QWebEngineView):
 
     def updateChart(self, chart, **kwargs):
         output = StringIO()
-        chart.save(output,'html', embed_options={'renderer':'svg'})
+        chart.save(output,'html', **kwargs)
+        # chart.save(output,'html', embed_options={'renderer':'svg'})
         self.setHtml(output.getvalue())
         
 class colListClass(QtWidgets.QListWidget):
@@ -458,7 +459,8 @@ class mainWindow(QMainWindow):
         uic.loadUi("mainGUI.ui",self)
         # loadUi("mainGUI.ui",self)
         self.Measure = {'Sales':"sum",'Quantity':"sum",'Discount':"sum",'Profit':"sum"}
-        
+        self.isInterRow = ''
+        self.isInterCol = ''
         self.typeChart = ['Bar','Line', 'Pie']
         self.typeDate = [['Order Date',"month"],['Ship Date',"month"]]
         self.fileNameList = []
@@ -491,18 +493,16 @@ class mainWindow(QMainWindow):
         self.FileListDimension = self.findChild(QListWidget,"FileListDimension")
         self.FileListMes = self.findChild(QListWidget,"FileListMes")
         
-        
         self.FileListChoose = self.findChild(FileChoose,"FileListChoose")
         
         self.chartType = self.findChild(QComboBox,"chartType")
         
-        self.tabWidget_2 = self.findChild(QTabWidget,"tabWidget_2")
+        # self.tabWidget_2 = self.findChild(QTabWidget,"tabWidget_2")
         
-        self.widget = self.findChild(QWidget,"widget")
+        # self.frame = self.findChild(QFrame,"frame")
         
-        self.gridLayout_11 = self.findChild(QGridLayout,"gridLayout_11")
-        self.gridLayout_11.addWidget(self.widget, 0, 0, 1, 1)
-            
+        self.vbox = QVBoxLayout(self.frame)
+        
         # function
         self.openDirecButton.clicked.connect(self.launchDialog)
         self.dataSourceTable.horizontalHeader().sectionClicked.connect(self.on_header_doubleClicked)
@@ -572,7 +572,7 @@ class mainWindow(QMainWindow):
         # print("--------IR IC",self.isInterRow,self.isInterCol)
         gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data)
         self.typeChart = []
-        print("--->",self.typeChart)
+        print("--->",self.isInterRow,self.isInterCol)
         if len(self.isInterRow)>0 or len(self.isInterCol)>0 :
             # if (len(self.isInterRow)>0 and len(self.isInterCol)==0) or (len(self.isInterCol)>0 and len(self.isInterRow)==0):
             self.typeChart = ['Bar']
@@ -612,16 +612,31 @@ class mainWindow(QMainWindow):
         
         if self.chartTypeS != "": 
             # if self.chartTypeS != "":
+            # print("----------------",self.chartTypeS)
             gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data)
-            self.Chart = gm.chooseChart(str(self.chartTypeS))
-            
-            self.view = WebEngineView()
+            # self.Chart = gm.chooseChart(str(self.chartTypeS))
+
+            cars = data.cars()
+
+            self.Chart = (
+                alt.Chart(cars)
+                .mark_bar()
+                .encode(x=alt.X("Miles_per_Gallon", bin=True), y="count()",)
+                .properties(title="A bar chart")
+                .configure_title(anchor="start")
+            )
+    
             # self.widget.setLayout(self.view)
             if self.Chart != None:
                 # print(type(self.Chart))
+                self.view = WebEngineView()
                 self.view.updateChart(self.Chart)
+                
+                # self.widget.setCentralWidget(self.view)
+                # self.widget.resize(640, 480)
+                # self.widget.show()
                 # self.view.show()
-                # vbox.addWidget(self.view)
+            self.vbox.addWidget(self.view)
             
     def rowcolChange(self):
         tmpr = []
@@ -810,7 +825,6 @@ class mainWindow(QMainWindow):
             self.ColChoose = []
             self.dataSourceTable.reset()
             self.dataSourceTable.setModel(None)
-            #print(self.data)
         
     def setFileInDirectory(self):
         self.FileList.clear()
@@ -818,16 +832,12 @@ class mainWindow(QMainWindow):
             self.FileList.addItems(self.fileNameList)
     
     def setFileChoose(self):
-        print("bf",self.selectFile)
         if self.FileListChoose != None :
             self.FileListChoose.clear()
         if type(self.selectFile) != list:
             self.selectFile = [self.selectFile]
         if self.selectFile != []:
             self.FileListChoose.addItems(self.selectFile)
-            # self.setTable()
-        # if self.selectFile != []:
-        #     self.loaddata()
             
     def launchDialog(self):
         file_filter = 'Excel File (*.xlsx *.csv *.xls)'
@@ -838,7 +848,7 @@ class mainWindow(QMainWindow):
             filter=file_filter,
             initialFilter='Excel File (*.xlsx *.xls *.csv)' #defult filter
         )
-        print(response)
+        # print(response)
         # self.selectFile = response
         self.folderpath = os.getcwd()
         filename = os.listdir(self.folderpath)
@@ -874,10 +884,6 @@ class mainWindow(QMainWindow):
     def setFileListDimension(self):
         self.FileListDimension.clear()
         self.FileListDimension.addItems(self.colHeader)
-        # self.FileListDimension_2.clear()
-        # self.FileListDimension_2.addItems(self.colHeader)
-        # self.FileListMes_2.clear()
-        # self.FileListMes_2.addItems(list(self.Measure.keys()))
         self.FileListMes.clear()
         self.FileListMes.addItems(list(self.Measure.keys()))
 
@@ -886,16 +892,7 @@ app = QApplication(sys.argv)
 gm = graphManager.graphManager()
 cm = cmpage.csvManager()
 mainW = mainWindow()
-# filD = filterDimenWindow()
-# filM = filterMesWindow()
-# widget.addWidget(mainW)
-# widget.addWidget(filM)
-# widget.addWidget(filD)
-# widget.show()
 try:
     sys.exit(app.exec_())
 except SystemExit:
     print('Closing Window...')
-# window = uic.loadUi("mainGUI.ui")
-# window.show()
-# app.exec()
