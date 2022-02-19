@@ -88,6 +88,8 @@ class filterDimenWindow(QMainWindow):
         self.sheet = ''
         self.filtered = {}
         self.checkedList = []
+        self.isInterRow = []        
+        self.isInterCol = []
         
         # defind
         self.allButton = self.findChild(QPushButton,"allButton")
@@ -222,12 +224,12 @@ class WebEngineView(QtWebEngineWidgets.QWebEngineView):
         chart.save(output, "html", **kwargs)
         self.setHtml(output.getvalue())
         
-class rowListClass(QtWidgets.QListWidget):
+class colListClass(QtWidgets.QListWidget):
     def __init__(self,parent=None):
-        super(rowListClass, self).__init__(parent)
+        super(colListClass, self).__init__(parent)
         self.setAcceptDrops(True)
-        # self.setDragEnabled(True)
-        self.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.setDragEnabled(True)
+        # self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         
     def dragLeaveEvent(self,event) -> None:
         if self.count():
@@ -235,15 +237,10 @@ class rowListClass(QtWidgets.QListWidget):
                 mainW.filJustAdd = self.item(self.currentRow()).text()
             self.takeItem(self.currentRow())
             self.clearSelection()
-        mainW.filChangeD()
+        # mainW.filChangeD()
         mainW.rowcolChange()
         # mainW.setChart()
-        mainW.setplot()
-        
-        
-    # def dragEnterEvent(self, event):
-    #     #if event.mimeData().hasUrls():
-    #     event.accept()
+        # mainW.setplot()
 
     # def dragMoveEvent(self, event):
     #     #if event.mimeData().hasUrls():
@@ -257,9 +254,79 @@ class rowListClass(QtWidgets.QListWidget):
             source_Widget.takeItem(source_Widget.indexFromItem(i).row())
             self.addItem(i)
         mainW.setFileListDimension()
-        mainW.filChange()
+        # mainW.filChange()
         mainW.rowcolChange()
         # mainW.setChart()
+        # mainW.setplot()
+        
+class rowListClass(QtWidgets.QListWidget):
+    def __init__(self,parent=None):
+        super(rowListClass, self).__init__(parent)
+        self.setAcceptDrops(True)
+        self.setDragEnabled(True)
+        # self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+        
+    def dragLeaveEvent(self,event) -> None:
+        if self.count():
+            if self.item(self.currentRow()) != None:
+                mainW.filJustAdd = self.item(self.currentRow()).text()
+            self.takeItem(self.currentRow())
+            self.clearSelection()
+        # mainW.filChangeD()
+        mainW.rowcolChange()
+        # mainW.setChart()
+        # mainW.setplot()
+
+    # def dragMoveEvent(self, event):
+    #     #if event.mimeData().hasUrls():
+    #     event.accept()
+            
+    def dropEvent(self, QDropEvent):
+        source_Widget=QDropEvent.source()
+        items=source_Widget.selectedItems()
+        QDropEvent.setDropAction(QtCore.Qt.MoveAction)
+        for i in items:
+            source_Widget.takeItem(source_Widget.indexFromItem(i).row())
+            self.addItem(i)
+        mainW.setFileListDimension()
+        # mainW.filChange()
+        mainW.rowcolChange()
+        # mainW.setChart()
+        # mainW.setplot()
+        
+class filListClass(QtWidgets.QListWidget):
+    def __init__(self,parent=None):
+        super(filListClass, self).__init__(parent)
+        self.setAcceptDrops(True)
+        self.setDragEnabled(True)
+        # self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
+        
+    def dragLeaveEvent(self,event) -> None:
+        if self.count():
+            if self.item(self.currentRow()) != None:
+                mainW.filJustAdd = self.item(self.currentRow()).text()
+            self.takeItem(self.currentRow())
+            self.clearSelection()
+        mainW.filChangeD()
+        # mainW.rowcolChange()
+        # # mainW.setChart()
+        mainW.setplot()
+
+    # def dragMoveEvent(self, event):
+    #     #if event.mimeData().hasUrls():
+    #     event.accept()
+            
+    def dropEvent(self, QDropEvent):
+        source_Widget=QDropEvent.source()
+        items=source_Widget.selectedItems()
+        # QDropEvent.setDropAction(QtCore.Qt.MoveAction)
+        for i in items:
+            source_Widget.takeItem(source_Widget.indexFromItem(i).row())
+            self.addItem(i)
+        mainW.setFileListDimension()
+        mainW.filChange()
+        # mainW.rowcolChange()
+        # # mainW.setChart()
         mainW.setplot()
             
 class TableModel2(QtCore.QAbstractTableModel):
@@ -408,9 +475,9 @@ class mainWindow(QMainWindow):
         self.openDirecButton = self.findChild(QPushButton,"openDirecButton")
         
         self.RowList = self.findChild(rowListClass,"RowList")
-        self.ColList  = self.findChild(rowListClass,"ColList")
+        self.ColList  = self.findChild(colListClass,"ColList")
         
-        self.filterList  = self.findChild(QListWidget,"filterList")
+        self.filterList  = self.findChild(filListClass,"filterList")
         
         self.dataSourceTable = self.findChild(QTableView,"table")
         self.dataSourceTable.horizontalHeader().setStretchLastSection(True)
@@ -429,13 +496,17 @@ class mainWindow(QMainWindow):
         
         self.tabWidget_2 = self.findChild(QTabWidget,"tabWidget_2")
         
-        self.frame = self.findChild(QFrame,"frame")
+        self.widget = self.findChild(QWidget,"widget")
         
+        self.gridLayout_11 = self.findChild(QGridLayout,"gridLayout_11")
+        self.gridLayout_11.addWidget(self.widget, 0, 0, 1, 1)
+            
         # function
         self.openDirecButton.clicked.connect(self.launchDialog)
         self.dataSourceTable.horizontalHeader().sectionClicked.connect(self.on_header_doubleClicked)
-        self.filterList.installEventFilter(self)
-        self.filterList.doubleClicked.connect(self.whichClicked)
+        if self.filterList != None:
+            self.filterList.installEventFilter(self)
+            self.filterList.doubleClicked.connect(self.whichClicked)
         if self.RowList != None:
             self.RowList.installEventFilter(self)
         if self.ColList != None:
@@ -486,36 +557,39 @@ class mainWindow(QMainWindow):
             self.windowD()
             
     def setplot(self):
+        print("--------R C",self.RowChoose,self.ColChoose)
         self.setSheetTable()
-        # self.setChart()
-        # self.showChart()
+        self.setChart()
+        self.showChart()
     
     def setChart(self):
         # print("set chart")
         # print("--------R C",self.RowChoose,self.ColChoose)
-        isInterRow = [value for value in self.RowChoose if value in list(self.Measure.keys())]
-        isInterCol = [value for value in self.ColChoose if value in list(self.Measure.keys())]
-        # print("--------IR IC",isInterRow,isInterCol)
+        # self.isInterRow = [value for value in self.RowChoose if value in [self.Measure.keys()]]
+        # self.isInterCol = [value for value in self.ColChoose if value in [self.Measure.keys()]]
+        # print("--------IR IC",self.isInterRow,self.isInterCol)
+        gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data)
         self.typeChart = []
-        if len(isInterRow)>0 or len(isInterCol)>0 :
-            if (len(isInterRow)>0 and len(isInterCol)==0) or (len(isInterCol)>0 and len(isInterRow)==0):
-                self.typeChart = ['Bar']
+        print("--->",self.typeChart)
+        if len(self.isInterRow)>0 or len(self.isInterCol)>0 :
+            # if (len(self.isInterRow)>0 and len(self.isInterCol)==0) or (len(self.isInterCol)>0 and len(self.isInterRow)==0):
+            self.typeChart = ['Bar']
             # print("Have Mes")
             # if (self.RowChoose != [] and self.ColChoose == []) or (self.RowChoose == [] and self.ColChoose != []) :
             
-            #     if (len(self.RowChoose)-len(isInterRow) == 1 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) or (len(self.ColChoose)-len(isInterCol) == 1 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
+            #     if (len(self.RowChoose)-len(self.isInterRow) == 1 and (len(self.isInterRow)>=1 or len(self.isInterCol)>=1) ) or (len(self.ColChoose)-len(self.isInterCol) == 1 and (len(self.isInterRow)>=1 or len(self.isInterCol)>=1) ) :
             #         self.typeChart = ['Bar', 'Pie']
             #         # print("1 di")
             #         for i in self.typeDate:
             #             if i in self.RowChoose + self.ColChoose:
             #                 self.typeChart.append('Line')
-            #     if (len(self.RowChoose)-len(isInterRow) == 2 and (len(isInterRow)>=1 or len(isInterCol)>=1)) or (len(self.ColChoose)-len(isInterCol) == 2 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
+            #     if (len(self.RowChoose)-len(self.isInterRow) == 2 and (len(self.isInterRow)>=1 or len(self.isInterCol)>=1)) or (len(self.ColChoose)-len(self.isInterCol) == 2 and (len(self.isInterRow)>=1 or len(self.isInterCol)>=1) ) :
             #         self.typeChart = ['Bar']
             #         # print("2 di")
             #         for i in self.typeDate:
             #             if i in self.RowChoose + self.ColChoose:
             #                 self.typeChart.append('Line')
-            #     if (len(self.RowChoose)-len(isInterRow) == 3 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) or (len(self.ColChoose)-len(isInterCol) == 3 and (len(isInterRow)>=1 or len(isInterCol)>=1) ) :
+            #     if (len(self.RowChoose)-len(self.isInterRow) == 3 and (len(self.isInterRow)>=1 or len(self.isInterCol)>=1) ) or (len(self.ColChoose)-len(self.isInterCol) == 3 and (len(self.isInterRow)>=1 or len(self.isInterCol)>=1) ) :
             #         self.typeChart = ['Bar']
             #         # print("3 di")
         
@@ -532,20 +606,20 @@ class mainWindow(QMainWindow):
         # vbox = QtWidgets.QVBoxLayout(self)
         # vbox.setContentsMargins(0, 0, 0, 0)
         self.chartTypeS = self.chartType.currentText()
-        print(self.chartTypeS)
+        # print(self.chartTypeS)
         
-        # if self.chartTypeS != "": 
-        #     # if self.chartTypeS != "":
-        #     gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data)
-        #     self.Chart = gm.chooseChart(str(self.chartTypeS))
+        if self.chartTypeS != "": 
+            # if self.chartTypeS != "":
+            gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data)
+            self.Chart = gm.chooseChart(str(self.chartTypeS))
             
-        #     self.view = WebEngineView(self.tabWidget_2)
-        #     # self.widget.setLayout(self.view)
-        #     if self.Chart != None:
-        #         print(type(self.Chart))
-        #         self.view.updateChart(self.Chart)
-        #         self.view.show()
-        #         # vbox.addWidget(self.view)
+            self.view = WebEngineView()
+            # self.widget.setLayout(self.view)
+            if self.Chart != None:
+                # print(type(self.Chart))
+                self.view.updateChart(self.Chart)
+                # self.view.show()
+                # vbox.addWidget(self.view)
             
     def rowcolChange(self):
         tmpr = []
@@ -553,7 +627,7 @@ class mainWindow(QMainWindow):
         tmpc = [] 
         tmpc =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
         
-        print("Before",tmpr,tmpc)
+        # print("Before",tmpr,tmpc)
         
         while (tmpr.count('')): tmpr.remove('')
         while (tmpc.count('')): tmpc.remove('')
@@ -561,18 +635,18 @@ class mainWindow(QMainWindow):
         self.RowChoose = tmpr
         self.ColChoose = tmpc
 
-        isInterRow = [value for value in self.RowChoose if value in list(self.Measure.keys())]
-        isInterCol = [value for value in self.ColChoose if value in list(self.Measure.keys())]
+        self.isInterRow = [value for value in self.RowChoose if value in list(self.Measure.keys())]
+        self.isInterCol = [value for value in self.ColChoose if value in list(self.Measure.keys())]
         
-        for i in isInterRow:
+        for i in self.isInterRow:
             if i in tmpr:
                 tmpr.remove(i)
-        tmpr += isInterRow
+        tmpr += self.isInterRow
         
-        for i in isInterCol:
+        for i in self.isInterCol:
             if i in tmpc:
                 tmpc.remove(i)
-        tmpc += isInterCol
+        tmpc += self.isInterCol
             
         self.ColList.clear()
         self.ColList.addItems(tmpc)
@@ -598,7 +672,13 @@ class mainWindow(QMainWindow):
         self.ColChoose = tmpc
         
         # print("After",tmpr,tmpc)
-        # self.setChart()
+        # tmpr2 = []
+        # tmpr2 =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
+        # tmpc2 = [] 
+        # tmpc2 =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
+        
+        # print("Before",tmpr2,tmpc2)
+        self.setplot()
         
     def filChangeD(self):
         if self.filJustAdd in self.filDic.keys():
@@ -625,9 +705,9 @@ class mainWindow(QMainWindow):
         # print(self.filDic)
         
     def setSheetTable(self):
-        isInterRow = [value for value in self.RowChoose if value in list(self.Measure.keys())]
-        isInterCol = [value for value in self.ColChoose if value in list(self.Measure.keys())]
-        # print(self.ColChoose,self.RowChoose)
+        # self.isInterRow = [value for value in self.RowChoose if value in list(self.Measure.keys())]
+        # self.isInterCol = [value for value in self.ColChoose if value in list(self.Measure.keys())]
+        print(self.RowChoose,self.ColChoose)
         if self.selectFile != [] : 
             # print(not(self.RowChoose == [] and self.ColChoose == []))
             if self.RowChoose == [] and self.ColChoose == []:
@@ -635,14 +715,16 @@ class mainWindow(QMainWindow):
             else:
                 self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
                 self.model = TableModel2(self.dataSheet)
+                # print(self.RowChoose,self.ColChoose)
                 # print("in")
                 # print(type(self.model))
                 # print(self.model)
-                if isInterRow != [] and isInterCol !=[]:
+                if self.isInterRow != [] and self.isInterCol !=[]:
                     self.sheetTable.setModel(None)
                 else:
                     self.sheetTable.setModel(self.model)
-                
+        print("Row Col after set sheet",self.RowChoose,self.ColChoose)
+    
     def sheetPageRowAndCol(self,Row,Col):
         # print("Start",Row,Col,len(set(Row)),len(set(Col)))
         if Row!=[] or Col!=[]:
@@ -774,7 +856,7 @@ class mainWindow(QMainWindow):
         cm.path = self.folderpath
         cm.selectFile = self.selectFile
         cm.setPath()
-        print(self.selectFile,self.data)
+        # print(self.selectFile,self.data)
         # print(response[0])
         if response[0] != "":
             self.dataSource()
