@@ -561,10 +561,11 @@ class mainWindow(QMainWindow):
             self.windowD()
             
     def setplot(self):
-        print("--------R C",self.RowChoose,self.ColChoose)
+        # print("--------R C",self.RowChoose,self.ColChoose)
         self.setSheetTable()
         self.setChart()
-        self.showChart()
+        # if self.typeChart != []:
+        #     self.showChart()
     
     def setChart(self):
         # print("set chart")
@@ -603,8 +604,6 @@ class mainWindow(QMainWindow):
         self.chartType.clear()
         self.chartType.addItems(self.typeChart)
         # self.chartType_2.addItems(self.typeChart)
-        if self.typeChart != []:
-            self.showChart()
     
     def showChart(self):
         # vbox = QtWidgets.QVBoxLayout(self)
@@ -659,9 +658,9 @@ class mainWindow(QMainWindow):
         for i in range(len(tmpr)):
             self.RowList.item(i).setForeground(QtGui.QColor('white'))
             if str(self.RowList.item(i).text()) in list(self.Measure.keys()):
-                self.RowList.item(i).setBackground(QtGui.QColor('green'))
+                self.RowList.item(i).setBackground(QtGui.QColor('#00b180'))
             else: 
-                self.RowList.item(i).setBackground(QtGui.QColor('blue'))
+                self.RowList.item(i).setBackground(QtGui.QColor('#4996b2'))
             
         for i in range(len(tmpc)):
             self.ColList.item(i).setForeground(QtGui.QColor('white'))

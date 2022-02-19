@@ -319,61 +319,57 @@ class csvManager:
                     k = pd.pivot_table(results,index = colNum[len(Rowdi):beforMesual], columns = colNum[:len(Rowdi)],values = colNum[beforMesual:],aggfunc=np.sum)
                     k = k.round(0)
                     k=k.T
+                    k.index = isInterRow
                     # print(isInterRow)
-                    # print(k.index)
-                    if len(isInterRow) > 1 and len(Rowdi) > 1:
+                    # print(len(k.index))
+                    if len(k.index) >= 1:
+                        k.index = isInterRow
+                    else:
                         changname = dict(k.index)
                         for i,j in zip(list(changname.keys()),isInterRow):
                             changname[i] = j 
-                        print(k.columns)
+                        # print(k.columns)
                         changname2 = {}
                         for i,j in zip(k.columns,isInterCol):
                             changname2[i] = j 
-                        print(changname2)
+                        # print(changname2)
                         # k.columns.names = isInterCol
                         k = k.rename(index=changname,columns = changname2)
-                        # print(k.columns)
-                        # k = k.stack()
-                        # print(k)
-                        
-                    else:
-                        if len(k.index.names)>1:
-                            k.index.names = [None]+Rowdi
-                        else: #row mes*1 col di*1 
-                            # print("121")
-                            # print( k.columns, isInterRow )
-                            k.index = isInterRow
                     
                 else: #mes in col
                     print("mes in col",Rowdi,Coldi)
                     k = pd.pivot_table(results,columns = colNum[len(Rowdi):beforMesual], index= colNum[:len(Rowdi)],values = colNum[beforMesual:],aggfunc=np.sum)
                     k = k.round(0)
+                    k.columns = isInterCol
+                    
                     if len(isInterRow) == 0 and len(Rowdi) == 0: 
                         print("Only mes col")
                         # print(k.index)              
-                        if len(k.index)>1:
-                            k.index = isInterCol
-                    elif len(isInterCol) > 1 and len(Coldi) > 1:
-                        # print(k)
-                        # print(k.index)
-                        changname = dict(k.columns)
-                        # print(changname)
-                        for i,j in zip(list(changname.keys()),isInterCol):
-                            changname[i] = j 
-                        # k.columns.names = isInterCol
-                        k = k.rename(columns=changname)
-                    else:
-                        print("Only row")
-                        # print(k.index)
+                        # if len(k.index)>1:
+                        #     k.index = isInterCol
+                        # elif len(isInterCol) > 1 and len(Coldi) > 1:
+                        #     # print(k)
+                        #     # print(k.index)
+                        #     changname = dict(k.columns)
+                        #     # print(changname)
+                        #     for i,j in zip(list(changname.keys()),isInterCol):
+                        #         changname[i] = j 
+                        #     # k.columns.names = isInterCol
+                        #     k = k.rename(columns=changname)
+                        
+                    if len(isInterCol) > 1: #di row col/ Mes Col
+                        print("121")
+                        # print(len(k.columns))
                         if len(k.columns.names)>1:
-                            k.columns.names = [None]+Coldi
-                        else: #row di*1 col mes*1 
-                            # print("121")
-                            # print(k)
-                            # print( k.columns, isInterCol )
+                            # print("----",dict(k.columns))
+                            # print(isInterCol)
+                            changname = dict(k.columns)
+                            for i,j in zip(list(changname.keys()),isInterCol):
+                                changname[i] = j 
+                            k = k.rename(columns = changname)
+                        if len(k.columns)>1:
                             k.columns = isInterCol
-                            # print(k)
-                    #k.index.names = Rowdi
+                        # print("----",k.index.names)
                     
                 k = k.replace(np.nan, '')
         #print(type(k))
@@ -399,14 +395,3 @@ class csvManager:
         print(k)
         return k
 
-ex = csvManager()
-ex.Measure = {'Sales':"sum",'Quantity':"sum",'Discount':"sum",'Profit':"sum"}        
-ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
-ex.getHead()
-#ex.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
-#ex.setDimensionSort(["Region","Segment","Region","Region"])
-# ex.setRowAndColumn(["Segment","Sales","Profit"],["Segment","Region"])
-# ex.setRowAndColumn(["Region","Segment"],["Region","Sales","Profit"])
-# ex.setRowAndColumn(["Segment","Region",],[["Profit","sum"],["Sales","sum"]])
-# ex.setRowAndColumn(["Segment","Region","Sales","Profit"],[])
-# ex.setRowAndColumn([],["Segment","Profit","Sales"])
