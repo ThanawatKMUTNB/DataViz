@@ -12,8 +12,8 @@ ex.getHead()
 # ex.setRowAndColumn([],["Sales"])
 # ex.setRowAndColumn(["Sales"],[])
 
-ex.setRowAndColumn([],["Sales","Profit"])
-ex.setRowAndColumn(["Sales","Profit"],[])
+# ex.setRowAndColumn([],["Sales","Profit"])
+# ex.setRowAndColumn(["Sales","Profit"],[])
 
 # ex.setRowAndColumn(["Segment"],["Sales","Profit"])
 # ex.setRowAndColumn(["Sales","Profit"],["Segment"])
