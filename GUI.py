@@ -216,9 +216,9 @@ class WebEngineView(QtWebEngineWidgets.QWebEngineView):
         if type_ == QtWebEngineWidgets.QWebEnginePage.WebBrowserTab:
             window = QtWidgets.QMainWindow(self)
             view = QtWebEngineWidgets.QWebEngineView(window)
-            window.resize(640, 480)
-            window.setCentralWidget(view)
-            window.show()
+            # window.resize(1000, 1000)
+            # window.setCentralWidget(view)
+            # window.showFullScreen()
             return view
 
     def updateChart(self, chart, **kwargs):
@@ -500,8 +500,10 @@ class mainWindow(QMainWindow):
         # self.tabWidget_2 = self.findChild(QTabWidget,"tabWidget_2")
         
         # self.frame = self.findChild(QFrame,"frame")
-        
+        self.view = WebEngineView()
         self.vbox = QVBoxLayout(self.frame)
+        self.vbox.addWidget(self.view)
+        # self.vbox.SetMaximumSize()
         
         # function
         self.openDirecButton.clicked.connect(self.launchDialog)
@@ -614,29 +616,12 @@ class mainWindow(QMainWindow):
             # if self.chartTypeS != "":
             # print("----------------",self.chartTypeS)
             gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data)
-            # self.Chart = gm.chooseChart(str(self.chartTypeS))
-
-            cars = data.cars()
-
-            self.Chart = (
-                alt.Chart(cars)
-                .mark_bar()
-                .encode(x=alt.X("Miles_per_Gallon", bin=True), y="count()",)
-                .properties(title="A bar chart")
-                .configure_title(anchor="start")
-            )
+            self.Chart = gm.chooseChart(str(self.chartTypeS))
     
             # self.widget.setLayout(self.view)
             if self.Chart != None:
                 # print(type(self.Chart))
-                self.view = WebEngineView()
                 self.view.updateChart(self.Chart)
-                
-                # self.widget.setCentralWidget(self.view)
-                # self.widget.resize(640, 480)
-                # self.widget.show()
-                # self.view.show()
-            self.vbox.addWidget(self.view)
             
     def rowcolChange(self):
         tmpr = []
@@ -868,6 +853,7 @@ class mainWindow(QMainWindow):
         cm.path = self.folderpath
         cm.selectFile = self.selectFile
         cm.setPath()
+        cm.Measure = self.Measure
         # print(self.selectFile,self.data)
         # print(response[0])
         if response[0] != "":
