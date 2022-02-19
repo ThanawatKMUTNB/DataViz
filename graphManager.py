@@ -78,6 +78,8 @@ class graphManager():
         print(self.MeasureDic,self.Measure,self.RowChoose,self.ColChoose)
         
         if chart == 'Bar':
+            #return self.exam()
+            #print(self.df)
             if checkMeasure(row,column):    #row is measure
                 print('row is measurement')
                 if len(column) > 2:
@@ -95,7 +97,8 @@ class graphManager():
                 chart = []
                 for c in column:
                     chart.append(self.plotBar(row,c,'column',len(row)))
-                return alt.hconcat(*chart).configure_view
+                return alt.hconcat(*chart)
+                #return self.plotBar(row,c,'column',len(row))
 
         elif chart == 'Pie':
             if checkMeasure(row,column):    #row is measure
@@ -358,10 +361,9 @@ class graphManager():
         print(self.RowChoose,self.ColChoose)
         #print(self.df)
         c = alt.Chart(self.df).mark_bar().encode(
-            x=str(self.ColChoose[0]),
-            y=str(self.RowChoose[0]),
+            x=str('Category'),
+            y=str('sum(Profit)'),
             #color=str(self.RowChoose[0]+':N')
-        ).facet(column=str(self.RowChoose[0]+':N')
         ).resolve_scale(x = 'independent')
         return c
     

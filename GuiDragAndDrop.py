@@ -1,56 +1,64 @@
-#Drag and drop class
-from PyQt5.QtWidgets import QApplication, QHBoxLayout, QWidget, QPushButton, QGridLayout
-from PyQt5.QtCore import Qt, QMimeData
-from PyQt5.QtGui import QDrag
+from PyQt5 import QtCore, QtWidgets, QtWebEngineWidgets
+
+from io import StringIO
 
 
-class DragButton(QPushButton):
+class WebEngineView(QtWebEngineWidgets.QWebEngineView):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.page().profile().downloadRequested.connect(self.onDownloadRequested)
+        self.windows = []
 
-    def mouseMoveEvent(self, e):
+    @QtCore.pyqtSlot(QtWebEngineWidgets.QWebEngineDownloadItem)
+    def onDownloadRequested(self, download):
+        if (
+            download.state()
+            == QtWebEngineWidgets.QWebEngineDownloadItem.DownloadRequested
+        ):
+            path, _ = QtWidgets.QFileDialog.getSaveFileName(
+                self, self.tr("Save as"), download.path()
+            )
+            if path:
+                download.setPath(path)
+                download.accept()
 
-        if e.buttons() == Qt.LeftButton:
-            drag = QDrag(self)
-            mime = QMimeData()
-            drag.setMimeData(mime)
-            drag.exec_(Qt.MoveAction)
+    def createWindow(self, type_):
+        if type_ == QtWebEngineWidgets.QWebEnginePage.WebBrowserTab:
+            window = QtWidgets.QMainWindow(self)
+            view = QtWebEngineWidgets.QWebEngineView(window)
+            window.resize(640, 480)
+            window.setCentralWidget(view)
+            window.show()
+            return view
+
+    def updateChart(self, chart, **kwargs):
+        output = StringIO()
+        chart.save(output, "html", **kwargs)
+        self.setHtml(output.getvalue())
 
 
-class Window(QWidget):
+if __name__ == "__main__":
+    import sys
 
-    def __init__(self):
-        super().__init__()
-        self.setAcceptDrops(True)
+    import altair as alt
+    from vega_datasets import data
 
-        self.blayout = QHBoxLayout()
-        for l in ['A', 'B']:
-            btn = DragButton(l)
-            self.blayout.addWidget(btn)
+    app = QtWidgets.QApplication(sys.argv)
+    w = QtWidgets.QMainWindow()
 
-        self.setLayout(self.blayout)
-        self.setFixedWidth(500)
-        self.setFixedHeight(500)
+    cars = data.cars()
 
-    def dragEnterEvent(self, e):
-        e.accept()
+    chart = (
+        alt.Chart(cars)
+        .mark_bar()
+        .encode(x=alt.X("Miles_per_Gallon", bin=True), y="count()",)
+        .properties(title="A bar chart")
+        .configure_title(anchor="start")
+    )
 
-    def dropEvent(self, e):
-        pos = e.pos()
-        widget = e.source()
-
-        for n in range(self.blayout.count()):
-            # Get the widget at each index in turn.
-            w = self.blayout.itemAt(n).widget()
-            if pos.x() < w.x() + w.size().width() // 2:
-                # We didn't drag past this widget.
-                # insert to the left of it.
-                self.blayout.insertWidget(n-1, widget)
-                break
-
-        e.accept()
-
-    
-app = QApplication([])
-w = Window()
-w.show()
-
-app.exec_()
+    view = WebEngineView()
+    view.updateChart(chart)
+    w.setCentralWidget(view)
+    w.resize(640, 480)
+    w.show()
+    sys.exit(app.exec_())
