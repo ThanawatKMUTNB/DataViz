@@ -19,7 +19,10 @@ class filterMesWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi("filterMes.ui",self)
-        self.show()
+        gm = graphManager.graphManager()
+        cm = cmpage.csvManager()
+
+        # self.show()
         self.dimen = ''
         self.minVa = ''
         self.maxVa = ''
@@ -46,7 +49,6 @@ class filterMesWindow(QMainWindow):
         self.atMostValueLabel_2 = self.findChild(QLabel,"atMostValueLabel_2")
         self.atLeastValueLabel_3 = self.findChild(QLabel,"atLeastValueLabel_3")
         self.atMostValueLabel_3 = self.findChild(QLabel,"atMostValueLabel_3")
-        
         self.setUp()
         
     def setUp(self):
@@ -79,7 +81,6 @@ class filterDimenWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi("filterDimen.ui",self)
-        self.show()
         self.dimen = ''
         self.sheet = ''
         self.filtered = {}
@@ -108,6 +109,7 @@ class filterDimenWindow(QMainWindow):
         self.setUp()
         self.setList()
         self.resetBut()
+        self.show()
     
     def ApplyBut(self):
         self.filtered[self.dimen] = self.checkedList
@@ -516,7 +518,7 @@ class mainWindow(QMainWindow):
         if self.ColList != None:
             self.ColList.installEventFilter(self)
         self.chartType.activated.connect(self.showChart)
-        self.showMaximized()
+        self.show()
         
     def whichClicked(self):
         filterItem = self.filterList.currentRow()
@@ -526,7 +528,19 @@ class mainWindow(QMainWindow):
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and (source is self.filterList or source is self.ColList or source is self.RowList):
             menu = QMenu()
+            item2 = source.itemAt(event.pos())
             filterAc = menu.addAction('Filter')
+            if item2.text() in list(self.Measure.keys()):
+                mesAc = menu.addAction('Measure ('+self.Measure[item2.text()]+')')
+                subMenu = QMenu(menu)
+                subMenu.addAction("averrage")
+                subMenu.addAction("sum")
+                subMenu.addAction("median")
+                subMenu.addAction("count")
+                subMenu.addAction("max")
+                subMenu.addAction("min")
+                
+            # print(self.filterList.currentRow())
             # menu.addAction('Action 2')
             # menu.addAction('Action 3')
             # if menu.exec_(event.globalPos()):
@@ -538,8 +552,10 @@ class mainWindow(QMainWindow):
                     tmpr.append(item.text())
                     self.filterList.addItems(tmpr)
                     self.filDic[item.text()] = ""
-                    print(self.filDic)
+                    # print(self.filDic)
                 self.selectFil(item.text())
+            if menu.exec_(event.globalPos()) == mesAc:
+                self.subMenu.exec_(event.globalPos())
             return True
         return super().eventFilter(source, event)
     
@@ -910,12 +926,13 @@ class mainWindow(QMainWindow):
         self.FileListMes.clear()
         self.FileListMes.addItems(list(self.Measure.keys()))
 
-app = QApplication(sys.argv)
-# widget = QtWidgets.QStackedWidget()
-gm = graphManager.graphManager()
-cm = cmpage.csvManager()
-mainW = mainWindow()
-try:
-    sys.exit(app.exec_())
-except SystemExit:
-    print('Closing Window...')
+def showWindow():
+    app = QApplication(sys.argv)
+    mainW = mainWindow()
+    mainW.show()
+    try:
+        sys.exit(app.exec_())
+    except SystemExit:
+        print('Closing Window...')
+
+showWindow()

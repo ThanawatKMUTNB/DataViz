@@ -1,4 +1,4 @@
-from curses import meta
+# from curses import meta
 from importlib.metadata import files, metadata
 import json
 from itertools import chain

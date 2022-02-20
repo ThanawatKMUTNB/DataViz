@@ -1,64 +1,49 @@
-from PyQt5 import QtCore, QtWidgets, QtWebEngineWidgets
-
-from io import StringIO
-
-
-class WebEngineView(QtWebEngineWidgets.QWebEngineView):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.page().profile().downloadRequested.connect(self.onDownloadRequested)
-        self.windows = []
-
-    @QtCore.pyqtSlot(QtWebEngineWidgets.QWebEngineDownloadItem)
-    def onDownloadRequested(self, download):
-        if (
-            download.state()
-            == QtWebEngineWidgets.QWebEngineDownloadItem.DownloadRequested
-        ):
-            path, _ = QtWidgets.QFileDialog.getSaveFileName(
-                self, self.tr("Save as"), download.path()
-            )
-            if path:
-                download.setPath(path)
-                download.accept()
-
-    def createWindow(self, type_):
-        if type_ == QtWebEngineWidgets.QWebEnginePage.WebBrowserTab:
-            window = QtWidgets.QMainWindow(self)
-            view = QtWebEngineWidgets.QWebEngineView(window)
-            window.resize(640, 480)
-            window.setCentralWidget(view)
-            window.show()
-            return view
-
-    def updateChart(self, chart, **kwargs):
-        output = StringIO()
-        chart.save(output, "html", **kwargs)
-        self.setHtml(output.getvalue())
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu
+import sys
+from PyQt5.QtCore import QEvent
 
 
-if __name__ == "__main__":
-    import sys
+class MyWindow(QMainWindow):
+    def __init__(self):
+        super(MyWindow, self).__init__()
+        self.createWidgets()
 
-    import altair as alt
-    from vega_datasets import data
+    def createWidgets(self):
+        self.my_button = QtWidgets.QPushButton(self)
+        self.my_button.setText("My Widget")
 
-    app = QtWidgets.QApplication(sys.argv)
-    w = QtWidgets.QMainWindow()
+        self.buttonMenu = QMenu(self.my_button)
+        self.buttonMenu.addAction("Option 1")
+        self.buttonMenu.addAction("Option 2")
+        self.buttonMenu.addAction("Option 3")
 
-    cars = data.cars()
+        self.subMenu = QMenu(self.buttonMenu)
+        self.subMenu.addAction("Sub Option 1")
+        self.subMenu.addAction("Sub Option 2")
+        self.subMenu.addAction("Sub Option 3")
 
-    chart = (
-        alt.Chart(cars)
-        .mark_bar()
-        .encode(x=alt.X("Miles_per_Gallon", bin=True), y="count()",)
-        .properties(title="A bar chart")
-        .configure_title(anchor="start")
-    )
+        self.my_button.installEventFilter(self)
+        self.buttonMenu.installEventFilter(self)
 
-    view = WebEngineView()
-    view.updateChart(chart)
-    w.setCentralWidget(view)
-    w.resize(640, 480)
-    w.show()
+    def eventFilter(self, source, event):
+        if event.type() == QEvent.ContextMenu:
+            if source == self.my_button:
+                self.buttonMenu.exec_(event.globalPos())
+                return True
+            elif source == self.buttonMenu:
+                self.subMenu.exec_(event.globalPos())
+                return True
+
+        return super().eventFilter(source, event)
+
+
+
+
+def showWindow():
+    app = QApplication(sys.argv)
+    window = MyWindow()
+    window.show()
     sys.exit(app.exec_())
+
+showWindow()
