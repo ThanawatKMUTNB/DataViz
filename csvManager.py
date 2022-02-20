@@ -319,29 +319,44 @@ class csvManager:
                     k = pd.pivot_table(results,index = colNum[len(Rowdi):beforMesual], columns = colNum[:len(Rowdi)],values = colNum[beforMesual:],aggfunc=np.sum)
                     k = k.round(0)
                     k=k.T
-                    k.index = isInterRow
+                    # print(dict(k.columns))
+                    # print("----",isInterRow)
+                    # print(k)
+                    if len(isInterRow) > 1:
+                        print("M")
+                        isInterRow = isInterRow*len(k.index)
+                        k.index = isInterRow
+                        # print(isInterRow)
+                    else:
+                        d = dict(k.index)
+                        d[list(d.keys())[0]] = isInterRow[0]
+                        # print(d)
+                        # k.index = isInterRow
+                        k = k.rename(index=d)
                     # print(isInterRow)
                     # print(len(k.index))
-                    if len(k.index) >= 1:
-                        k.index = isInterRow
-                    else:
-                        changname = dict(k.index)
-                        for i,j in zip(list(changname.keys()),isInterRow):
-                            changname[i] = j 
-                        # print(k.columns)
-                        changname2 = {}
-                        for i,j in zip(k.columns,isInterCol):
-                            changname2[i] = j 
-                        # print(changname2)
-                        # k.columns.names = isInterCol
-                        k = k.rename(index=changname,columns = changname2)
+                    # if len(k.index) >= 1:
+                    #     k.index = isInterRow
+                    # else:
+                    #     changname = dict(k.index)
+                    #     for i,j in zip(list(changname.keys()),isInterRow):
+                    #         changname[i] = j 
+                    #     # print(k.columns)
+                    #     changname2 = {}
+                    #     for i,j in zip(k.columns,isInterCol):
+                    #         changname2[i] = j 
+                    #     # print(changname2)
+                    #     # k.columns.names = isInterCol
+                    #     k = k.rename(index=changname,columns = changname2)
                     
                 else: #mes in col
                     print("mes in col",Rowdi,Coldi)
                     k = pd.pivot_table(results,columns = colNum[len(Rowdi):beforMesual], index= colNum[:len(Rowdi)],values = colNum[beforMesual:],aggfunc=np.sum)
                     k = k.round(0)
+                    # print((k.columns.names))
                     if len(isInterCol) == 1:
                         isInterCol = isInterCol*len(k.columns)
+                        k.columns = isInterCol
                         # print(isInterCol)
                     else:
                         k.columns = isInterCol
@@ -396,5 +411,5 @@ class csvManager:
         k.index = changIndex
         print(k)'''
         # print(Row,Col)
-        # print(k)
+        print(k)
         return k
