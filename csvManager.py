@@ -417,23 +417,25 @@ class csvManager:
         print(k)
         return k
 
-    def savedata(self) :
+    def savedata(self,filename) :
         filename = 'metadata.json'
         metadata = {}
-        metadata["Path"] = self.path + "\\" + self.selectFile
+        metadata["Filepath"] = self.path + "\\" + self.selectFile
         #metadata[self.selectFile] = {}
-        metadata["Dimen"] = self.getDimension()
-        metadata["Meas"] = self.getMeasure()
+        metadata["Dimension"] = self.getDimension()
+        metadata["Measurement"] = self.getMeasure()
         
         with open(filename, 'w') as exportFile:
             saveFile = json.dumps(metadata , indent= 4)
             exportFile.write(saveFile)
 
-    def loaddata(self) :
+    def loaddata(self,filename) :
         filename = 'metadata.json'
         with open(filename) as metadata_json:
             metadata = json.load(metadata_json)
-        Path = []
+        self.path = str(metadata["Filepath"])
+        self.Measure = list(metadata["Measurement"])
+        '''Path = []
         Dimension = []
         Measurment = []    
         if "Path" in metadata :
@@ -443,6 +445,6 @@ class csvManager:
         if "Meas" in metadata :
             Measurment = (metadata["Meas"])
         #print(self.df)
-        return Path,Dimension, Measurment
+        return Path,Dimension, Measurment'''
             
             #print(Path,Dimension,Measurment)
