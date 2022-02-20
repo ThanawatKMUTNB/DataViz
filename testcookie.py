@@ -1,48 +1,64 @@
-import sys
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QApplication, QWidget, QSlider, QLabel, QVBoxLayout, QHBoxLayout
- 
- 
-class Demo(QWidget):
-    def __init__(self):
-        super(Demo, self).__init__()
-        self.slider_1 = QSlider(Qt.Horizontal, self)                                       # 1
-        self.slider_1.setRange(0, 100)                                                     # 2
-        self.slider_1.valueChanged.connect(lambda: self.on_change_func(self.slider_1))     # 3
- 
-        self.slider_2 = QSlider(Qt.Vertical, self)
-        self.slider_2.setMinimum(0)                                                        # 4
-        self.slider_2.setMaximum(100)                                                      # 5
-        self.slider_2.valueChanged.connect(lambda: self.on_change_func(self.slider_2))
- 
-        self.label = QLabel('0', self)                                                     # 6
-        self.label.setFont(QFont('Arial Black', 20))
- 
-        self.h_layout = QHBoxLayout()
-        self.v_layout = QVBoxLayout()
- 
-        self.h_layout.addWidget(self.slider_2)
-        self.h_layout.addStretch(1)
-        self.h_layout.addWidget(self.label)
-        self.h_layout.addStretch(1)
- 
-        self.v_layout.addWidget(self.slider_1)
-        self.v_layout.addLayout(self.h_layout)
-        
-        self.setLayout(self.v_layout)
- 
-    def on_change_func(self, slider):                                                       # 7
-        if slider == self.slider_1:
-            self.slider_2.setValue(self.slider_1.value())
-            self.label.setText(str(self.slider_1.value()))
-        else:
-            self.slider_1.setValue(self.slider_2.value())
-            self.label.setText(str(self.slider_2.value()))
- 
- 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    demo = Demo()
-    demo.show()
+from PyQt5 import QtCore, QtWidgets, QtWebEngineWidgets
+
+from io import StringIO
+
+
+class WebEngineView(QtWebEngineWidgets.QWebEngineView):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.page().profile().downloadRequested.connect(self.onDownloadRequested)
+        self.windows = []
+
+    @QtCore.pyqtSlot(QtWebEngineWidgets.QWebEngineDownloadItem)
+    def onDownloadRequested(self, download):
+        if (
+            download.state()
+            == QtWebEngineWidgets.QWebEngineDownloadItem.DownloadRequested
+        ):
+            path, _ = QtWidgets.QFileDialog.getSaveFileName(
+                self, self.tr("Save as"), download.path()
+            )
+            if path:
+                download.setPath(path)
+                download.accept()
+
+    def createWindow(self, type_):
+        if type_ == QtWebEngineWidgets.QWebEnginePage.WebBrowserTab:
+            window = QtWidgets.QMainWindow(self)
+            view = QtWebEngineWidgets.QWebEngineView(window)
+            window.resize(640, 480)
+            window.setCentralWidget(view)
+            window.show()
+            return view
+
+    def updateChart(self, chart, **kwargs):
+        output = StringIO()
+        chart.save(output, "html", **kwargs)
+        self.setHtml(output.getvalue())
+
+
+if __name__ == "__main__":
+    import sys
+
+    import altair as alt
+    from vega_datasets import data
+
+    app = QtWidgets.QApplication(sys.argv)
+    w = QtWidgets.QMainWindow()
+
+    cars = data.cars()
+
+    chart = (
+        alt.Chart(cars)
+        .mark_bar()
+        .encode(x=alt.X("Miles_per_Gallon", bin=True), y="count()",)
+        .properties(title="A bar chart")
+        .configure_title(anchor="start")
+    )
+
+    view = WebEngineView()
+    view.updateChart(chart)
+    w.setCentralWidget(view)
+    w.resize(640, 480)
+    w.show()
     sys.exit(app.exec_())
