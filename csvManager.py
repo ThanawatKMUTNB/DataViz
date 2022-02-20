@@ -1,3 +1,6 @@
+from curses import meta
+from importlib.metadata import files, metadata
+import json
 from itertools import chain
 import os
 from re import S
@@ -413,3 +416,33 @@ class csvManager:
         # print(Row,Col)
         print(k)
         return k
+
+    def savedata(self) :
+        filename = 'metadata.json'
+        metadata = {}
+        metadata["Path"] = self.path + "\\" + self.selectFile
+        #metadata[self.selectFile] = {}
+        metadata["Dimen"] = self.getDimension()
+        metadata["Meas"] = self.getMeasure()
+        
+        with open(filename, 'w') as exportFile:
+            saveFile = json.dumps(metadata , indent= 4)
+            exportFile.write(saveFile)
+
+    def loaddata(self) :
+        filename = 'metadata.json'
+        with open(filename) as metadata_json:
+            metadata = json.load(metadata_json)
+        Path = []
+        Dimension = []
+        Measurment = []    
+        if "Path" in metadata :
+            Path = (metadata["Path"])
+        if "Dimen" in metadata :
+            Dimension = (metadata["Dimen"])
+        if "Meas" in metadata :
+            Measurment = (metadata["Meas"])
+        #print(self.df)
+        return Path,Dimension, Measurment
+            
+            #print(Path,Dimension,Measurment)
