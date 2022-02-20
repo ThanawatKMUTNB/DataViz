@@ -157,20 +157,30 @@ class csvManager:
     Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
     
     def setDataFilter(self,Row,Col):
+        # print("filter",self.filter,Row+Col)
         for i in list(self.filter.keys()):
-            if i not in Row+Col:
-                self.filter.pop(i)
+            if i not in self.Measure.keys():
+                if i not in Row+Col:
+                    self.filter.pop(i)
         for i in Row+Col:
-            if i not in list(self.filter.keys()):
-                self.filter[i] = ""
+            if type(i) != list:
+                if i not in list(self.filter.keys()):
+                    self.filter[i] = ""
         for i in list(self.filter.keys()):
-            if self.filter[i] == "":
-                self.filter[i] = list(set(self.df[i].values))
+            if type(self.filter[i]) != list:
+                if self.filter[i] == "":
+                    self.filter[i] = list(set(self.df[i].values))
         self.dfFil = self.df
+        # print(self.filter)
         for i in self.filter.keys():
-            self.dfFil = self.dfFil[self.dfFil[i].isin(self.filter[i])]
-        # print(self.dfFil)
-        
+            if i not in self.Measure.keys():
+                self.dfFil = self.dfFil[self.dfFil[i].isin(self.filter[i])]
+            # else:
+            #     # print(i)
+            #     # print(self.filter[i][0])
+            #     self.dfFil = self.dfFil.loc[self.dfFil[i] > self.filter[i][0]]
+            #     self.dfFil = self.dfFil.loc[self.dfFil[i] < self.filter[i][1]] 
+            #     # print(self.dfFil)
                 
     def setRowAndColumn(self,Row,Col):
         # print("CMS")
@@ -201,6 +211,8 @@ class csvManager:
         # isInterCol = list(set.intersection(set(Col) & set(self.Measure.keys())))
         isInterRow = list(set(Row).intersection(set(self.Measure.keys())))
         isInterCol = list(set(Col).intersection(set(self.Measure.keys())))
+        # if len(isInterRow+isInterCol) != []:
+        #     usedata = self.setDataFilterMes(usedata,isInterRow+isInterCol)
         # print("****",isInterRow,isInterCol)
         if isInterRow == [] and isInterCol == []: #No Mes
             if Row != [] and Col == []:
@@ -338,10 +350,10 @@ class csvManager:
                                 # print(isInterCol)
                             else:
                                 # print("CC")
-                                print(oriRow,oriCal)
-                                print(k)
-                                print(Coldi,k.columns,isInterCol)
-                                print(Rowdi,k.index,isInterRow)
+                                # print(oriRow,oriCal)
+                                # print(k)
+                                # print(Coldi,k.columns,isInterCol)
+                                # print(Rowdi,k.index,isInterRow)
                                 if isInterCol != []:
                                     # print("0000000000000")
                                     k.columns = isInterCol
@@ -431,7 +443,7 @@ class csvManager:
         k.index = changIndex
         print(k)'''
         # print(Row,Col)
-        print(k)
+        # print(k)
         return k
 
     def savedata(self,filename) :

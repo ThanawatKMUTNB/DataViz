@@ -36,7 +36,7 @@ ex.getHead()
 
 # ex.setRowAndColumn(["Segment","Profit","Sales"],[])
 # ex.setRowAndColumn([],["Segment","Profit","Sales"])
-
+# ex.filter = {'Discount': [0.0, 0.8], 'Profit': [50, 219.0], 'Region': ['East','South']}
 # ex.setRowAndColumn(["Ship Mode",["Profit","sum"],["Sales","sum"]],["Segment","Region"])
 
 # ex.setRowAndColumn(["Segment",["Sales","sum"]],["Category","Region"])

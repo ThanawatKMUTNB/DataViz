@@ -27,6 +27,8 @@ class filterMesWindow(QMainWindow):
         self.original = {}
         self.filtered = {}
         self.checkedList = []
+        self.row = []
+        self.col = []
         
         # defind
         self.atLeatSlider = self.findChild(QSlider,"atLeatSlider")
@@ -49,7 +51,7 @@ class filterMesWindow(QMainWindow):
         self.atMostValueLabel_3 = self.findChild(QLabel,"atMostValueLabel_3")
         
         self.resetButton = self.findChild(QPushButton,"resetButton")
-        self.applyButton = self.findChild(QPushButton,"applyButtonself")
+        self.applyButton = self.findChild(QPushButton,"applyButton")
         self.cancleButton = self.findChild(QPushButton,"cancleButton")
         
         #  func
@@ -73,7 +75,14 @@ class filterMesWindow(QMainWindow):
     
     def ApplyBut(self):
         mainW.filDic = self.filtered
-        mainW.setSheetTable()
+        # print(self.filtered)
+        # print(mainW.dataSheet)
+        mainW.dataSheet = mainW.dataSheet.loc[mainW.dataSheet[self.dimen] > self.filtered[self.dimen][0]]
+        # print(mainW.dataSheet)
+        mainW.dataSheet = mainW.dataSheet.loc[mainW.dataSheet[self.dimen] < self.filtered[self.dimen][1]] 
+        # print(self.sheet)
+        # mainW.dataSheet = self.sheet
+        mainW.showSheet()
         self.close()
         
     def cancleBut(self):
@@ -134,10 +143,27 @@ class filterMesWindow(QMainWindow):
         self.filtered[self.dimen][1] = atMostSlider_2
         # self.filtered[self.dimen][0] = self.minVa
         self.setValues()
-        
+    
+    def setRC(self):
+        self.row = mainW.RowChoose
+        self.col = mainW.ColChoose
+        for i in range(len(self.row)):
+            if type(self.row[i]) == list:
+                self.row[i] = self.row[i][0]
+        for i in range(len(self.col)):
+            if type(self.col[i]) == list:
+                self.col[i] = self.col[i][0]
+                
     def setUp(self):
         self.dimen = mainW.diForFil
-        self.sheet = mainW.data
+        self.setRC()
+        # print(self.dimen,mainW.RowChoose,mainW.ColChoose)
+        if (self.dimen in self.row) or (self.dimen in self.col):
+            # print("K")
+            self.sheet = mainW.dataSheet
+        else :
+            # print("J")
+            self.sheet = mainW.data
         self.filtered = mainW.filDic
         if self.filtered[self.dimen] == "":
             self.filtered[self.dimen] = [self.sheet[self.dimen].min(),self.sheet[self.dimen].max()]
@@ -174,7 +200,7 @@ class filterMesWindow(QMainWindow):
         # self.setValues()
     
     def setValues(self):
-        print(self.filtered)
+        # print(self.filtered)
         # print(self.minVa,self.maxVa)
         # print(self.dimen,self.filtered)
         self.rangeMax.setText(str(float(self.filtered[self.dimen][1])))
@@ -242,10 +268,11 @@ class filterDimenWindow(QMainWindow):
     def reverseCheck(self):
         filterItem = self.filterItemListWidget.currentRow()
         strItem = self.filterItemListWidget.item(filterItem)
-        if strItem.checkState() == 2:
-            strItem.setCheckState(QtCore.Qt.Unchecked)
-        else:
-            strItem.setCheckState(QtCore.Qt.Checked)
+        if strItem != None:
+            if strItem.checkState() == 2:
+                strItem.setCheckState(QtCore.Qt.Unchecked)
+            else:
+                strItem.setCheckState(QtCore.Qt.Checked)
         self.checked()
             
     def allBut(self):
@@ -268,8 +295,8 @@ class filterDimenWindow(QMainWindow):
         for i in range(self.filterItemListWidget.count()):
             if self.filterItemListWidget.item(i).checkState() == 2:
                 self.checkedList.append(self.filterItemListWidget.item(i).text())
-        
-        self.selectionLabel.setText("Selection : "+ str(len(self.checkedList))+" of "+str(len(mainW.data[self.dimen].drop_duplicates))+" values.")
+        # if self.checkedList == list:
+        # self.selectionLabel.setText("Selection : "+ str(len(self.checkedList))+" of "+str(len(mainW.data[self.dimen].drop_duplicates))+" values.")
         
         #     print(i)
         #     print(self.filterItemListWidget.item(i).checkState())
@@ -875,8 +902,11 @@ class mainWindow(QMainWindow):
                     if i not in list(self.filDic.keys()):
                         self.filDic[i] = ""
         # print(self.filDic)
-        
+    def showSheet(self):
+        self.model = TableModel2(self.dataSheet)
+        self.sheetTable.setModel(self.model)
     def setSheetTable(self):
+        print("filter",self.filDic)
         # self.isInterRow = [value for value in self.RowChoose if value in list(self.Measure.keys())]
         # self.isInterCol = [value for value in self.ColChoose if value in list(self.Measure.keys())]
         print(self.RowChoose,self.ColChoose)

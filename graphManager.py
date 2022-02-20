@@ -54,7 +54,7 @@ class graphManager():
         self.setMes()
         self.df = dataSheet
         print("Graph")
-        print(self.MeasureDic,self.Measure,self.RowChoose,self.ColChoose)
+        # print(self.MeasureDic,self.Measure,self.RowChoose,self.ColChoose)
         #self.df['Order Date'] = pd.to_datetime(self.df['Order Date'],format='%d/%m/%Y')
         #self.df['Ship Date'] = pd.to_datetime(self.df['Ship Date'],format='%d/%m/%Y')
         
