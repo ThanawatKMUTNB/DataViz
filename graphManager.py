@@ -240,6 +240,8 @@ class graphManager():
 
     def rangeScale(self,Di,Meas):
         fil = Meas[1]
+        if fil == 'average':
+            fil = 'mean'
         df = self.df
         if len(Di) == 1:
             if (type(Di[0]) == type(['list'])):
