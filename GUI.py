@@ -24,6 +24,7 @@ class filterMesWindow(QMainWindow):
         self.minVa = ''
         self.maxVa = ''
         self.sheet = ''
+        self.original = {}
         self.filtered = {}
         self.checkedList = []
         
@@ -38,7 +39,7 @@ class filterMesWindow(QMainWindow):
         self.atLeastMax = self.findChild(QLineEdit,"atLeastMax")
         self.atLeastMin = self.findChild(QLineEdit,"atLeastMin")
         self.atMostMax = self.findChild(QLineEdit,"atMostMax")
-        self.atMosttMin = self.findChild(QLineEdit,"atMostMin")
+        self.atMostMin = self.findChild(QLineEdit,"atMostMin")
         
         self.atLeastValueLabel = self.findChild(QLabel,"atLeastValueLabel")
         self.atMostValueLabel = self.findChild(QLabel,"atMostValueLabel")
@@ -47,28 +48,91 @@ class filterMesWindow(QMainWindow):
         self.atLeastValueLabel_3 = self.findChild(QLabel,"atLeastValueLabel_3")
         self.atMostValueLabel_3 = self.findChild(QLabel,"atMostValueLabel_3")
         
-        self.atLeatSlider.valueChanged.connect(self.valuechange1)
+        self.resetButton = self.findChild(QPushButton,"resetButton")
+        self.applyButton = self.findChild(QPushButton,"applyButtonself")
+        self.cancleButton = self.findChild(QPushButton,"cancleButton")
+        
+        #  func
+        self.atLeatSlider.valueChanged.connect(self.valuechange)
         self.atMostSlider.valueChanged.connect(self.valuechange1)
-        self.atLeatSlider_2.valueChanged.connect(self.valuechange)
-        self.atMostSlider_2.valueChanged.connect(self.valuechange)
-        self.tabwidget.tabBarClicked.connect(self.handle_tabbar_clicked)
+        self.atLeatSlider_2.valueChanged.connect(self.valuechange2)
+        self.atMostSlider_2.valueChanged.connect(self.valuechange3)
+        
+        self.rangeMin.textChanged.connect(self.rangeMinchange)
+        self.rangeMax.textChanged.connect(self.rangeMaxchange)
+        self.atLeastMax.textChanged.connect(self.atLeastMaxchange)
+        self.atLeastMin.textChanged.connect(self.atLeastMinchange)
+        self.atMostMax.textChanged.connect(self.atMostMaxchange)
+        self.atMostMin.textChanged.connect(self.atMostMinchange)
+        
+        self.resetButton.clicked.connect(self.resetBut)
+        self.cancleButton.clicked.connect(self.cancleBut)
+        self.applyButton.clicked.connect(self.ApplyBut)
+        
         self.setUp()
+    
+    def ApplyBut(self):
+        mainW.filDic = self.filtered
+        mainW.setSheetTable()
+        self.close()
         
-    def handle_tabbar_clicked(self, index):
-        print(index)
+    def cancleBut(self):
+        self.close()
         
-    def valuechange1(self):
-        atLeatSlider = str(self.atLeatSlider.value())
-        atMostSlider = str(self.atMostSlider.value())
-        self.filtered[self.dimen][0] = atLeatSlider
-        self.filtered[self.dimen][1] = atMostSlider
+    def resetBut(self):
+        self.setUp()
+        self.setValues()
+        
+    def rangeMaxchange(self):
+        self.filtered[self.dimen][1] =self.rangeMax.text()
+        self.setValues()
+    
+    def rangeMinchange(self):
+        self.filtered[self.dimen][0] =self.rangeMin.text()
+        self.setValues()
+        
+    def atLeastMaxchange(self):
+        self.filtered[self.dimen][1] =self.atLeastMax.text()
+        self.setValues()
+    
+    def atLeastMinchange(self):
+        self.filtered[self.dimen][0] =self.atLeastMin.text()
+        self.setValues()
+        
+    def atMostMaxchange(self):
+        self.filtered[self.dimen][1] =self.atMostMax.text()
+        self.setValues()
+    
+    def atMostMinchange(self):
+        self.filtered[self.dimen][0] =self.atMostMin.text()
         self.setValues()
         
     def valuechange(self):
-        atLeatSlider_2 = str(self.atLeatSlider_2.value())
-        atMostSlider_2 = str(self.atMostSlider_2.value())
-        self.filtered[self.dimen][0] = atLeatSlider_2
+        atLeatSlider = float(self.atLeatSlider.value())
+        atMostSlider = float(self.atMostSlider.value())
+        self.filtered[self.dimen][0] = atLeatSlider
+        if atLeatSlider >= atMostSlider:
+            self.filtered[self.dimen][1] = atLeatSlider
+        self.setValues()
+        
+    def valuechange1(self):
+        atMostSlider = float(self.atMostSlider.value())
+        atLeatSlider = float(self.atLeatSlider.value())
+        self.filtered[self.dimen][1] = atMostSlider
+        if atMostSlider <= atLeatSlider:
+            self.filtered[self.dimen][0] = atMostSlider
+        self.setValues()
+        
+    def valuechange2(self):
+        atLeatSlider = float(self.atLeatSlider_2.value())
+        self.filtered[self.dimen][0] = atLeatSlider
+        # self.filtered[self.dimen][1] = self.maxVa
+        self.setValues()
+    
+    def valuechange3(self):
+        atMostSlider_2 = float(self.atMostSlider_2.value())
         self.filtered[self.dimen][1] = atMostSlider_2
+        # self.filtered[self.dimen][0] = self.minVa
         self.setValues()
         
     def setUp(self):
@@ -77,26 +141,53 @@ class filterMesWindow(QMainWindow):
         self.filtered = mainW.filDic
         if self.filtered[self.dimen] == "":
             self.filtered[self.dimen] = [self.sheet[self.dimen].min(),self.sheet[self.dimen].max()]
-        self.maxVa = str(self.sheet[self.dimen].max())
-        self.minVa = str(self.sheet[self.dimen].min())
-        self.setValues()
+        self.maxVa = float(self.sheet[self.dimen].max())
+        self.minVa = float(self.sheet[self.dimen].min())
+        
+        format(self.maxVa, '.2f')
+        format(self.minVa, '.2f')
+        
+        maxVa = float(self.sheet[self.dimen].max())
+        minVa = float(self.sheet[self.dimen].min())
+        format(maxVa, '.2f')
+        format(minVa, '.2f')
+        
+        sliderLList = [self.atLeatSlider,self.atLeatSlider_2]
+        sliderMList = [self.atMostSlider,self.atMostSlider_2]
+        
+        for i,j in zip(sliderLList,sliderMList):
+            i.setMinimum(minVa)
+            i.setMaximum(maxVa)
+            j.setMinimum(minVa)
+            j.setMaximum(maxVa)
+            i.setValue(minVa)
+            j.setValue(maxVa)
+            
+        self.atLeastValueLabel.setText(str(self.minVa))
+        self.atMostValueLabel.setText(str(self.maxVa))
+        self.atLeastValueLabel_2.setText(str(self.minVa))
+        self.atMostValueLabel_2.setText(str(self.maxVa))
+        self.atLeastValueLabel_3.setText(str(self.minVa))
+        self.atMostValueLabel_3.setText(str(self.maxVa))
+            # i.setValue(minVa)
+        # print(self.filtered,self.original)
+        # self.setValues()
     
     def setValues(self):
+        print(self.filtered)
         # print(self.minVa,self.maxVa)
-        print(self.dimen,self.filtered)
-        self.rangeMin.setText(str(self.filtered[self.dimen][0]))
-        self.rangeMax.setText(str(self.filtered[self.dimen][1]))
-        self.atLeastMax.setText(str(self.filtered[self.dimen][1]))
-        self.atLeastMin.setText(str(self.filtered[self.dimen][0]))
-        self.atMostMax.setText(str(self.filtered[self.dimen][1]))
-        self.atMosttMin.setText(str(self.filtered[self.dimen][0]))
+        # print(self.dimen,self.filtered)
+        self.rangeMax.setText(str(float(self.filtered[self.dimen][1])))
+        self.rangeMin.setText(str(float(self.filtered[self.dimen][0])))
+        self.atLeastMax.setText(str(float(self.filtered[self.dimen][1])))
+        self.atLeastMin.setText(str(float(self.filtered[self.dimen][0])))
+        self.atMostMax.setText(str(float(self.filtered[self.dimen][1])))
+        self.atMostMin.setText(str(float(self.filtered[self.dimen][0])))
         
-        self.atLeastValueLabel.setText(self.minVa)
-        self.atMostValueLabel.setText(self.maxVa)
-        self.atLeastValueLabel_2.setText(self.minVa)
-        self.atMostValueLabel_2.setText(self.maxVa)
-        self.atLeastValueLabel_3.setText(self.minVa)
-        self.atMostValueLabel_3.setText(self.maxVa)
+        self.atMostSlider.setValue(float(self.filtered[self.dimen][1]))
+        self.atMostSlider_2.setValue(float(self.filtered[self.dimen][1]))
+        self.atLeatSlider.setValue(float(self.filtered[self.dimen][0]))
+        self.atLeatSlider_2.setValue(float(self.filtered[self.dimen][0]))
                 
 class filterDimenWindow(QMainWindow):
     def __init__(self):
@@ -550,38 +641,39 @@ class mainWindow(QMainWindow):
         if event.type() == QEvent.ContextMenu and (source is self.filterList or source is self.ColList or source is self.RowList):
             menu = QMenu()
             item2 = source.itemAt(event.pos())
-            filterAc = menu.addAction('Filter')
-            if item2.text() in list(self.Measure.keys()):
-                # mesAc = menu.addAction('Measure ('+self.Measure[item2.text()]+')')
-                subMenu = QMenu('Measure ('+self.Measure[item2.text()]+')')
-                avgAc = subMenu.addAction("averrage")
-                sumAc = subMenu.addAction("sum")
-                medAc = subMenu.addAction("median")
-                countAc = subMenu.addAction("count")
-                maxAc = subMenu.addAction("max")
-                minAc = subMenu.addAction("min")
-                acList = [avgAc,sumAc,medAc,countAc,maxAc,minAc]
-                for i in acList:
-                    i.setCheckable(True)
-                sumAc.setChecked(True)
-                # print(sumAc.text())
-                menu.addMenu(subMenu)
-                
-            # print(self.filterList.currentRow())
-            # menu.addAction('Action 2')
-            # menu.addAction('Action 3')
-            # if menu.exec_(event.globalPos()):
-                # action = menu.exec_(self.mapToGlobal())
-            if menu.exec_(event.globalPos()) == filterAc:
-                item = source.itemAt(event.pos())
-                if item.text() not in list(self.filDic.keys()):
-                    tmpr =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
-                    tmpr.append(item.text())
-                    self.filterList.addItems(tmpr)
-                    self.filDic[item.text()] = ""
-                    print(self.filDic)
-                self.selectFil(item.text())
-            return True
+            if item2 != None:
+                # print("---",item2.text(),"---")
+                filterAc = menu.addAction('Filter')
+                if item2.text() in list(self.Measure.keys()):
+                    # mesAc = menu.addAction('Measure ('+self.Measure[item2.text()]+')')
+                    subMenu = QMenu('Measure ('+self.Measure[item2.text()]+')')
+                    avgAc = subMenu.addAction("averrage")
+                    sumAc = subMenu.addAction("sum")
+                    medAc = subMenu.addAction("median")
+                    countAc = subMenu.addAction("count")
+                    maxAc = subMenu.addAction("max")
+                    minAc = subMenu.addAction("min")
+                    acList = [avgAc,sumAc,medAc,countAc,maxAc,minAc]
+                    for i in acList:
+                        i.setCheckable(True)
+                    sumAc.setChecked(True)
+                    # print(sumAc.text())
+                    menu.addMenu(subMenu)
+                # print(self.filterList.currentRow())
+                # menu.addAction('Action 2')
+                # menu.addAction('Action 3')
+                # if menu.exec_(event.globalPos()):
+                    # action = menu.exec_(self.mapToGlobal())
+                if menu.exec_(event.globalPos()) == filterAc:
+                    item = source.itemAt(event.pos())
+                    if item.text() not in list(self.filDic.keys()):
+                        tmpr =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
+                        tmpr.append(item.text())
+                        self.filterList.addItems(tmpr)
+                        self.filDic[item.text()] = ""
+                        print(self.filDic)
+                    self.selectFil(item.text())
+                return True
         return super().eventFilter(source, event)
     
     def windowM(self):

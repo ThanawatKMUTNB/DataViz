@@ -122,7 +122,7 @@
           <item row="0" column="1">
            <widget class="QSlider" name="atMostSlider">
             <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
+             <enum>Qt::LeftToRight</enum>
             </property>
             <property name="styleSheet">
              <string notr="true">&quot;QSlider::groove:horizontal {background-color:red;}&quot;</string>
@@ -394,7 +394,7 @@
           <item row="0" column="1">
            <widget class="QSlider" name="atMostSlider_2">
             <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
+             <enum>Qt::LeftToRight</enum>
             </property>
             <property name="styleSheet">
              <string notr="true">&quot;QSlider::groove:horizontal {background-color:red;}&quot;</string>
