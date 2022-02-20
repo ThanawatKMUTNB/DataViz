@@ -170,8 +170,8 @@ class csvManager:
         
                 
     def setRowAndColumn(self,Row,Col):
-        print("CMS")
-        print(Row,Col)
+        # print("CMS")
+        # print(Row,Col)
         usedata = self.df
         if self.filter != {}:
             self.setDataFilter(Row,Col)
@@ -225,7 +225,7 @@ class csvManager:
             #print(Row,Col)
             #print(type(k))
         else: # Have Mes 
-            print("c",Row,Col)
+            # print("c",Row,Col)
             # print("isin",isInterRow,isInterCol)
             intersecAt = ''
             filterChoose = "sum"
@@ -259,8 +259,8 @@ class csvManager:
                 intersecAt = 'Col'
                 intersec = isInterCol
             packDf = []
-            print("caf",Rowdi,Coldi)
-            print("isin ",isInterRow,isInterCol)
+            # print("caf",Rowdi,Coldi)
+            # print("isin ",isInterRow,isInterCol)
             if Rowdi == [] and Coldi == []: #Only mes
                 #print(Rowdi,Coldi)
                 colList = usedata[intersec]
@@ -311,87 +311,104 @@ class csvManager:
                 results = pd.concat(packDf, axis=1,ignore_index=True)
                 results = results.sort_values(by=results.columns.tolist())
                 colNum = results.columns.tolist()
+                # print(colNum)
                 beforMesual = (-1)*len(intersec)
                 
-                if isInterRow != []: #mes in row
+                if isInterRow != [] and isInterCol == []: #mes in row
                     # print(Row,Col)
                     print("meas in row")
                     k = pd.pivot_table(results,index = colNum[len(Rowdi):beforMesual], columns = colNum[:len(Rowdi)],values = colNum[beforMesual:],aggfunc=np.sum)
                     k = k.round(0)
-                    k=k.T
-                    # print(dict(k.columns))
-                    # print("----",isInterRow)
-                    # print(k)
-                    if len(isInterRow) > 1:
-                        print("M")
-                        isInterRow = isInterRow*len(k.index)
+                    # print(k.unstack())
+                    if oriCal != []:
+                        k=k.T
+                        # print(dict(k.columns))
+                        # print("----",isInterRow)
+                        # print(k)
+                        if len(isInterRow) > 1:
+                            # print("M")
+                            # isInterRow = isInterRow*len(k.index)
+                            # k.index = isInterRow
+                            if len(isInterCol) == 1:
+                                isInterCol = isInterCol*len(k.columns)
+                                k.columns = isInterCol
+                                # print(isInterCol)
+                            else:
+                                # print("CC")
+                                print(oriRow,oriCal)
+                                print(k)
+                                print(Coldi,k.columns,isInterCol)
+                                print(Rowdi,k.index,isInterRow)
+                                if isInterCol != []:
+                                    # print("0000000000000")
+                                    k.columns = isInterCol
+                                if isInterRow != [] and Rowdi == []:
+                                    # print("1111111111")
+                                    # print(len(k.index))
+                                    k.index = isInterRow
+                                else:
+                                    # print(dict(k.index))
+                                    changname = dict(k.index)
+                                    for i,j in zip(list(changname.keys()),isInterRow):
+                                        changname[i] = j 
+                                    k = k.rename(index = changname)
+                            
+                                    # k.index = Rowdi
+                        else:
+                            if Coldi != []:
+                                if Rowdi != []:
+                                    d = dict(k.index)
+                                    d[list(d.keys())[0]] = isInterRow[0]
+                                    k = k.rename(index=d)
+                                else:
+                                    k.index = isInterRow
+                            if Rowdi != []:
+                                # k.columns = Rowdi
+                                d = dict(k.index)
+                                d[list(d.keys())[0]] = isInterRow[0]
+                                k = k.rename(index=d)
+                                # print(k)
+                    else:
                         k.index = isInterRow
-                        # print(isInterRow)
-                    else:
-                        d = dict(k.index)
-                        d[list(d.keys())[0]] = isInterRow[0]
-                        # print(d)
-                        # k.index = isInterRow
-                        k = k.rename(index=d)
-                    # print(isInterRow)
-                    # print(len(k.index))
-                    # if len(k.index) >= 1:
-                    #     k.index = isInterRow
-                    # else:
-                    #     changname = dict(k.index)
-                    #     for i,j in zip(list(changname.keys()),isInterRow):
-                    #         changname[i] = j 
-                    #     # print(k.columns)
-                    #     changname2 = {}
-                    #     for i,j in zip(k.columns,isInterCol):
-                    #         changname2[i] = j 
-                    #     # print(changname2)
-                    #     # k.columns.names = isInterCol
-                    #     k = k.rename(index=changname,columns = changname2)
-                    
+                        k=k.unstack()
                 else: #mes in col
-                    print("mes in col",Rowdi,Coldi)
-                    k = pd.pivot_table(results,columns = colNum[len(Rowdi):beforMesual], index= colNum[:len(Rowdi)],values = colNum[beforMesual:],aggfunc=np.sum)
-                    k = k.round(0)
-                    # print((k.columns.names))
-                    if len(isInterCol) == 1:
-                        isInterCol = isInterCol*len(k.columns)
-                        k.columns = isInterCol
-                        # print(isInterCol)
-                    else:
-                        k.columns = isInterCol
+                    print("mes in col")
                     
-                    if len(isInterRow) == 0 and len(Rowdi) == 0: 
-                        print("Only mes col")
-                        # print(k.index)              
-                        # if len(k.index)>1:
-                        #     k.index = isInterCol
-                        # elif len(isInterCol) > 1 and len(Coldi) > 1:
-                        #     # print(k)
-                        #     # print(k.index)
-                        #     changname = dict(k.columns)
-                        #     # print(changname)
-                        #     for i,j in zip(list(changname.keys()),isInterCol):
-                        #         changname[i] = j 
-                        #     # k.columns.names = isInterCol
-                        #     k = k.rename(columns=changname)
-                        
-                    if len(isInterCol) > 1: #di row col/ Mes Col
-                        print("121")
-                        # print(len(k.columns))
-                        if len(k.columns.names)>1:
-                            # print("----",dict(k.columns))
-                            # print(isInterCol)
-                            changname = dict(k.columns)
-                            for i,j in zip(list(changname.keys()),isInterCol):
-                                changname[i] = j 
-                            k = k.rename(columns = changname)
-                        if len(k.columns)>1:
+                    if Rowdi != []:
+                        k = pd.pivot_table(results,columns = colNum[len(Rowdi):beforMesual], index= colNum[:len(Rowdi)],values = colNum[beforMesual:],aggfunc=np.sum)
+                        k = k.round(0)
+                        if len(isInterCol) == 1:
+                            isInterCol = isInterCol*len(k.columns)
                             k.columns = isInterCol
-                        # print("----",k.index.names)
-                    
+                            # print(isInterCol)
+                        else:
+                            # print(oriRow,oriCal)
+                            # print(k)
+                            # print(Coldi,k.columns,isInterCol)
+                            # print(Rowdi,k.index,isInterRow)
+                                if isInterCol != [] and Coldi == []:
+                                    k.columns = isInterCol
+                                if isInterCol != [] and Coldi != []:
+                                    # print(dict(k.index))
+                                    changname = dict(k.columns)
+                                    for i,j in zip(list(changname.keys()),isInterCol):
+                                        changname[i] = j 
+                                    k = k.rename(columns = changname)
+                    else :
+                        # print("cc",beforMesual)
+                        
+                        # if type(results) == pd.Series :
+                        #     results = results.to_frame()
+                        # results = results.groupby(0).sum().round(0).stack()
+                        
+                        k = pd.pivot_table(results,columns = colNum[:beforMesual],values = colNum[beforMesual:],aggfunc=np.sum)
+                        k = k.round(0)
+                        
+                        k.index = isInterCol
+                        # print("-------")
+                        # k = k.unstack()
                 k = k.replace(np.nan, '')
-        #print(type(k))
+        # print(type(k))
         #print(k.index.tolist())
         
         #list_of_lists = [list(elem) for elem in k.index.tolist()]
