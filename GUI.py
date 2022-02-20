@@ -216,9 +216,9 @@ class WebEngineView(QtWebEngineWidgets.QWebEngineView):
         if type_ == QtWebEngineWidgets.QWebEnginePage.WebBrowserTab:
             window = QtWidgets.QMainWindow(self)
             view = QtWebEngineWidgets.QWebEngineView(window)
-            window.resize(640, 480)
-            window.setCentralWidget(view)
-            window.show()
+            # window.resize(1000, 1000)
+            # window.setCentralWidget(view)
+            # window.showFullScreen()
             return view
 
     def updateChart(self, chart, **kwargs):
@@ -500,8 +500,10 @@ class mainWindow(QMainWindow):
         # self.tabWidget_2 = self.findChild(QTabWidget,"tabWidget_2")
         
         # self.frame = self.findChild(QFrame,"frame")
-        
+        self.view = WebEngineView()
         self.vbox = QVBoxLayout(self.frame)
+        self.vbox.addWidget(self.view)
+        # self.vbox.SetMaximumSize()
         
         # function
         self.openDirecButton.clicked.connect(self.launchDialog)
@@ -559,12 +561,13 @@ class mainWindow(QMainWindow):
             self.windowD()
             
     def setplot(self):
-        print("--------R C",self.RowChoose,self.ColChoose)
+        # print("--------R C",self.RowChoose,self.ColChoose)
         self.setSheetTable()
         self.setChart()
-        self.showChart()
+        # if self.typeChart != []:
+        #     self.showChart()
     
-    def setChart(self): #choose type chart
+    def setChart(self):
         # print("set chart")
         # print("--------R C",self.RowChoose,self.ColChoose)
         # self.isInterRow = [value for value in self.RowChoose if value in [self.Measure.keys()]]
@@ -601,8 +604,6 @@ class mainWindow(QMainWindow):
         self.chartType.clear()
         self.chartType.addItems(self.typeChart)
         # self.chartType_2.addItems(self.typeChart)
-        if self.typeChart != []:
-            self.showChart()
     
     def showChart(self):
         # vbox = QtWidgets.QVBoxLayout(self)
@@ -614,30 +615,12 @@ class mainWindow(QMainWindow):
             # if self.chartTypeS != "":
             # print("----------------",self.chartTypeS)
             gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data)
-            # self.Chart = gm.chooseChart(str(self.chartTypeS))
-
-            '''cars = data.cars()
-
-            self.Chart = (
-                alt.Chart(cars)
-                .mark_bar()
-                .encode(x=alt.X("Miles_per_Gallon", bin=True), y="count()",)
-                .properties(title="A bar chart")
-                .configure_title(anchor="start")
-            )'''
             self.Chart = gm.chooseChart(str(self.chartTypeS))
     
             # self.widget.setLayout(self.view)
             if self.Chart != None:
                 # print(type(self.Chart))
-                self.view = WebEngineView()
                 self.view.updateChart(self.Chart)
-                
-                # self.widget.setCentralWidget(self.view)
-                # self.widget.resize(640, 480)
-                # self.widget.show()
-                # self.view.show()
-            self.vbox.addWidget(self.view)
             
     def rowcolChange(self):
         tmpr = []
@@ -675,9 +658,9 @@ class mainWindow(QMainWindow):
         for i in range(len(tmpr)):
             self.RowList.item(i).setForeground(QtGui.QColor('white'))
             if str(self.RowList.item(i).text()) in list(self.Measure.keys()):
-                self.RowList.item(i).setBackground(QtGui.QColor('green'))
+                self.RowList.item(i).setBackground(QtGui.QColor('#00b180'))
             else: 
-                self.RowList.item(i).setBackground(QtGui.QColor('blue'))
+                self.RowList.item(i).setBackground(QtGui.QColor('#4996b2'))
             
         for i in range(len(tmpc)):
             self.ColList.item(i).setForeground(QtGui.QColor('white'))
@@ -869,6 +852,7 @@ class mainWindow(QMainWindow):
         cm.path = self.folderpath
         cm.selectFile = self.selectFile
         cm.setPath()
+        cm.Measure = self.Measure
         # print(self.selectFile,self.data)
         # print(response[0])
         if response[0] != "":
