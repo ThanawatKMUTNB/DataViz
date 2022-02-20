@@ -66,38 +66,101 @@ class graphManager():
     def chooseChart(self,chart):
         row = self.RowChoose
         column = self.ColChoose
+        Measure = []
+        for m in self.Measure:
+            Measure.append(m[0])
+        Measure = list(set(Measure))
+
         def checkMeasure(R,C):      #True when row is measure
             for r in R:
                 if type(r) == type([]):
-                    if r[0] in self.Measure:
+                    if r[0] in Measure:
                         return True
                     else:
                         return False
                 else:
                     return False
-        print(self.MeasureDic,self.Measure,self.RowChoose,self.ColChoose)
+        #print(self.MeasureDic,self.Measure,self.RowChoose,self.ColChoose)
         
         if chart == 'Bar':
-            #return self.exam()
-            #print(self.df)
-            if checkMeasure(row,column):    #row is measure
-                print('row is measurement')
-                if len(column) > 2:
-                    print('column 3 Dimen')
-                    return self.plotBar(row,column,'row',len(column))
+            mes = 'col'
+            for r in row:
+                if type(r) == type(['list']):
+                    if r[0] in Measure:
+                        mes = 'row'
+            print(row,column)
+            if mes == 'row':
                 chart = []
-                for r in row:
-                    chart.append(self.plotBar(r,column,'row',len(column)))
-                return alt.vconcat(*chart)
+                if type(row[0]) == type(['list']):  #Datetime and Meas
+                    if row[0][0] not in Measure:    #Datetime
+                        if row[1][0] not in Measure:       #4Dimension (Can't plot)
+                            print('4 Dimension')
+                            l = [*column]
+                            l.append(row[0])
+                            l.append(row[1])
+                            for r in range(len(row)-2):
+                                chart.append(self.plotBar([row[0],row[1],row[r+2]],column,row[r+2],l,mes))
+                            return alt.vconcat(*chart)
+                        else:
+                            l = [*column]
+                            l.append(row[0])
+                            for r in range(len(row)-1):
+                                chart.append(self.plotBar([row[0],row[r+1]],column,row[r+1],l,mes))
+                            return alt.vconcat(*chart)
+                    else:                           #Measure
+                        for r in range(len(row)):
+                            chart.append(self.plotBar([row[r]],column,row[r],[*column],mes))
+                        return alt.vconcat(*chart)
+                else:                               #Dimension
+                    if row[1][0] not in Measure:       #4Dimension
+                        l = [*column]
+                        l.append(row[0])
+                        l.append(row[1])
+                        for r in range(len(row)-2):
+                            chart.append(self.plotBar([row[0],row[1],row[r+2]],column,row[r+2],l,mes))
+                        return alt.vconcat(*chart)
+                    else:
+                        l = [*column]
+                        l.append(row[0])
+                        for r in range(len(row)-1):
+                            chart.append(self.plotBar([row[0],row[r+1]],column,row[r+1],l,mes))
+                        return alt.vconcat(*chart)
             else:
-                print('column is measurement')
-                if len(row) > 2:
-                    print('row is 3 Dimen')
-                    return self.plotBar(row,column,'column',len(row))
                 chart = []
-                for c in column:
-                    chart.append(self.plotBar(row,c,'column',len(row)))
-                return alt.hconcat(*chart)
+                if type(column[0]) == type(['list']):
+                    if column[0][0] not in Measure:
+                        if column[1][0] not in Measure:
+                            l = [*row]
+                            l.append(column[0])
+                            l.append(column[1])
+                            for c in range(len(column)-2):
+                                chart.append(self.plotBar(row,[column[0],column[1],column[c+2]],column[c+2],l,mes))
+                            return alt.vconcat(*chart)
+                        else:
+                            l = [*row]
+                            l.append(column[0])
+                            for c in range(len(column)-1):
+                                chart.append(self.plotBar(row,[column[0],column[c+1]],column[c+1],l,mes))
+                            return alt.vconcat(*chart)
+                    else:
+                        for c in range(len(column)):
+                            chart.append(self.plotBar(row,[column[c]],column[c],[*row],mes))
+                        return alt.vconcat(*chart)
+                else:
+                    if column[1][0] not in Measure:
+                        l = [*row]
+                        l.append(column[0])
+                        l.append(column[1])
+                        for c in range(len(column)-2):
+                            chart.append(self.plotBar(row,[column[0],column[1],column[c+2]],column[c+2],l,mes))
+                        return alt.vconcat(*chart)
+                    else:
+                        l = [*row]
+                        l.append(column[0])
+                        for c in range(len(column)-1):
+                            chart.append(self.plotBar(row,[column[0],column[c+1]],column[c+1],l,mes))
+                        return alt.vconcat(*chart)
+
 
         elif chart == 'Pie':
             if checkMeasure(row,column):    #row is measure
@@ -113,18 +176,50 @@ class graphManager():
                     chart.append(self.plotPie(row,c,'column'))
                 return alt.hconcat(*chart)
         elif chart == 'Line':
-            if checkMeasure(row,column):    #row is measure
-                print('row is measurement')
+            mes = 'col'
+            for r in row:
+                if type(r) == type(['list']):
+                    if r[0] in Measure:
+                        mes = 'row'
+            #print(mes)
+            if mes == 'row':
                 chart = []
-                for r in row:
-                    chart.append(self.plotLine(r,column,'row',len(column)))
-                return alt.vconcat(*chart)
-            else:                       #column is Measurement
-                print('column is measurement')
+                if type(row[0]) == type(['list']):  #Datetime and Meas
+                    if row[0][0] not in Measure:    #Datetime
+                        l = [*column]
+                        l.append(row[0])
+                        for r in range(len(row)-1):
+                            chart.append(self.plotLine([row[0],row[r+1]],column,row[r+1],l,mes))
+                        return alt.vconcat(*chart)
+                    else:                           #Measure
+                        for r in range(len(row)):
+                            chart.append(self.plotLine([row[r]],column,row[r],[*column],mes))
+                        return alt.vconcat(*chart)
+                else:                               #Dimension
+                    l = [*column]
+                    l.append(row[0])
+                    for r in range(len(row)-1):
+                        chart.append(self.plotLine([row[0],row[r+1]],column,row[r+1],l,mes))
+                    return alt.vconcat(*chart)
+            else:
                 chart = []
-                for c in column:
-                    chart.append(self.plotLine(row,c,'column',len(row)))
-                return alt.hconcat(*chart)
+                if type(column[0]) == type(['list']):
+                    if column[0][0] not in Measure:
+                        l = [*row]
+                        l.append(column[0])
+                        for c in range(len(column)-1):
+                            chart.append(self.plotLine(row,[column[0],column[c+1]],column[c+1],l,mes))
+                        return alt.vconcat(*chart)
+                    else:
+                        for c in range(len(column)):
+                            chart.append(self.plotLine(row,[column[c]],column[c],[*row],mes))
+                        return alt.vconcat(*chart)
+                else:
+                    l = [*row]
+                    l.append(column[0])
+                    for c in range(len(column)-1):
+                        chart.append(self.plotLine(row,[column[0],column[c+1]],column[c+1],l,mes))
+                    return alt.vconcat(*chart)
     
     def filterDate(self,Dimension,typ): #Date inly
 
@@ -174,186 +269,195 @@ class graphManager():
             return [tmin,tmax]
         return
 
-    def plotBar(self,row,column,mes,dimen):
+    def functionRC(self,row,column):
+        lr = []
+        lc = []
 
-        print(row,column)
+        for r in row:
+            if type(r) == type(['list']):
+                s = str(r[1]+'('+r[0]+')')
+                lr.append(s)
+            else:
+                lr.append(r)
+
+        for c in column:
+            if type(c) == type(['list']):
+                s = str(c[1]+'('+c[0]+')')
+                lc.append(s)
+            else:
+                lc.append(c)
+        
+        return [lr,lc]
+
+    def plotBar(self,row,column,meas,di,mes):
+
         df = self.df
-        if dimen == 1:     #column 1 , row 1
-            print('1 Dimension')
-            if mes == 'row':               #Measure in Row
-                sy = str(row[1]+'('+row[0]+')')
-            else:
-                if type(row[0]) == type(['datetime']):
-                #if df[row[0]].dtypes == 'datetime64[ns]':   #Dimension(Datetime) in Row
-                    sy = str(row[0][1]+'('+row[0][0]+')')
-                else:
-                    sy = str(row[0])                        #normal Dimension in Row
-
-            if mes == 'column':           #Measure in Column
-                sx = str(column[1]+'('+column[0]+')')
-            else:
-                if type(column[0]) == type(['datetime']):
-                #if df[column[0]].dtypes == 'datetime64[ns]':    #Dimension(Datetime) in column
-                    sx = str(column[0][1]+'('+column[0][0]+')')
-                else:
-                    sx = str(column[0])                     #normal Dimension in Column
-            
+        Measure = self.Measure
+        l = self.functionRC(row,column)
+        lr = l[0]
+        lc = l[1]
+        if len(lr) == 2 and len(lc) == 0:           # 1 dimension and Measurement on row
             c = alt.Chart(df).mark_bar().encode(
-                x=sx,
-                y=sy,
-                tooltip = [sy,sx]
+                y= alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                tooltip = [lr[-2],lr[-1]]
+            ).facet(row=lr[-2]
             ).resolve_scale(x = 'independent',y = 'independent')
             self.Chart = c
-
-        elif dimen == 2:
-            print('2 Dimension')                                  #2 Dimension
-            if mes == 'row' :               #2 Column (Dimension)
-                Di = column
-                Me = row[0]
-                fil = row[1]
-
-                if (type(Di[-1]) == type(['datetime'])) and (type(Di[-2]) == type(['datetime'])):   #index 0 is Dimension , index 1 is function
-                    Col = Di[-2][0]
-                    X = Di[-1][0]
-                    scol = str(Di[-2][1]+'('+Col+')')           
-                    sx = str(Di[-1][1]+'('+X+')')
-                elif type(Di[-2]) == type(['datetime']):
-                    Col = Di[-2][0]
-                    scol = str(Di[-2][1]+'('+Col+')')           
-                    sx = str(Di[-1])
-                elif type(Di[-1]) == type(['datetime']):
-                    X = Di[-1][0]
-                    scol = str(Di[-2])
-                    sx = str(Di[-1][1]+'('+X+')')
-                else:
-                    scol = str(Di[-2])                      #column > x
-                    sx = str(Di[-1])
-
+        
+        elif len(lr) == 0 and len(lc) == 2:         # 1 dimension and Measurement on column
+            c = alt.Chart(df).mark_bar().encode(
+                x= alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                tooltip = [lc[-2],lc[-1]]
+            ).facet(column=lc[-2]
+            ).resolve_scale(x = 'independent',y = 'independent')
+            self.Chart = c
+        
+        elif len(lr) == 1 and len(lc) == 1:         #1 dimension and Measurement with row and column
+            c = alt.Chart(df).mark_bar().encode(
+                x=lc[-1],
+                y=lr[-1],
+                tooltip = [lc[-1],lr[-1]]
+            ).resolve_scale(x = 'independent',y = 'independent')
+            self.Chart = c
+            
+        elif len(lr) == 2 and len(lc) == 1:             
+            if mes == 'row':
                 c = alt.Chart(df).mark_bar().encode(
-                    x=sx,
-                    y=alt.Y(str(fil+'('+Me+')'),scale=alt.Scale(domain=self.rangeScale(Di,row))),
-                    #color=scol,
-                    tooltip = [sx,str(fil+'('+Me+')')]
-                ).facet(column=scol
+                    x=lc[-1],
+                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    tooltip = [lr[-2],lr[-1],lc[-1]]
+                ).facet(row=lr[-2]
                 ).resolve_scale(x = 'independent',y = 'independent')
                 self.Chart = c
-            elif mes == 'column':                 #2 Row (Dimension)
-                Di = row    
-                Me = column[0]
-                fil = column[1]
-
-                if (type(Di[-1]) == type(['datetime'])) and (type(Di[-2]) == type(['datetime'])):
-                    srow = str(Di[-2][1]+'('+Di[-2][0]+')')           
-                    sy = str(Di[-1][1]+'('+Di[-1][0]+')')
-                elif type(Di[-2]) == type(['datetime']):            #year,date error (large data)
-                    srow = str(Di[-2][1]+'('+Di[-2][0]+')')
-                    sy = str(Di[-1])
-                elif type(Di[-1]) == type(['datetime']):
-                    srow = str(Di[-2])
-                    sy = str(Di[-1][1]+'('+Di[-1][0]+')')
-                else:
-                    srow = str(Di[-2])
-                    sy = str(Di[-1])
+            else:
                 c = alt.Chart(df).mark_bar().encode(
-                    x=alt.X(str(fil+'('+Me+')'),scale=alt.Scale(domain=self.rangeScale(Di,column))),
-                    y=sy,
-                    #color=srow,
-                    tooltip = [sy,str(fil+'('+Me+')')]
-                ).facet(row=srow
-                ).resolve_scale(y = 'independent',x = 'independent')
-                self.Chart = c
-        elif dimen == 3:   #3 Dimension
-            print('3 Dimension')
-            if mes == 'row' :               #2 Column (Dimension)
-                Di = column
-                Me = row[0][0]
-                fil = row[0][1]
-
-                if (type(Di[-1]) == type(['datetime'])) and (type(Di[-2]) == type(['datetime'])) and (type(Di[-3]) == type(['datetime'])):
-                    scol = str(Di[-3][1]+'('+Di[-3][0]+')')
-                    sx = str(Di[-2][1]+'('+Di[-2][0]+')')
-                    scolor = str(Di[-1][1]+'('+Di[-1][0]+')')
-                elif (type(Di[-1]) == type(['datetime'])) and (type(Di[-2]) == type(['datetime'])):
-                    scol = str(Di[-3])
-                    sx = str(Di[-2][1]+'('+Di[-2][0]+')')
-                    scolor = str(Di[-1][1]+'('+Di[-1][0]+')')
-                elif (type(Di[-1]) == type(['datetime'])) and (type(Di[-3]) == type(['datetime'])):
-                    scol = str(Di[-3][1]+'('+Di[-3][0]+')')
-                    sx = str(Di[-2])
-                    scolor = str(Di[-1][1]+'('+Di[-1][0]+')')
-                elif (type(Di[-2]) == type(['datetime'])) and (type(Di[-3]) == type(['datetime'])):
-                    scol = str(Di[-3][1]+'('+Di[-3][0]+')')
-                    sx = str(Di[-2][1]+'('+Di[-2][0]+')')
-                    scolor = str(Di[-1])
-                elif type(Di[-2]) == type(['datetime']):          
-                    scol = str(Di[-3])
-                    sx = str(Di[-2][1]+'('+Di[-2][0]+')')
-                    scolor = str(Di[-1])
-                elif type(Di[-1]) == type(['datetime']):
-                    scol = str(Di[-3])
-                    sx = str(Di[-2])
-                    scolor = str(Di[-1][1]+'('+Di[-1][0]+')')
-                elif type(Di[-3]) == type(['datetime']):
-                    scol = str(Di[-3][1]+'('+Di[-3][0]+')')
-                    sx = str(Di[-2])
-                    scolor = str(Di[-1])
-                else:
-                    scol = str(Di[-3])                      #column > x > color
-                    sx = str(Di[-2])
-                    scolor = str(Di[-1])
-                c = alt.Chart(df).mark_bar().encode(
-                    x=sx,
-                    y=alt.Y(str(fil+'('+Me+')'),scale=alt.Scale(domain=self.rangeScale([Di[1],Di[2]],row[0]))),
-                    color=scolor,
-                    tooltip = [scolor,sx,str(fil+'('+Me+')')]
-                ).facet(column=scol
+                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    y=lr[-1],
+                    tooltip = [lr[-2],lr[-1],lc[-1]]
+                ).facet(row=lr[-2]
                 ).resolve_scale(x = 'independent',y = 'independent')
                 self.Chart = c
-            elif mes == 'column':                 #2 Row (Dimension)
-                Di = row    
-                Me = column[0][0]
-                fil = column[0][1]
 
-                if (type(Di[-1]) == type(['datetime'])) and (type(Di[-2]) == type(['datetime'])) and (type(Di[-3]) == type(['datetime'])):
-                    srow = str(Di[-3][1]+'('+Di[-3][0]+')')
-                    sy = str(Di[-2][1]+'('+Di[-2][0]+')')
-                    scolor = str(Di[-1][1]+'('+Di[-1][0]+')')
-                elif (type(Di[-1]) == type(['datetime'])) and (type(Di[-2]) == type(['datetime'])):
-                    srow = str(Di[-3])
-                    sy = str(Di[-2][1]+'('+Di[-2][0]+')')
-                    scolor = str(Di[-1][1]+'('+Di[-1][0]+')')
-                elif (type(Di[-1]) == type(['datetime'])) and (type(Di[-3]) == type(['datetime'])):
-                    srow = str(Di[-3][1]+'('+Di[-3][0]+')')
-                    sy = str(Di[-2])
-                    scolor = str(Di[-1][1]+'('+Di[-1][0]+')')
-                elif (type(Di[-2]) == type(['datetime'])) and (type(Di[-3]) == type(['datetime'])):
-                    srow = str(Di[-3][1]+'('+Di[-3][0]+')')
-                    sy = str(Di[-2][1]+'('+Di[-2][0]+')')
-                    scolor = str(Di[-1])
-                elif type(Di[-2]) == type(['datetime']):        
-                    srow = str(Di[-3])
-                    sy = str(Di[-2][1]+'('+Di[-2][0]+')')
-                    scolor = str(Di[-1])
-                elif type(Di[-1]) == type(['datetime']):
-                    srow = str(Di[-3])
-                    sy = str(Di[-2])
-                    scolor = str(Di[-1][1]+'('+Di[-1][0]+')')
-                elif type(Di[-3]) == type(['datetime']):
-                    srow = str(Di[-3][1]+'('+Di[-3][0]+')')
-                    sy = str(Di[-2])
-                    scolor = str(Di[-1])
-                else:
-                    srow = str(Di[-3])                      #column > x > color
-                    sy = str(Di[-2])
-                    scolor = str(Di[-1])
+        elif len(lr) == 1 and len(lc) == 2:     #dimension2 date error
+                    
+            if mes == 'row':   
                 c = alt.Chart(df).mark_bar().encode(
-                    x=alt.X(str(fil+'('+Me+')'),scale=alt.Scale(domain=self.rangeScale([Di[1],Di[2]],column[0]))),
-                    y=sy,
-                    color=scolor,
-                    tooltip = [scolor,sy,str(fil+'('+Me+')')]
-                ).facet(row=srow
-                ).resolve_scale(y = 'independent',x = 'independent')
+                    x=lc[-1],
+                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    tooltip = [lc[-2],lr[-1],lc[-1]]
+                ).facet(column=lc[-2]
+                ).resolve_scale(x = 'independent',y = 'independent')
                 self.Chart = c
+            else:
+                c = alt.Chart(df).mark_bar().encode(
+                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    y=lr[-1],
+                    tooltip = [lc[-2],lr[-1],lc[-1]]
+                ).facet(column=lc[-2]
+                ).resolve_scale(x = 'independent',y = 'independent')
+                self.Chart = c
+
+        elif len(lr) == 2 and len(lc) == 2:             ###################
+            if mes == 'row':
+                c = alt.Chart(df).mark_bar().encode(
+                    x=lc[-1],
+                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    tooltip = [lc[-2],lr[-1],lc[-2],lc[-1]]
+                ).facet(column=lc[-2],row=lr[-2]
+                ).resolve_scale(x = 'independent',y = 'independent')
+                self.Chart = c
+            else:
+                c = alt.Chart(df).mark_bar().encode(
+                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    y=lr[-1],
+                    tooltip = [lc[-2],lr[-1],lc[-2],lc[-1]]
+                ).facet(column=lc[-2],row=lr[-2]
+                ).resolve_scale(x = 'independent',y = 'independent')
+                self.Chart = c
+
+
+        elif len(lr) == 1 and len(lc) == 3:
+            if mes == 'row':                
+                c = alt.Chart(df).mark_bar().encode(        #all Dimen on Col or Row
+                    x=lc[-2],
+                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    color = lc[-1],
+                    tooltip = [lc[-3],lc[-2],lc[-1],lr[-1]]
+                ).facet(column=lc[-3]
+                ).resolve_scale(x = 'independent',y = 'independent')
+                self.Chart = c
+            else:
+                if column[2][0] in Measure:
+                    print('x=',lc[-2],'y=',lr[-1],'color=',lc[-1],'col=',lc[-3])
+                    c = alt.Chart(df).mark_bar().encode(
+                        x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                        y=lr[-1],
+                        color = lc[-2],
+                        tooltip = [lc[-3],lc[-2],lc[-1],lr[-1]]
+                    ).facet(column=lc[-3]
+                    ).resolve_scale(x = 'independent',y = 'independent')
+                    self.Chart = c
+                    
+                else:
+                    c = alt.Chart(df).mark_bar().encode(
+                        x=alt.X(lc[-2],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                        y=lr[-1],
+                        color = lc[-1],
+                        tooltip = [lc[-3],lc[-2],lc[-1],lr[-1]]
+                    ).facet(column=lc[-3]
+                    ).resolve_scale(x = 'independent',y = 'independent')
+                    self.Chart = c
+
+        elif len(lr) == 3 and len(lc) == 1:
+            if mes == 'row':
+                if row[2][0] in Measure:
+                    c = alt.Chart(df).mark_bar().encode(
+                        x=lc[-1],
+                        y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                        color = lr[-2],
+                        tooltip = [lc[-1],lr[-3],lr[-2],lr[-1]]
+                    ).facet(row=lr[-3]
+                    ).resolve_scale(x = 'independent',y = 'independent')
+                    self.Chart = c
+                else:
+                    c = alt.Chart(df).mark_bar().encode(
+                        x=lc[-1],
+                        y=alt.Y(lr[-2],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                        color = lr[-1],
+                        tooltip = [lc[-1],lr[-3],lr[-2],lr[-1]]
+                    ).facet(row=lr[-3]
+                    ).resolve_scale(x = 'independent',y = 'independent')
+                    self.Chart = c
+            else:
+                c = alt.Chart(df).mark_bar().encode(
+                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    y=lr[-2],
+                    color = lr[-1],
+                    tooltip = [lc[-1],lr[-3],lr[-2],lr[-1]]
+                ).facet(row=lr[-3]
+                ).resolve_scale(x = 'independent',y = 'independent')
+                self.Chart = c
+
+        elif len(lr) == 3 and len(lc) == 2:
+            #print('x=',lc[-1],'y=',lr[-1],'color=',lr[-2],'row=',lr[-3],'column=',lc[-2])
+            c = alt.Chart(df).mark_bar().encode(
+                x=lc[-1],
+                y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                color = lr[-2],
+                tooltip = [lc[-1],lr[-3],lr[-2],lr[-1]]
+            ).facet(row=lr[-3] , column = lc[-2]
+            ).resolve_scale(y = 'independent')
+            self.Chart = c
+
+        elif len(lr) == 2 and len(lc) == 3: 
+            c = alt.Chart(df).mark_bar().encode(
+                x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                y=lr[-1],
+                color = lc[-2],
+                tooltip = [lc[-3],lc[-2],lc[-1],lr[-1]]
+            ).facet(column=lc[-3] , row = lr[-2]
+            ).resolve_scale(x = 'independent')
+            self.Chart = c
         return self.Chart
     
     def exam(self):
@@ -364,7 +468,8 @@ class graphManager():
             y=str('sum(Profit)'),
             #color=str(self.RowChoose[0]+':N')
         ).resolve_scale(x = 'independent')
-        return c
+        self.Chart = c
+        return self.Chart
     
     def plotLine(self,row,column,mes,Dimen):
 
@@ -384,7 +489,7 @@ class graphManager():
                 self.Chart = ch
             elif Dimen == 2:
                 ch = alt.Chart(df).mark_line(point=True).encode(
-                    alt.X(str(fil+'('+Me+'):Q'),scale=alt.Scale(domain=self.rangeScale([row[0],row[1]],column))),
+                    alt.X(str(fil+'('+Me+'):Q'),scale=alt.Scale(domain=self.self.rangeScale([row[0],row[1]],column))),
                     alt.Y(str(row[-1][1]+'('+row[-1][0]+'):T')),
                     row = str(row[-2][1]+'('+row[-2][0]+'):T'),
                     tooltip = [str(row[-1][1]+'('+row[-1][0]+'):T'),str(fil+'('+Me+')')]
@@ -410,7 +515,7 @@ class graphManager():
                 self.Chart = ch
             elif Dimen == 2:
                 ch = alt.Chart(df).mark_line(point=True).encode(
-                    alt.Y(str(fil+'('+Me+'):Q'),scale=alt.Scale(domain=self.rangeScale([column[0],column[1]],row))),
+                    alt.Y(str(fil+'('+Me+'):Q'),scale=alt.Scale(domain=self.self.rangeScale([column[0],column[1]],row))),
                     alt.X(str(column[-1][1]+'('+column[-1][0]+'):T')),
                     column = str(column[-2][1]+'('+column[-2][0]+'):T'),
                     tooltip = [str(column[-1][1]+'('+column[-1][0]+'):T'),str(fil+'('+Me+')')]
