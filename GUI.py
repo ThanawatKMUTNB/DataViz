@@ -564,8 +564,8 @@ class mainWindow(QMainWindow):
         # print("--------R C",self.RowChoose,self.ColChoose)
         self.setSheetTable()
         self.setChart()
-        # if self.typeChart != []:
-        #     self.showChart()
+        if self.typeChart != []:
+            self.showChart()
     
     def setChart(self):
         # print("set chart")
