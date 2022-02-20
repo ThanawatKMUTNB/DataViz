@@ -47,7 +47,29 @@ class filterMesWindow(QMainWindow):
         self.atLeastValueLabel_3 = self.findChild(QLabel,"atLeastValueLabel_3")
         self.atMostValueLabel_3 = self.findChild(QLabel,"atMostValueLabel_3")
         
+        self.atLeatSlider.valueChanged.connect(self.valuechange1)
+        self.atMostSlider.valueChanged.connect(self.valuechange1)
+        self.atLeatSlider_2.valueChanged.connect(self.valuechange)
+        self.atMostSlider_2.valueChanged.connect(self.valuechange)
+        self.tabwidget.tabBarClicked.connect(self.handle_tabbar_clicked)
         self.setUp()
+        
+    def handle_tabbar_clicked(self, index):
+        print(index)
+        
+    def valuechange1(self):
+        atLeatSlider = str(self.atLeatSlider.value())
+        atMostSlider = str(self.atMostSlider.value())
+        self.filtered[self.dimen][0] = atLeatSlider
+        self.filtered[self.dimen][1] = atMostSlider
+        self.setValues()
+        
+    def valuechange(self):
+        atLeatSlider_2 = str(self.atLeatSlider_2.value())
+        atMostSlider_2 = str(self.atMostSlider_2.value())
+        self.filtered[self.dimen][0] = atLeatSlider_2
+        self.filtered[self.dimen][1] = atMostSlider_2
+        self.setValues()
         
     def setUp(self):
         self.dimen = mainW.diForFil
@@ -61,6 +83,7 @@ class filterMesWindow(QMainWindow):
     
     def setValues(self):
         # print(self.minVa,self.maxVa)
+        print(self.dimen,self.filtered)
         self.rangeMin.setText(str(self.filtered[self.dimen][0]))
         self.rangeMax.setText(str(self.filtered[self.dimen][1]))
         self.atLeastMax.setText(str(self.filtered[self.dimen][1]))
@@ -537,6 +560,11 @@ class mainWindow(QMainWindow):
                 countAc = subMenu.addAction("count")
                 maxAc = subMenu.addAction("max")
                 minAc = subMenu.addAction("min")
+                acList = [avgAc,sumAc,medAc,countAc,maxAc,minAc]
+                for i in acList:
+                    i.setCheckable(True)
+                sumAc.setChecked(True)
+                # print(sumAc.text())
                 menu.addMenu(subMenu)
                 
             # print(self.filterList.currentRow())
