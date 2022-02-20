@@ -241,33 +241,43 @@ class graphManager():
     def rangeScale(self,Di,Meas):
         fil = Meas[1]
         df = self.df
-        if len(Di) == 2:
-            if (type(Di[0]) == type(['list'])) and (type(Di[1]) == type(['list'])):
-                x = str(Di[1][0]+' '+Di[1][1])
-                col = str(Di[0][0]+' '+Di[0][1])
-            elif type(Di[0]) == type(['list']):
-                x = Di[1]
-                col = str(Di[0][0]+' '+Di[0][1])
-            elif type(Di[1]) == type(['list']):
-                x = str(Di[1][0]+' '+Di[1][1])
-                col = Di[0]
+        if len(Di) == 1:
+            if (type(Di[0]) == type(['list'])):
+                x = str(Di[0][0]+' '+Di[0][1])
             else:
-                x = Di[1]
-                col = Di[0]
+                x = Di[0]
+            #print([x])
+            tmax = df.groupby([x], as_index=False)[Meas[0]].agg(fil).max()[1]
+            tmin = df.groupby([x], as_index=False)[Meas[0]].agg(fil).min()[1]
             
-            if fil == 'average':
-                fil = 'mean'
-
-            tmax = df.groupby([col,x], as_index=False)[Meas[0]].agg(fil).max()[2]
-            tmin = df.groupby([col,x], as_index=False)[Meas[0]].agg(fil).min()[2]
-        
             if tmin > 0:
                 tmin = 0
             elif tmax < 0 :
                 tmax = 0
-            
             return [tmin,tmax]
-        return
+
+        elif (type(Di[0]) == type(['list'])) and (type(Di[1]) == type(['list'])):
+            x = str(Di[1][0]+' '+Di[1][1])
+            col = str(Di[0][0]+' '+Di[0][1])
+        elif type(Di[0]) == type(['list']):
+            x = Di[1]
+            col = str(Di[0][0]+' '+Di[0][1])
+        elif type(Di[1]) == type(['list']):
+            x = str(Di[1][0]+' '+Di[1][1])
+            col = Di[0]
+        else:
+            x = Di[1]
+            col = Di[0]
+        #print(col,x,Meas[0])
+        tmax = df.groupby([col,x], as_index=False)[Meas[0]].agg(fil).max()[2]
+        tmin = df.groupby([col,x], as_index=False)[Meas[0]].agg(fil).min()[2]
+        
+        if tmin > 0:
+            tmin = 0
+        elif tmax < 0 :
+            tmax = 0
+        
+        return [tmin,tmax]
 
     def functionRC(self,row,column):
         lr = []
@@ -429,6 +439,8 @@ class graphManager():
                     ).resolve_scale(x = 'independent',y = 'independent')
                     self.Chart = c
             else:
+                #print('x=',lc[-1],'y=',lr[-2],'color=',lr[-1],'row=',lr[-3])
+                #print(di,meas)
                 c = alt.Chart(df).mark_bar().encode(
                     x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
                     y=lr[-2],
@@ -471,60 +483,73 @@ class graphManager():
         self.Chart = c
         return self.Chart
     
-    def plotLine(self,row,column,mes,Dimen):
-
-        print(row,column)
+    def plotLine(self,row,column,meas,di,mes):
         df = self.df
-        if mes == 'column':                 #column is Measure
-            fil = column[1]
-            Me = column[0]
-            if Dimen == 1:
-                Di = row[0][0]
-                fd = row[0][1]
-                ch = alt.Chart(df).mark_line(point=True).encode(
-                    alt.X(str(fil+'('+Me+'):Q')),
-                    alt.Y(str(fd+'('+Di+'):T')),
-                    tooltip = [str(fd+'('+Di+'):T'),str(fil+'('+Me+'):Q')]
-                )
-                self.Chart = ch
-            elif Dimen == 2:
-                ch = alt.Chart(df).mark_line(point=True).encode(
-                    alt.X(str(fil+'('+Me+'):Q'),scale=alt.Scale(domain=self.self.rangeScale([row[0],row[1]],column))),
-                    alt.Y(str(row[-1][1]+'('+row[-1][0]+'):T')),
-                    row = str(row[-2][1]+'('+row[-2][0]+'):T'),
-                    tooltip = [str(row[-1][1]+'('+row[-1][0]+'):T'),str(fil+'('+Me+')')]
-                ).resolve_legend(
-                    size='independent'
-                ).resolve_scale(
-                    y = 'independent',x = 'independent'
-                )
-                self.Chart = ch
+        l = self.functionRC(row,column)
+        lr = l[0]
+        lc = l[1]
 
-        elif mes == 'row':   #row is Measure
-            Me = row[0]
-            fil = row[1]
-            #elif df[c].dtypes == 'datetime64[ns]':
-            if Dimen == 1:
-                Di = column[0][0]
-                fd = column[0][1]
-                ch = alt.Chart(df).mark_line(point=True).encode(
-                    alt.X(str(fd+'('+Di+'):T')),
-                    alt.Y(str(fil+'('+Me+'):Q')),
-                    tooltip = [str(fd+'('+Di+'):T'),str(fil+'('+Me+'):Q')]
-                )
-                self.Chart = ch
-            elif Dimen == 2:
-                ch = alt.Chart(df).mark_line(point=True).encode(
-                    alt.Y(str(fil+'('+Me+'):Q'),scale=alt.Scale(domain=self.self.rangeScale([column[0],column[1]],row))),
-                    alt.X(str(column[-1][1]+'('+column[-1][0]+'):T')),
-                    column = str(column[-2][1]+'('+column[-2][0]+'):T'),
-                    tooltip = [str(column[-1][1]+'('+column[-1][0]+'):T'),str(fil+'('+Me+')')]
-                ).resolve_legend(
-                    size='independent'
-                ).resolve_scale(
-                    y = 'independent',x = 'independent'
-                )
-                self.Chart = ch
+        if len(lr) == 1 and len(lc) == 1:         #1 dimension and Measurement with row and column
+            c = alt.Chart(df).mark_line(point=True).encode(
+                x=alt.X(lc[-1]),
+                y=alt.Y(lr[-1]),
+                tooltip = [lc[-1],lr[-1]]
+            ).resolve_legend(size='independent')
+            self.Chart = c
+            
+        elif len(lr) == 2 and len(lc) == 1:             
+            if mes == 'row':
+                c = alt.Chart(df).mark_line(point=True).encode(
+                    x=lc[-1],
+                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    tooltip = [lc[-1],lr[-1]]
+                ).facet(row=lr[-2]
+                ).resolve_scale(x = 'independent',y = 'independent')
+                self.Chart = c
+            else:
+                c = alt.Chart(df).mark_line(point=True).encode(
+                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    y=lr[-1],
+                    tooltip = [lr[-1],lc[-1]]
+                ).facet(row=lr[-2]
+                ).resolve_scale(x = 'independent',y = 'independent')
+                self.Chart = c
+
+        elif len(lr) == 1 and len(lc) == 2:     #dimension2 date error
+            if mes == 'row':   
+                c = alt.Chart(df).mark_line(point=True).encode(
+                    x=lc[-1],
+                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    tooltip = [lc[-1],lr[-1]]
+                ).facet(column=lc[-2]
+                ).resolve_scale(x = 'independent',y = 'independent')
+                self.Chart = c
+            else:
+                c = alt.Chart(df).mark_line(point=True).encode(
+                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    y=lr[-1],
+                    tooltip = [lr[-1],lc[-1]]
+                ).facet(column=lc[-2]
+                ).resolve_scale(x = 'independent',y = 'independent')
+                self.Chart = c
+
+        elif len(lr) == 2 and len(lc) == 2:             ###################
+            if mes == 'row':
+                c = alt.Chart(df).mark_line(point=True).encode(
+                    x=lc[-1],
+                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    tooltip = [lc[-1],lr[-1]]
+                ).facet(column=lc[-2],row=lr[-2]
+                ).resolve_scale(x = 'independent',y = 'independent')
+                self.Chart = c
+            else:
+                c = alt.Chart(df).mark_line(point=True).encode(
+                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    y=lr[-1],
+                    tooltip = [lr[-1],lc[-1]]
+                ).facet(column=lc[-2],row=lr[-2]
+                ).resolve_scale(x = 'independent',y = 'independent')
+                self.Chart = c
         return self.Chart
 
     def plotPie(self,row,column,mes):
