@@ -665,9 +665,9 @@ class mainWindow(QMainWindow):
         for i in range(len(tmpc)):
             self.ColList.item(i).setForeground(QtGui.QColor('white'))
             if str(self.ColList.item(i).text()) in list(self.Measure.keys()):
-                self.ColList.item(i).setBackground(QtGui.QColor('green'))
+                self.ColList.item(i).setBackground(QtGui.QColor('#00b180'))
             else: 
-                self.ColList.item(i).setBackground(QtGui.QColor('blue'))
+                self.ColList.item(i).setBackground(QtGui.QColor('#4996b2'))
                 
         self.RowChoose = tmpr
         self.ColChoose = tmpc

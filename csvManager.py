@@ -340,7 +340,11 @@ class csvManager:
                     print("mes in col",Rowdi,Coldi)
                     k = pd.pivot_table(results,columns = colNum[len(Rowdi):beforMesual], index= colNum[:len(Rowdi)],values = colNum[beforMesual:],aggfunc=np.sum)
                     k = k.round(0)
-                    k.columns = isInterCol
+                    if len(isInterCol) == 1:
+                        isInterCol = isInterCol*len(k.columns)
+                        # print(isInterCol)
+                    else:
+                        k.columns = isInterCol
                     
                     if len(isInterRow) == 0 and len(Rowdi) == 0: 
                         print("Only mes col")
@@ -392,5 +396,5 @@ class csvManager:
         k.index = changIndex
         print(k)'''
         # print(Row,Col)
-        print(k)
+        # print(k)
         return k
