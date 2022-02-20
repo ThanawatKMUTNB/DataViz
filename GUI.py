@@ -574,11 +574,29 @@ class mainWindow(QMainWindow):
         # self.isInterCol = [value for value in self.ColChoose if value in [self.Measure.keys()]]
         # print("--------IR IC",self.isInterRow,self.isInterCol)
         gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data)
+        Measure = list(self.Measure.keys())
         self.typeChart = []
         print("--->",self.isInterRow,self.isInterCol)
-        if len(self.isInterRow)>0 or len(self.isInterCol)>0 :
+        print('RC CH',self.RowChoose,self.ColChoose)
+        if (len(self.isInterRow)>0 and len(self.isInterCol)==0) or (len(self.isInterCol)>0 and len(self.isInterRow)==0):    #Measurement same line
+            if (len(self.RowChoose)==1 and len(self.isInterCol)>0) or (len(self.ColChoose)==1 and len(self.isInterRow)>0):
+                self.typeChart = ['Bar','Pie','Line']
+            elif (len(self.RowChoose)==2 and len(self.isInterCol)>0) or (len(self.ColChoose)==2 and len(self.isInterRow)>0):
+                self.typeChart = ['Bar','Line']
+            elif (len(self.RowChoose)==2 and len(self.isInterCol)>0 and len(self.ColChoose)>1) or (len(self.ColChoose)==2 and len(self.isInterRow)>0 and len(self.RowChoose)>1):    #don't check
+                self.typeChart = ['Bar','Line']
+            elif (self.RowChoose != [] and self.ColChoose == [] and len(self.isInterRow)>0) or (self.RowChoose == [] and self.ColChoose != [] and len(self.isInterCol)>0):  #don't check 1 dimen
+                self.typeChart = ['Bar']
+            elif (len(self.RowChoose)==3 and len(self.isInterCol)==1) or (len(self.ColChoose)==3 and len(self.isInterRow)==1):
+                print('3dimen')
+                self.typeChart = ['Bar']
+            elif (len(self.RowChoose)==2 and len(self.isInterCol)==1 and len(self.ColChoose)==3) or (len(self.ColChoose)==2 and len(self.isInterRow)==1 and len(self.RowChoose)==3):
+                self.typeChart = ['Bar']
+            else:
+                self.typeChart = []
+        #if len(self.isInterRow)>0 or len(self.isInterCol)>0 :
             # if (len(self.isInterRow)>0 and len(self.isInterCol)==0) or (len(self.isInterCol)>0 and len(self.isInterRow)==0):
-            self.typeChart = ['Bar']
+            #self.typeChart = ['Bar']
             # print("Have Mes")
             # if (self.RowChoose != [] and self.ColChoose == []) or (self.RowChoose == [] and self.ColChoose != []) :
             
