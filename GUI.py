@@ -559,6 +559,25 @@ class mainWindow(QMainWindow):
             self.windowM()
         else:
             self.windowD()
+        
+    def lenDimen(self,row,col):
+        r = 0
+        c = 0
+        Measure = list(self.Measure.keys())
+        for i in row:
+            if type(i) == type(['list']):
+                if i[0] not in Measure:
+                    r += 1
+            elif i not in Measure:
+                r +=1
+        
+        for j in col:
+            if type(j) == type(['list']):
+                if j[0] not in Measure:
+                    c += 1
+            elif j not in Measure:
+                c +=1
+        return [r,c]
             
     def setplot(self):
         # print("--------R C",self.RowChoose,self.ColChoose)
@@ -577,18 +596,19 @@ class mainWindow(QMainWindow):
         Measure = list(self.Measure.keys())
         self.typeChart = []
         print("--->",self.isInterRow,self.isInterCol)
-        print('RC CH',self.RowChoose,self.ColChoose)
+        #print('RC CH',self.RowChoose,self.ColChoose)
         if (len(self.isInterRow)>0 and len(self.isInterCol)==0) or (len(self.isInterCol)>0 and len(self.isInterRow)==0):    #Measurement same line
-            if (len(self.RowChoose)==1 and len(self.isInterCol)>0) or (len(self.ColChoose)==1 and len(self.isInterRow)>0):
+            if (self.lenDimen(self.RowChoose,self.ColChoose)[0] == 0 and len(self.isInterCol)>0) or (self.lenDimen(self.RowChoose,self.ColChoose)[1] == 0 and len(self.isInterRow)>0):
+                self.typeChart = []
+            elif (len(self.RowChoose)==1 and len(self.isInterCol)>0) or (len(self.ColChoose)==1 and len(self.isInterRow)>0):
                 self.typeChart = ['Bar','Pie','Line']
             elif (len(self.RowChoose)==2 and len(self.isInterCol)>0) or (len(self.ColChoose)==2 and len(self.isInterRow)>0):
                 self.typeChart = ['Bar','Line']
-            elif (len(self.RowChoose)==2 and len(self.isInterCol)>0 and len(self.ColChoose)>1) or (len(self.ColChoose)==2 and len(self.isInterRow)>0 and len(self.RowChoose)>1):    #don't check
+            elif (self.lenDimen(self.RowChoose,self.ColChoose)[0] == 2 and  self.lenDimen(self.RowChoose,self.ColChoose)[1] == 1) or (self.lenDimen(self.RowChoose,self.ColChoose)[0] == 1 and  self.lenDimen(self.RowChoose,self.ColChoose)[1] == 2):    #don't check
                 self.typeChart = ['Bar','Line']
-            elif (self.RowChoose != [] and self.ColChoose == [] and len(self.isInterRow)>0) or (self.RowChoose == [] and self.ColChoose != [] and len(self.isInterCol)>0):  #don't check 1 dimen
+            elif (self.RowChoose != [] and self.ColChoose == [] and len(self.isInterRow)>0) or (self.RowChoose == [] and self.ColChoose != [] and len(self.isInterCol)>0) and (self.lenDimen(self.RowChoose,self.ColChoose)[0] == 1 or self.lenDimen(self.RowChoose,self.ColChoose)[1] == 1):
                 self.typeChart = ['Bar']
             elif (len(self.RowChoose)==3 and len(self.isInterCol)==1) or (len(self.ColChoose)==3 and len(self.isInterRow)==1):
-                print('3dimen')
                 self.typeChart = ['Bar']
             elif (len(self.RowChoose)==2 and len(self.isInterCol)==1 and len(self.ColChoose)==3) or (len(self.ColChoose)==2 and len(self.isInterRow)==1 and len(self.RowChoose)==3):
                 self.typeChart = ['Bar']
