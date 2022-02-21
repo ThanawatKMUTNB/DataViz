@@ -674,7 +674,7 @@ class mainWindow(QMainWindow):
                 if item2.text() in list(self.Measure.keys()):
                     # mesAc = menu.addAction('Measure ('+self.Measure[item2.text()]+')')
                     subMenu = QMenu('Measure ('+self.Measure[item2.text()]+')')
-                    avgAc = subMenu.addAction("averrage")
+                    avgAc = subMenu.addAction("average")
                     sumAc = subMenu.addAction("sum")
                     medAc = subMenu.addAction("median")
                     countAc = subMenu.addAction("count")
@@ -685,6 +685,8 @@ class mainWindow(QMainWindow):
                         i.setCheckable(True)
                         if self.Measure[item2.text()] == i.text():
                             i.setChecked(True)
+                        else:
+                            i.setChecked(False)
                     # print(sumAc.text())
                     menu.addMenu(subMenu)
                     # print(menu.exec_(event.globalPos()).text())
@@ -700,20 +702,35 @@ class mainWindow(QMainWindow):
                     self.selectFil(item.text())
                 else: # menu.exec_(event.globalPos()) in acList:
                     print("secound")
-                    print(subMenu.exec_(event.globalPos()).text())
-                    print(self.Measure)
-                    # for i in acList:
-                    #     print("---")
-                    #     print(i.text(),menu.exec_(event.globalPos()).text())
-                        # if i.text() == menu.exec_(event.globalPos()).text():
-                            # print(i.text())
-                    menu.exec_(event.globalPos()).setChecked(True)
-                    self.Measure[item2.text()] = menu.exec_(event.globalPos()).text()
-                    print(self.Measure)
-                    for j in acList:
-                        if j.text() != menu.exec_(event.globalPos()).text() :
-                            j.setChecked(False)
-                            # print(self.Measure)
+                    item = source.itemAt(event.pos())
+                    
+                    
+                    # print(menu.exec_(event.globalPos()).text())
+                    # print(subMenu.exec_(event.globalPos()).text())
+                    # if subMenu.exec_(event.globalPos()) == countAc:
+                    #     print("ok1")
+                    if menu.exec_(event.globalPos()) == countAc:
+                        print("ok")
+                    else:
+                        print("try")
+                    if subMenu.exec_(event.globalPos()) == countAc:
+                        print("ok1")
+                    else:
+                        print("try1")
+                    # print(subMenu.exec_(event.globalPos()).text())
+                    # print(self.Measure)
+                    # # for i in acList:
+                    # #     print("---")
+                    # #     print(i.text(),menu.exec_(event.globalPos()).text())
+                    #     # if i.text() == menu.exec_(event.globalPos()).text():
+                    #         # print(i.text())
+                    # menu.exec_(event.globalPos()).setChecked(True)
+                    # self.Measure[item2.text()] = menu.exec_(event.globalPos()).text()
+                    # print(self.Measure)
+                    # for j in acList:
+                    #     if j.text() != menu.exec_(event.globalPos()).text() :
+                    #         j.setChecked(False)
+                    #         # print(self.Measure)
                 return True
         return super().eventFilter(source, event)
     
@@ -900,7 +917,7 @@ class mainWindow(QMainWindow):
         
     def filChange(self):
         
-        #print(self.filDic)
+        print(self.filDic)
         itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
         itemsTextList =  list(set(itemsTextList))
         # print(itemsTextList)
@@ -909,25 +926,26 @@ class mainWindow(QMainWindow):
             itemsTextList.remove('')
             
         if itemsTextList != []:
-                self.filterList.clear()
-                self.filterList.addItems(itemsTextList)
-                
-                for i in itemsTextList:
-                    if i not in list(self.filDic.keys()):
-                        self.filDic[i] = ""
-        # print(self.filDic)
+            self.filterList.clear()
+            self.filterList.addItems(itemsTextList)
+            
+            for i in itemsTextList:
+                if i not in list(self.filDic.keys()):
+                    self.filDic[i] = ""
+            # print(self.filDic)
+            
     def showSheet(self):
+        # cm.filter = self.filDic
         buf = self.dataSheet
-        print(buf)
+        # print(buf)
         for i in self.filDic.keys():
             if i in self.Measure.keys():
                 print("show sheet",self.filDic)
-                buf = self.dataSheet[self.dataSheet[i].between(self.filDic[i][0], self.filDic[i][1])]
-                # buf = buf.loc[(buf[i] < self.filDic[i][1])]
-                # buf = self.dataSheet.loc[self.dataSheet[i] < self.filDic[i][1]] 
-        print(buf)
+                buf = self.dataSheet[self.dataSheet[i].between(min(self.filDic[i]), max(self.filDic[i]))]
         self.model = TableModel2(buf)
+        # self.model = TableModel2(self.dataSheet)
         self.sheetTable.setModel(self.model)
+        
     def setSheetTable(self):
         print("filter",self.filDic)
         # self.isInterRow = [value for value in self.RowChoose if value in list(self.Measure.keys())]
