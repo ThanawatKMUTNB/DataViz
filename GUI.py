@@ -75,13 +75,10 @@ class filterMesWindow(QMainWindow):
     
     def ApplyBut(self):
         mainW.filDic = self.filtered
-        # print(self.filtered)
-        # print(mainW.dataSheet)
-        mainW.dataSheet = mainW.dataSheet.loc[mainW.dataSheet[self.dimen] > self.filtered[self.dimen][0]]
-        # print(mainW.dataSheet)
-        mainW.dataSheet = mainW.dataSheet.loc[mainW.dataSheet[self.dimen] < self.filtered[self.dimen][1]] 
-        # print(self.sheet)
-        # mainW.dataSheet = self.sheet
+        # mainW.dataSheet = mainW.dataSheet.loc[mainW.dataSheet[self.dimen] > self.filtered[self.dimen][0]]
+        # mainW.dataSheet = mainW.dataSheet.loc[mainW.dataSheet[self.dimen] < self.filtered[self.dimen][1]] 
+        mainW.setChart()
+        mainW.showChart()
         mainW.showSheet()
         self.close()
         
@@ -165,16 +162,19 @@ class filterMesWindow(QMainWindow):
             # print("J")
             self.sheet = mainW.data
         self.filtered = mainW.filDic
-        if self.filtered[self.dimen] == "":
-            self.filtered[self.dimen] = [self.sheet[self.dimen].min(),self.sheet[self.dimen].max()]
-        self.maxVa = float(self.sheet[self.dimen].max())
-        self.minVa = float(self.sheet[self.dimen].min())
-        
+        print("start",self.filtered)
+        if self.filtered[self.dimen] == "" or len(self.filtered[self.dimen])>2:
+            self.filtered[self.dimen] = [min(self.sheet[self.dimen]),max(self.sheet[self.dimen])]
+        print("set up",self.filtered)
+        self.maxVa = float(max(self.sheet[self.dimen]))
+        self.minVa = float(min(self.sheet[self.dimen]))
+        # print(self.dimen)
+        print(self.filtered)
         format(self.maxVa, '.2f')
         format(self.minVa, '.2f')
         
-        maxVa = float(self.sheet[self.dimen].max())
-        minVa = float(self.sheet[self.dimen].min())
+        maxVa = float(max(self.sheet[self.dimen]))
+        minVa = float(min(self.sheet[self.dimen]))
         format(maxVa, '.2f')
         format(minVa, '.2f')
         
@@ -197,7 +197,7 @@ class filterMesWindow(QMainWindow):
         self.atMostValueLabel_3.setText(str(self.maxVa))
             # i.setValue(minVa)
         # print(self.filtered,self.original)
-        # self.setValues()
+        self.setValues()
     
     def setValues(self):
         # print(self.filtered)
@@ -209,7 +209,7 @@ class filterMesWindow(QMainWindow):
         self.atLeastMin.setText(str(float(self.filtered[self.dimen][0])))
         self.atMostMax.setText(str(float(self.filtered[self.dimen][1])))
         self.atMostMin.setText(str(float(self.filtered[self.dimen][0])))
-        
+        print("set value",self.filtered)
         self.atMostSlider.setValue(float(self.filtered[self.dimen][1]))
         self.atMostSlider_2.setValue(float(self.filtered[self.dimen][1]))
         self.atLeatSlider.setValue(float(self.filtered[self.dimen][0]))
@@ -634,8 +634,8 @@ class mainWindow(QMainWindow):
         self.FileListDimension = self.findChild(QListWidget,"FileListDimension")
         self.FileListMes = self.findChild(QListWidget,"FileListMes")
         
+        self.FileList = self.findChild(FileInDirec,"FileList")
         self.FileListChoose = self.findChild(FileChoose,"FileListChoose")
-        
         self.chartType = self.findChild(QComboBox,"chartType")
         
         # self.tabWidget_2 = self.findChild(QTabWidget,"tabWidget_2")
@@ -683,15 +683,13 @@ class mainWindow(QMainWindow):
                     acList = [avgAc,sumAc,medAc,countAc,maxAc,minAc]
                     for i in acList:
                         i.setCheckable(True)
-                    sumAc.setChecked(True)
+                        if self.Measure[item2.text()] == i.text():
+                            i.setChecked(True)
                     # print(sumAc.text())
                     menu.addMenu(subMenu)
-                # print(self.filterList.currentRow())
-                # menu.addAction('Action 2')
-                # menu.addAction('Action 3')
-                # if menu.exec_(event.globalPos()):
-                    # action = menu.exec_(self.mapToGlobal())
+                    # print(menu.exec_(event.globalPos()).text())
                 if menu.exec_(event.globalPos()) == filterAc:
+                    # print("first Click",filterAc.text())
                     item = source.itemAt(event.pos())
                     if item.text() not in list(self.filDic.keys()):
                         tmpr =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
@@ -700,6 +698,22 @@ class mainWindow(QMainWindow):
                         self.filDic[item.text()] = ""
                         print(self.filDic)
                     self.selectFil(item.text())
+                else: # menu.exec_(event.globalPos()) in acList:
+                    print("secound")
+                    print(subMenu.exec_(event.globalPos()).text())
+                    print(self.Measure)
+                    # for i in acList:
+                    #     print("---")
+                    #     print(i.text(),menu.exec_(event.globalPos()).text())
+                        # if i.text() == menu.exec_(event.globalPos()).text():
+                            # print(i.text())
+                    menu.exec_(event.globalPos()).setChecked(True)
+                    self.Measure[item2.text()] = menu.exec_(event.globalPos()).text()
+                    print(self.Measure)
+                    for j in acList:
+                        if j.text() != menu.exec_(event.globalPos()).text() :
+                            j.setChecked(False)
+                            # print(self.Measure)
                 return True
         return super().eventFilter(source, event)
     
@@ -903,7 +917,16 @@ class mainWindow(QMainWindow):
                         self.filDic[i] = ""
         # print(self.filDic)
     def showSheet(self):
-        self.model = TableModel2(self.dataSheet)
+        buf = self.dataSheet
+        print(buf)
+        for i in self.filDic.keys():
+            if i in self.Measure.keys():
+                print("show sheet",self.filDic)
+                buf = self.dataSheet[self.dataSheet[i].between(self.filDic[i][0], self.filDic[i][1])]
+                # buf = buf.loc[(buf[i] < self.filDic[i][1])]
+                # buf = self.dataSheet.loc[self.dataSheet[i] < self.filDic[i][1]] 
+        print(buf)
+        self.model = TableModel2(buf)
         self.sheetTable.setModel(self.model)
     def setSheetTable(self):
         print("filter",self.filDic)
@@ -1021,7 +1044,7 @@ class mainWindow(QMainWindow):
             self.FileListChoose.clear()
         if type(self.selectFile) != list:
             self.selectFile = [self.selectFile]
-        if self.selectFile != []:
+        if self.selectFile != [] and self.selectFile != None:
             self.FileListChoose.addItems(self.selectFile)
             
     def launchDialog(self):
