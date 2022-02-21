@@ -758,7 +758,7 @@ class mainWindow(QMainWindow):
         print("--->",self.isInterRow,self.isInterCol)
         #print('RC CH',self.RowChoose,self.ColChoose)
         if (len(self.isInterRow)>0 and len(self.isInterCol)==0) or (len(self.isInterCol)>0 and len(self.isInterRow)==0):    #Measurement same line
-            if (self.lenDimen(self.RowChoose,self.ColChoose)[0] == 0 and len(self.isInterCol)>0) or (self.lenDimen(self.RowChoose,self.ColChoose)[1] == 0 and len(self.isInterRow)>0):
+            if (self.lenDimen(self.RowChoose,self.ColChoose)[0] == 0 and self.lenDimen(self.RowChoose,self.ColChoose)[1] == 0 and len(self.isInterCol)>0) or (self.lenDimen(self.RowChoose,self.ColChoose)[1] == 0 and self.lenDimen(self.RowChoose,self.ColChoose)[0] == 0 and len(self.isInterRow)>0):
                 self.typeChart = []
             elif (len(self.RowChoose)==1 and len(self.isInterCol)>0) or (len(self.ColChoose)==1 and len(self.isInterRow)>0):
                 self.typeChart = ['Bar','Pie','Line']
@@ -766,7 +766,7 @@ class mainWindow(QMainWindow):
                 self.typeChart = ['Bar','Line']
             elif (self.lenDimen(self.RowChoose,self.ColChoose)[0] == 2 and  self.lenDimen(self.RowChoose,self.ColChoose)[1] == 1) or (self.lenDimen(self.RowChoose,self.ColChoose)[0] == 1 and  self.lenDimen(self.RowChoose,self.ColChoose)[1] == 2):    #don't check
                 self.typeChart = ['Bar','Line']
-            elif (self.RowChoose != [] and self.ColChoose == [] and len(self.isInterRow)>0) or (self.RowChoose == [] and self.ColChoose != [] and len(self.isInterCol)>0) and (self.lenDimen(self.RowChoose,self.ColChoose)[0] == 1 or self.lenDimen(self.RowChoose,self.ColChoose)[1] == 1):
+            elif ((self.lenDimen(self.RowChoose,self.ColChoose)[0] == 1 and len(self.isInterRow)>0) or (self.lenDimen(self.RowChoose,self.ColChoose)[1] == 1and len(self.isInterCol)>0)):
                 self.typeChart = ['Bar']
             elif (len(self.RowChoose)==3 and len(self.isInterCol)==1) or (len(self.ColChoose)==3 and len(self.isInterRow)==1):
                 self.typeChart = ['Bar']
