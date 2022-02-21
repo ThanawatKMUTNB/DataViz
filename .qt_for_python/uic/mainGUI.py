@@ -18,6 +18,8 @@ from PySide2.QtWidgets import *
 import FileInDirec
 import FileChoose
 import rowListClass
+import colListClass
+import filListClass
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -32,7 +34,7 @@ class Ui_MainWindow(object):
         self.gridLayout_7.setObjectName(u"gridLayout_7")
         self.tabWidget = QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName(u"tabWidget")
-        self.tabWidget.setTabPosition(QTabWidget.West)
+        self.tabWidget.setTabPosition(QTabWidget.South)
         self.tabWidget.setTabShape(QTabWidget.Rounded)
         self.tabWidget.setMovable(False)
         self.dataSourceTab = QWidget()
@@ -233,7 +235,7 @@ class Ui_MainWindow(object):
 
         self.gridLayout_10.addWidget(self.filterLabel, 0, 1, 1, 2)
 
-        self.filterList = rowListClass(self.SheetTab)
+        self.filterList = filListClass(self.SheetTab)
         self.filterList.setObjectName(u"filterList")
         sizePolicy3.setHeightForWidth(self.filterList.sizePolicy().hasHeightForWidth())
         self.filterList.setSizePolicy(sizePolicy3)
@@ -272,51 +274,11 @@ class Ui_MainWindow(object):
 
         self.gridLayout_8.addWidget(self.ColLabel, 2, 0, 1, 1)
 
-        self.ColList = rowListClass(self.SheetTab)
-        self.ColList.setObjectName(u"ColList")
+        self.RowList = rowListClass(self.SheetTab)
+        self.RowList.setObjectName(u"RowList")
         sizePolicy6 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         sizePolicy6.setHorizontalStretch(0)
         sizePolicy6.setVerticalStretch(0)
-        sizePolicy6.setHeightForWidth(self.ColList.sizePolicy().hasHeightForWidth())
-        self.ColList.setSizePolicy(sizePolicy6)
-        self.ColList.setMinimumSize(QSize(0, 40))
-        self.ColList.setMaximumSize(QSize(16777215, 40))
-        self.ColList.setMouseTracking(False)
-        self.ColList.setContextMenuPolicy(Qt.DefaultContextMenu)
-        self.ColList.setAcceptDrops(True)
-        self.ColList.setLayoutDirection(Qt.LeftToRight)
-        self.ColList.setAutoFillBackground(True)
-        self.ColList.setFrameShape(QFrame.StyledPanel)
-        self.ColList.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.ColList.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
-        self.ColList.setAutoScroll(True)
-        self.ColList.setAutoScrollMargin(5)
-        self.ColList.setProperty("showDropIndicator", False)
-        self.ColList.setDragEnabled(True)
-        self.ColList.setDragDropOverwriteMode(False)
-        self.ColList.setDragDropMode(QAbstractItemView.DragDrop)
-        self.ColList.setDefaultDropAction(Qt.MoveAction)
-        self.ColList.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.ColList.setTextElideMode(Qt.ElideMiddle)
-        self.ColList.setVerticalScrollMode(QAbstractItemView.ScrollPerItem)
-        self.ColList.setHorizontalScrollMode(QAbstractItemView.ScrollPerItem)
-        self.ColList.setFlow(QListView.LeftToRight)
-        self.ColList.setProperty("isWrapping", False)
-        self.ColList.setResizeMode(QListView.Adjust)
-        self.ColList.setSpacing(5)
-        self.ColList.setGridSize(QSize(60, 0))
-        self.ColList.setViewMode(QListView.ListMode)
-        self.ColList.setModelColumn(0)
-        self.ColList.setUniformItemSizes(False)
-        self.ColList.setBatchSize(1)
-        self.ColList.setWordWrap(False)
-        self.ColList.setSelectionRectVisible(False)
-        self.ColList.setSortingEnabled(False)
-
-        self.gridLayout_8.addWidget(self.ColList, 2, 1, 1, 1)
-
-        self.RowList = rowListClass(self.SheetTab)
-        self.RowList.setObjectName(u"RowList")
         sizePolicy6.setHeightForWidth(self.RowList.sizePolicy().hasHeightForWidth())
         self.RowList.setSizePolicy(sizePolicy6)
         self.RowList.setMinimumSize(QSize(0, 40))
@@ -354,6 +316,46 @@ class Ui_MainWindow(object):
         self.RowList.setSortingEnabled(False)
 
         self.gridLayout_8.addWidget(self.RowList, 0, 1, 1, 1)
+
+        self.ColList = colListClass(self.SheetTab)
+        self.ColList.setObjectName(u"ColList")
+        sizePolicy6.setHeightForWidth(self.ColList.sizePolicy().hasHeightForWidth())
+        self.ColList.setSizePolicy(sizePolicy6)
+        self.ColList.setMinimumSize(QSize(0, 40))
+        self.ColList.setMaximumSize(QSize(16777215, 40))
+        self.ColList.setMouseTracking(False)
+        self.ColList.setContextMenuPolicy(Qt.DefaultContextMenu)
+        self.ColList.setAcceptDrops(True)
+        self.ColList.setLayoutDirection(Qt.LeftToRight)
+        self.ColList.setAutoFillBackground(True)
+        self.ColList.setFrameShape(QFrame.StyledPanel)
+        self.ColList.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.ColList.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+        self.ColList.setAutoScroll(True)
+        self.ColList.setAutoScrollMargin(5)
+        self.ColList.setProperty("showDropIndicator", False)
+        self.ColList.setDragEnabled(True)
+        self.ColList.setDragDropOverwriteMode(False)
+        self.ColList.setDragDropMode(QAbstractItemView.DragDrop)
+        self.ColList.setDefaultDropAction(Qt.MoveAction)
+        self.ColList.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.ColList.setTextElideMode(Qt.ElideMiddle)
+        self.ColList.setVerticalScrollMode(QAbstractItemView.ScrollPerItem)
+        self.ColList.setHorizontalScrollMode(QAbstractItemView.ScrollPerItem)
+        self.ColList.setFlow(QListView.LeftToRight)
+        self.ColList.setProperty("isWrapping", False)
+        self.ColList.setResizeMode(QListView.Adjust)
+        self.ColList.setSpacing(5)
+        self.ColList.setGridSize(QSize(60, 0))
+        self.ColList.setViewMode(QListView.ListMode)
+        self.ColList.setModelColumn(0)
+        self.ColList.setUniformItemSizes(False)
+        self.ColList.setBatchSize(1)
+        self.ColList.setWordWrap(False)
+        self.ColList.setSelectionRectVisible(False)
+        self.ColList.setSortingEnabled(False)
+
+        self.gridLayout_8.addWidget(self.ColList, 2, 1, 1, 1)
 
 
         self.gridLayout_12.addLayout(self.gridLayout_8, 0, 1, 1, 1)
@@ -401,6 +403,13 @@ class Ui_MainWindow(object):
         self.tab_2.setObjectName(u"tab_2")
         self.gridLayout_11 = QGridLayout(self.tab_2)
         self.gridLayout_11.setObjectName(u"gridLayout_11")
+        self.frame = QFrame(self.tab_2)
+        self.frame.setObjectName(u"frame")
+        self.frame.setFrameShape(QFrame.StyledPanel)
+        self.frame.setFrameShadow(QFrame.Raised)
+
+        self.gridLayout_11.addWidget(self.frame, 0, 0, 1, 1)
+
         self.tabWidget_2.addTab(self.tab_2, QString())
 
         self.gridLayout_12.addWidget(self.tabWidget_2, 1, 1, 1, 1)

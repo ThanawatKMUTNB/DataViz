@@ -169,7 +169,7 @@ class filterMesWindow(QMainWindow):
         self.maxVa = float(max(self.sheet[self.dimen]))
         self.minVa = float(min(self.sheet[self.dimen]))
         # print(self.dimen)
-        print(self.filtered)
+        # print(self.filtered)
         format(self.maxVa, '.2f')
         format(self.minVa, '.2f')
         
@@ -209,7 +209,7 @@ class filterMesWindow(QMainWindow):
         self.atLeastMin.setText(str(float(self.filtered[self.dimen][0])))
         self.atMostMax.setText(str(float(self.filtered[self.dimen][1])))
         self.atMostMin.setText(str(float(self.filtered[self.dimen][0])))
-        print("set value",self.filtered)
+        # print("set value",self.filtered)
         self.atMostSlider.setValue(float(self.filtered[self.dimen][1]))
         self.atMostSlider_2.setValue(float(self.filtered[self.dimen][1]))
         self.atLeatSlider.setValue(float(self.filtered[self.dimen][0]))
@@ -235,6 +235,7 @@ class filterDimenWindow(QMainWindow):
         self.resetButton = self.findChild(QPushButton,"resetButton")
         self.cancleButton = self.findChild(QPushButton,"cancleButton")
         self.okButton = self.findChild(QPushButton,"okButton")
+        
         #  func
         self.allButton.clicked.connect(self.allBut)
         self.noneButton.clicked.connect(self.noneBut)
@@ -304,11 +305,15 @@ class filterDimenWindow(QMainWindow):
         
     def setUp(self):
         self.dimen = mainW.diForFil
+            
         self.sheet = mainW.data
         self.filtered = mainW.filDic
         # print("BF--------",self.filtered,self.filtered[self.dimen])
         if self.filtered[self.dimen] == "":
-            self.filtered[self.dimen] = list(set(self.sheet[self.dimen].values))
+            if self.dimen in mainW.typeDate.keys():
+                self.filtered[self.dimen] = cm.getDateByFunc(self.dimen,mainW.typeDate[self.dimen])
+            else :
+                self.filtered[self.dimen] = list(set(self.sheet[self.dimen].values))
         # print(self.filtered)
     
     def setList(self):
@@ -603,7 +608,7 @@ class mainWindow(QMainWindow):
         self.isInterRow = ''
         self.isInterCol = ''
         self.typeChart = ['Bar','Line', 'Pie']
-        self.typeDate = [['Order Date',"month"],['Ship Date',"month"]]
+        self.typeDate = {'Order Date':"year",'Ship Date':"year"}
         self.fileNameList = []
         self.selectFile = []
         self.dataSheet = ""
@@ -673,13 +678,13 @@ class mainWindow(QMainWindow):
                 filterAc = menu.addAction('Filter')
                 if item2.text() in list(self.Measure.keys()):
                     # mesAc = menu.addAction('Measure ('+self.Measure[item2.text()]+')')
-                    subMenu = QMenu('Measure ('+self.Measure[item2.text()]+')')
-                    avgAc = subMenu.addAction("average")
-                    sumAc = subMenu.addAction("sum")
-                    medAc = subMenu.addAction("median")
-                    countAc = subMenu.addAction("count")
-                    maxAc = subMenu.addAction("max")
-                    minAc = subMenu.addAction("min")
+                    # subMenu = QMenu('Measure ('+self.Measure[item2.text()]+')')
+                    avgAc = menu.addAction("average")
+                    sumAc = menu.addAction("sum")
+                    medAc = menu.addAction("median")
+                    countAc = menu.addAction("count")
+                    maxAc = menu.addAction("max")
+                    minAc = menu.addAction("min")
                     acList = [avgAc,sumAc,medAc,countAc,maxAc,minAc]
                     for i in acList:
                         i.setCheckable(True)
@@ -688,7 +693,7 @@ class mainWindow(QMainWindow):
                         else:
                             i.setChecked(False)
                     # print(sumAc.text())
-                    menu.addMenu(subMenu)
+                    # menu.addMenu(subMenu)
                     # print(menu.exec_(event.globalPos()).text())
                 if menu.exec_(event.globalPos()) == filterAc:
                     # print("first Click",filterAc.text())
@@ -698,11 +703,11 @@ class mainWindow(QMainWindow):
                         tmpr.append(item.text())
                         self.filterList.addItems(tmpr)
                         self.filDic[item.text()] = ""
-                        print(self.filDic)
+                        # print(self.filDic)
                     self.selectFil(item.text())
                 else: # menu.exec_(event.globalPos()) in acList:
                     print("secound")
-                    item = source.itemAt(event.pos())
+                    # item = source.itemAt(event.pos())
                     
                     
                     # print(menu.exec_(event.globalPos()).text())
@@ -917,7 +922,7 @@ class mainWindow(QMainWindow):
         
     def filChange(self):
         
-        print(self.filDic)
+        # print(self.filDic)
         itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
         itemsTextList =  list(set(itemsTextList))
         # print(itemsTextList)
