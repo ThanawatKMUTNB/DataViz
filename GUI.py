@@ -1,4 +1,3 @@
-from ast import Global
 import os
 import sys
 from PyQt5.QtCore import Qt,QEvent
@@ -627,7 +626,7 @@ class TableModel(QtCore.QAbstractTableModel):
 
 class mainWindow(QMainWindow):
     def __init__(self):
-        super(QMainWindow,self).__init__()
+        super(mainWindow,self).__init__()
         uic.loadUi("mainGUI.ui",self)
         # loadUi("mainGUI.ui",self)
         self.Measure = {'Sales':"sum",'Quantity':"sum",'Discount':"sum",'Profit':"sum"}
@@ -688,7 +687,7 @@ class mainWindow(QMainWindow):
         if self.ColList != None:
             self.ColList.installEventFilter(self)
         self.chartType.activated.connect(self.showChart)
-        self.show()
+        # self.show()
         
     def whichClicked(self):
         filterItem = self.filterList.currentRow()
@@ -1170,14 +1169,14 @@ class mainWindow(QMainWindow):
         self.FileListMes.clear()
         self.FileListMes.addItems(list(self.Measure.keys()))
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    # MainWindow = QtWidgets.QMainWindow()
-    # widget = QtWidgets.QStackedWidget()
-    gm = graphManager.graphManager()
-    cm = cmpage.csvManager()
-    mainW = mainWindow()
-    try:
-        sys.exit(app.exec_())
-    except SystemExit:
-        print('Closing Window...')
+app = QApplication(sys.argv)
+# widget = QtWidgets.QStackedWidget()
+gm = graphManager.graphManager()
+cm = cmpage.csvManager()
+mainW = mainWindow()
+mainW.show()
+try:
+    sys.exit(app.exec_())
+except SystemExit:
+    app.exec()
+    print('Closing Window...')
