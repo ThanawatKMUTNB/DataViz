@@ -40,10 +40,32 @@ class csvManager:
                 #print(fileExtension[-1])
                 df = pd.read_excel(path, engine = "openpyxl")
             return df
+
+    def filterDate(self,Dimension,typ): #Date only
+
+        self.df[Dimension] = pd.to_datetime(self.df[Dimension],format='%d/%m/%Y')
+
+        if typ == 'year':
+            s = str(Dimension+' year')
+            self.df[s] = self.df[Dimension].dt.year
+            return self.df[s]
+        elif typ == 'month':
+            s = str(Dimension+' month')
+            self.df[s] = self.df[Dimension].dt.month
+            return self.df[s]
+        elif typ == 'day':
+            s = str(Dimension+' day')
+            self.df[s] = self.df[Dimension].dt.day
+            return self.df[s]
     
     def getHead(self):
         self.Head = list(self.df.columns)
         return list(self.df.columns)
+
+
+    def getDateByFunc(self,head,func):
+        dfD = self.filterDate(head,func)
+        return list(dfD.drop_duplicates())
         
 
     def getDataWithPandas(self):
