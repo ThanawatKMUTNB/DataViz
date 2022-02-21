@@ -124,8 +124,18 @@ class csvManager:
         #print("---------",new)
         pd.MultiIndex.from_frame(new)
         return new
-
-    def getMeasure(self):
+    
+    def readMeasure(self):
+        dic = {}
+        # print(list(self.df.columns)[::-1])
+        for head in list(self.df.columns)[::-1]:
+            if (self.df.dtypes[head] == 'int64' or self.df.dtypes[head] == 'float64'):
+                dic[head] = "sum"
+            else:
+                break
+        return dic
+                
+    def getMeasure(self): # is Measure
         Dimen = []
         Meas = []
         for head in self.df.columns:

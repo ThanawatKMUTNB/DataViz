@@ -5,7 +5,7 @@ ex = csvManager()
 ex.Measure = {'Sales':"sum",'Quantity':"sum",'Discount':"sum",'Profit':"sum"}        
 ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
 ex.getHead()
-
+# ex.readMeasure()
 # ex.setRowAndColumn(["Segment"],[])
 # ex.setRowAndColumn([],["Segment"])
 

@@ -629,7 +629,8 @@ class mainWindow(QMainWindow):
         super(mainWindow,self).__init__()
         uic.loadUi("mainGUI.ui",self)
         # loadUi("mainGUI.ui",self)
-        self.Measure = {'Sales':"sum",'Quantity':"sum",'Discount':"sum",'Profit':"sum"}
+        # self.Measure = {'Sales':"sum",'Quantity':"sum",'Discount':"sum",'Profit':"sum"}
+        self.Measure = {}
         self.isInterRow = ''
         self.isInterCol = ''
         self.typeChart = ['Bar','Line', 'Pie']
@@ -1029,6 +1030,7 @@ class mainWindow(QMainWindow):
             self.dataSheet = cm.setRowAndColumn(Row,Col)
     
     def setColH(self):
+        self.colHeader = list(set(self.colHeader))
         for i in self.colHeader:
             if i in self.Measure.keys():
                 self.colHeader.remove(i)
@@ -1151,7 +1153,8 @@ class mainWindow(QMainWindow):
         cm.path = self.folderpath
         cm.selectFile = self.selectFile
         cm.setPath()
-        cm.Measure = self.Measure
+        cm.Measure = cm.readMeasure()
+        self.Measure = cm.readMeasure()
         # print(self.selectFile,self.data)
         # print(response[0])
         if response[0] != "":
@@ -1178,5 +1181,6 @@ mainW.show()
 try:
     sys.exit(app.exec_())
 except SystemExit:
-    app.exec()
+    sys.exit()
+    # app.exec()
     print('Closing Window...')
