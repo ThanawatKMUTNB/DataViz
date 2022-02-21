@@ -196,15 +196,25 @@ class csvManager:
         # print(self.filter)
         for i in self.filter.keys():
             if i not in self.Measure.keys():
+                print("fil dimen")
                 self.dfFil = self.dfFil[self.dfFil[i].isin(self.filter[i])]
+            
+    def filterMes(self,data):
+        print(self.filter)
+        for i in self.filter.keys():
+            if i in self.Measure.keys():
+                print("fil mes")
+                data = data.loc[data[i].between(min(self.filter[i]), max(self.filter[i]))]
+        return data
             # else:
             #     # print(i)
             #     # print(self.filter[i][0])
             #     self.dfFil = self.dfFil.loc[self.dfFil[i] > self.filter[i][0]]
             #     self.dfFil = self.dfFil.loc[self.dfFil[i] < self.filter[i][1]] 
             #     # print(self.dfFil)
-                
+            
     def setRowAndColumn(self,Row,Col):
+        print(self.filter)
         # print("CMS")
         # print(Row,Col)
         usedata = self.df
@@ -465,7 +475,11 @@ class csvManager:
         k.index = changIndex
         print(k)'''
         # print(Row,Col)
-        # print(k)
+        if type(k) == pd.Series :
+            k = k.to_frame()
+        print(k)
+        # if isInterCol != [] or isInterRow != []:
+        #     k = self.filterMes(k)
         return k
 
     def savedata(self,filename) :
