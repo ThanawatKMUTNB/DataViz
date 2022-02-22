@@ -701,15 +701,16 @@ class mainWindow(QMainWindow):
     
     def clickFunc(self):
         menu = self.sender()
-        if self.item2.text() in list(self.typeDate.keys()):
-            self.typeDate[self.item2.text()] = menu.text()
-            self.subMenuDate.setTitle(str(self.item2.text())+'('+self.typeDate[self.item2.text()]+')')
-        if self.item2.text() in list(self.Measure.keys()):
-            self.Measure[self.item2.text()] = menu.text()
-            self.subMenu.setTitle('Measure ('+self.Measure[self.item2.text()]+')')
+        pt = self.getPlainText(str(self.item2.text()))
+        if pt in list(self.typeDate.keys()):
+            self.typeDate[pt] = menu.text().lower()
+            self.subMenuDate.setTitle(pt+'('+self.typeDate[pt]+')')
+        if pt in list(self.Measure.keys()):
+            self.Measure[pt] = menu.text().lower()
+            self.subMenu.setTitle('Measure ('+self.Measure[pt]+')')
         # print(self.filDic)
         for i in self.acList:
-            if self.item2.text() == i.text():
+            if pt == i.text().lower():
                 i.setChecked(True)
             else:
                 i.setChecked(False)
@@ -766,6 +767,7 @@ class mainWindow(QMainWindow):
                         self.filDic[item.text()] = ""
                         # print(self.filDic)
                     self.selectFil(item.text())
+                self.rowcolChange()
                 return True
         return super().eventFilter(source, event)
     
@@ -1025,8 +1027,6 @@ class mainWindow(QMainWindow):
         r = self.getRow()
         c = self.getCol()
         # print(r,c)
-        # self.isInterRow = [value for value in self.RowChoose if value in list(self.Measure.keys())]
-        # self.isInterCol = [value for value in self.ColChoose if value in list(self.Measure.keys())]
         # print(self.RowChoose,self.ColChoose)
         if self.selectFile != [] : 
             # print(not(self.RowChoose == [] and self.ColChoose == []))
@@ -1047,7 +1047,8 @@ class mainWindow(QMainWindow):
         if Row!=[] or Col!=[]:
             cm.filter = self.filDic
             cm.Measure = self.Measure
-            # print("BF table",self.filDic)
+            cm.typeDate = self.typeDate
+            # print("BF table",self.filDic,self.Measure,self.typeDate)
             self.dataSheet = cm.setRowAndColumn(Row,Col)
     
     def setColH(self):
