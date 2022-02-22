@@ -19,6 +19,7 @@ class csvManager:
         self.Head = []
         self.usemes = []
         self.func = []
+        self.colHeader = []
     
     def setPath(self):
         pathBuf = os.path.join(self.path,self.selectFile) 
@@ -44,6 +45,7 @@ class csvManager:
                 #print(fileExtension[-1])
                 df = pd.read_excel(path, engine = "openpyxl")
             return df
+        
     def readDate(self):
         # print(self.df.columns)
         dateDic = {}
@@ -243,6 +245,7 @@ class csvManager:
             
     def setRowAndColumn(self,Row,Col):
         print(self.filter)
+        Rowdi = ''
         # print("CMS")
         # print(Row,Col)
         usedata = self.df
@@ -275,6 +278,8 @@ class csvManager:
         #     usedata = self.setDataFilterMes(usedata,isInterRow+isInterCol)
         # print("****",isInterRow,isInterCol)
         if isInterRow == [] and isInterCol == []: #No Mes
+            Rowdi = Row.copy()
+            Coldi = Col.copy()
             if Row != [] and Col == []:
                 rowList = usedata[Row]
                 packDf = [rowList]
@@ -297,8 +302,6 @@ class csvManager:
                 k = k.T
             if Row == [] and Col != []:
                 k = k.T
-            #print(Row,Col)
-            #print(type(k))
         else: # Have Mes 
             # print("c",Row,Col)
             # print("isin",isInterRow,isInterCol)
@@ -432,6 +435,7 @@ class csvManager:
                         else:
                             if Coldi != []:
                                 if Rowdi != []:
+                                    print("Error",k.index)
                                     d = dict(k.index)
                                     d[list(d.keys())[0]] = isInterRow[0]
                                     k = k.rename(index=d)
@@ -486,30 +490,83 @@ class csvManager:
         # print(type(k))
         #print(k.index.tolist())
         
-        #list_of_lists = [list(elem) for elem in k.index.tolist()]
-        
-        #print(list_of_lists)
-        #print(len(k))
-        # print(type(k))
-        '''tmp = [list(ele) for ele in k.index]
-        eachList = []
-        for j in range(len(tmp[0])):
-            eachList.append([i[j] for i in tmp[:]])
-        for i in range(len(eachList)):
-            for j in range(len(eachList[i])-1,0,-1):
-                if eachList[i][j] == eachList[i][j-1] :
-                    eachList[i][j]=''
-        changIndex = pd.MultiIndex.from_arrays(eachList, names=k.index.names)
-        k.index = changIndex
-        print(k)'''
-        # print(Row,Col)
         if type(k) == pd.Series :
             k = k.to_frame()
-        print(k)
-        # if isInterCol != [] or isInterRow != []:
-        #     k = self.filterMes(k)
+        # print(k)
         return k
 
+    def setRowForSpan(self,data,Rowdi):
+        k = data
+        if type(k) == pd.Series :
+            k = k.to_frame()
+        # print(k.index.tolist())
+        print(k)
+        if type(k.index) == pd.MultiIndex:
+            j = k.index.tolist()
+            for i in range(len(j)):
+                j[i] = ' '.join(j[i])
+                # for s in list(j[i]):
+                #     print(s)
+                #     if s not in self.Measure.keys():
+                #         j[i]=s
+        else : j = k.index.tolist()
+        if Rowdi != '':
+            if len(Rowdi) == 1 :
+                # print("-------",(k.index))
+                k.insert(0, Rowdi[0], j)
+            else:
+                print(j)
+                listOfValues = list(zip(*j))
+                l = Rowdi
+                print(l,listOfValues)
+                # print(len(listOfValues))
+                m = 0
+                for i,p in zip(l,listOfValues):
+                    # print(i,p)
+                    # print(list(listOfValues[n]))
+                    if type(p) == tuple:
+                        # print("Y")
+                        p = list(p)
+                        for s in p:
+                            if s not in self.Measure.keys():
+                                p=s
+                    k.insert(m, i, p, True)
+                    m+=1
+    def getSpan(data,MesKey):
+        k = data
+        if type(k) == pd.Series :
+            k = k.to_frame()
+        
+        # print(k)
+        indexSpan = []
+        colindex = 0
+        for i in k.columns.tolist():
+            # print(list(self.Measure.keys()))
+            if i not in MesKey:
+                print(i)
+                tmp = []
+                span = []
+                tmp.append(colindex)
+                span.append(0)
+                for p in range(len(k[i])-1):
+                    if k[i][p] != k[i][p+1]:
+                        # print(k[i][p], k[i][p+1])
+                        span.append(p)
+                        tmp.append(span)
+                        if span[0] != span[1]:
+                            # print(k[i][span[0]],k[i][span[0]])
+                            indexSpan.append(tmp)
+                        span = []
+                        span.append(p+1)
+                        tmp = []
+                        tmp.append(colindex)
+                    if p == len(k[i])-2:
+                        span.append(p+1)
+                        tmp.append(span)
+                        if span[0] != span[1]:
+                            indexSpan.append(tmp)
+                colindex += 1
+        return indexSpan
     def savedata(self,filename) :
         filename = 'metadata.json'
         metadata = {}

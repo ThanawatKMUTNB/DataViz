@@ -540,9 +540,13 @@ class TableModel2(QtCore.QAbstractTableModel):
                 
             if orientation == Qt.Vertical: #y
                 if type(self._data.index[section]) == tuple:
-                    head = self._data.index.names
+                    head = self._data.index.names # [None,0,1,2... Row-1]
+                    # print("hxh")
+                    # print("head ---------" , head)
                     head = [ "%s" % x for x in list(head) ]
-                    if len(head) > 1 :head = ["\\".join(head)]
+                    if len(head) > 1 :
+                        head = ["\\".join(head)]
+                    # print(head)
                     indexN = [ "%s" % x for x in list(self._data.index[section]) ]
                     indexN = " ".join(indexN)
                 else: 
@@ -697,16 +701,18 @@ class mainWindow(QMainWindow):
     
     def clickFunc(self):
         menu = self.sender()
-        # print(self.item2.text(), menu.text())
-        # self.filDic[self.item2.text()] = menu.text()
-        self.Measure[self.item2.text()] = menu.text()
+        if self.item2.text() in list(self.typeDate.keys()):
+            self.typeDate[self.item2.text()] = menu.text()
+            self.subMenuDate.setTitle(str(self.item2.text())+'('+self.typeDate[self.item2.text()]+')')
+        if self.item2.text() in list(self.Measure.keys()):
+            self.Measure[self.item2.text()] = menu.text()
+            self.subMenu.setTitle('Measure ('+self.Measure[self.item2.text()]+')')
         # print(self.filDic)
         for i in self.acList:
             if self.item2.text() == i.text():
                 i.setChecked(True)
             else:
                 i.setChecked(False)
-        self.subMenu.setTitle('Measure ('+self.Measure[self.item2.text()]+')')
         self.rowcolChange()
         
         
@@ -715,21 +721,36 @@ class mainWindow(QMainWindow):
             menu = QMenu()
             self.item2 = source.itemAt(event.pos())
             if self.item2 != None:
-                # print("---",self.item2.text(),"---")
+                pt = self.getPlainText(str(self.item2.text()))
                 filterAc = menu.addAction('Filter')
-                if self.item2.text() in list(self.Measure.keys()):
+                if pt in list(self.typeDate.keys()):
+                    self.subMenuDate = QMenu(pt+'('+self.typeDate[pt]+')')
+                    yearAc = self.subMenuDate.addAction("Year",self.clickFunc)
+                    # quarterAc = self.subMenuDate.addAction("Quarter",self.clickFunc)
+                    mounthAc = self.subMenuDate.addAction("Mounth",self.clickFunc)
+                    dayAc = self.subMenuDate.addAction("Day",self.clickFunc)
+                    self.acList = [yearAc,mounthAc,dayAc]
+                    print(self.typeDate)
+                    for i in self.acList:
+                        i.setCheckable(True)
+                        if self.typeDate[pt] == i.text().lower():
+                            i.setChecked(True)
+                        else:
+                            i.setChecked(False)
+                    menu.addMenu(self.subMenuDate)
+                if pt in list(self.Measure.keys()):
                     # mesAc = menu.addAction('Measure ('+self.Measure[self.item2.text()]+')')
-                    self.subMenu = QMenu('Measure ('+self.Measure[self.item2.text()]+')')
-                    avgAc = self.subMenu.addAction("average",self.clickFunc)
-                    sumAc = self.subMenu.addAction("sum",self.clickFunc)
-                    medAc = self.subMenu.addAction("median",self.clickFunc)
-                    countAc = self.subMenu.addAction("count",self.clickFunc)
-                    maxAc = self.subMenu.addAction("max",self.clickFunc)
-                    minAc = self.subMenu.addAction("min",self.clickFunc)
+                    self.subMenu = QMenu('Measure ('+self.Measure[pt]+')')
+                    avgAc = self.subMenu.addAction("Average",self.clickFunc)
+                    sumAc = self.subMenu.addAction("Sum",self.clickFunc)
+                    medAc = self.subMenu.addAction("Median",self.clickFunc)
+                    countAc = self.subMenu.addAction("Count",self.clickFunc)
+                    maxAc = self.subMenu.addAction("Max",self.clickFunc)
+                    minAc = self.subMenu.addAction("Min",self.clickFunc)
                     self.acList = [avgAc,sumAc,medAc,countAc,maxAc,minAc]
                     for i in self.acList:
                         i.setCheckable(True)
-                        if self.Measure[self.item2.text()] == i.text():
+                        if self.Measure[pt] == i.text().lower():
                             i.setChecked(True)
                         else:
                             i.setChecked(False)
@@ -905,8 +926,10 @@ class mainWindow(QMainWindow):
             m = self.getDi(str(self.RowList.item(i).text()))
             if m in self.Measure.keys() :
                 self.RowList.item(i).setBackground(QtGui.QColor('#00b180'))
+                # self.RowList.item(i).resizeColumnToContents(m)
             else: 
                 self.RowList.item(i).setBackground(QtGui.QColor('#4996b2'))
+                # self.RowList.item(i).resizeColumnToContents(m)
         
         for i in range(len(tmpc)):
             self.ColList.item(i).setForeground(QtGui.QColor('white'))
@@ -925,6 +948,7 @@ class mainWindow(QMainWindow):
         self.setplot()
         
     def filChangeD(self):
+        self.filJustAdd = self.getPlainText(self.filJustAdd)
         if self.filJustAdd in self.filDic.keys():
             del self.filDic[self.filJustAdd]
         self.filChange()
@@ -943,7 +967,10 @@ class mainWindow(QMainWindow):
             
             for i in itemsTextList:
                 if i not in list(self.filDic.keys()):
-                    self.filDic[i] = "sum"
+                    if i in self.Measure.keys():
+                        self.filDic[i] = "sum"
+                    if i in self.Measure.keys():
+                        self.filDic[i] = "year"
             # print(self.filDic)
             
     def showSheet(self):
@@ -963,6 +990,15 @@ class mainWindow(QMainWindow):
             j = n.index("(")
             n = n[j+1:len(n)-1]
         return n
+    
+    def getPlainText(self,oldText):
+        listHaveMes = str(oldText)
+        if "(" in list(listHaveMes) and ")" in list(listHaveMes):
+            if listHaveMes[-1] == ")":
+                j = listHaveMes.index("(")
+                listHaveMes = listHaveMes[j+1:len(listHaveMes)-1]
+        print(listHaveMes)
+        return listHaveMes
     
     def getRow(self):
         listHaveMes = self.RowChoose
@@ -985,20 +1021,20 @@ class mainWindow(QMainWindow):
         
     def setSheetTable(self):
         # print("filter",self.filDic)
-        print(self.RowChoose,self.ColChoose)
+        # print(self.RowChoose,self.ColChoose)
         r = self.getRow()
         c = self.getCol()
-        print(r,c)
+        # print(r,c)
         # self.isInterRow = [value for value in self.RowChoose if value in list(self.Measure.keys())]
         # self.isInterCol = [value for value in self.ColChoose if value in list(self.Measure.keys())]
         # print(self.RowChoose,self.ColChoose)
         if self.selectFile != [] : 
             # print(not(self.RowChoose == [] and self.ColChoose == []))
-            if self.RowChoose == [] and self.ColChoose == []:
+            if r == [] and c == []:
                 self.sheetTable.setModel(None)
             else:
                 # print(self.RowChoose,self.ColChoose)
-                self.sheetPageRowAndCol(self.RowChoose,self.ColChoose)
+                self.sheetPageRowAndCol(r,c)
                 self.model = TableModel2(self.dataSheet)
                 if self.isInterRow != [] and self.isInterCol !=[]:
                     self.sheetTable.setModel(None)
@@ -1007,9 +1043,10 @@ class mainWindow(QMainWindow):
         # print("Row Col after set sheet",self.RowChoose,self.ColChoose)
     
     def sheetPageRowAndCol(self,Row,Col):
-        print("Start",Row,Col)
+        # print("Start",Row,Col)
         if Row!=[] or Col!=[]:
             cm.filter = self.filDic
+            cm.Measure = self.Measure
             # print("BF table",self.filDic)
             self.dataSheet = cm.setRowAndColumn(Row,Col)
     
@@ -1023,7 +1060,6 @@ class mainWindow(QMainWindow):
         #headCur = index
         self.colHeader = cm.getHead()
         self.data = cm.setAllDataByOneDimension(self.colHeader[index])
-        self.setColH()
         self.model = TableModel(self.data)
         self.dataSourceTable.setModel(self.model)
         
@@ -1043,14 +1079,14 @@ class mainWindow(QMainWindow):
         if self.selectFile != []:
             self.colHeader = cm.getHead()
             self.setColH()
+            cm.colHeader = self.colHeader
+            # print(self.colHeader)
             self.setFileListDimension()
         else: 
             self.colHeader = []
             self.dataSourceTable.reset()
-            
             self.FileListDimension.clear()
             self.FileListDimension.addItems(self.colHeader)
-            
             self.FileListMes.clear()
             self.FileListMes.addItems([])
             
@@ -1075,6 +1111,7 @@ class mainWindow(QMainWindow):
                 self.data = cm.unionFile(self.selectFile)
                 self.colHeader = cm.getHead()
                 self.setColH()
+                cm.colHeader = self.colHeader
                 self.setFileListDimension()
                 self.model = TableModel(self.data)
                 self.dataSourceTable.setModel(self.model)
@@ -1144,14 +1181,17 @@ class mainWindow(QMainWindow):
             self.dataSource()
             self.colHeader = cm.getHead()
             self.setColH()
-                
+            cm.colHeader = self.colHeader.copy()
+            # print(cm.colHeader)
+            # print()
             self.setFileListDimension()
             self.setFileInDirectory()
             self.setFileChoose()
         
     def setFileListDimension(self):
         self.FileListDimension.clear()
-        self.FileListDimension.addItems(self.colHeader)
+        # print(cm.colHeader)
+        self.FileListDimension.addItems(cm.colHeader)
         self.FileListMes.clear()
         self.FileListMes.addItems(list(self.Measure.keys()))
 
