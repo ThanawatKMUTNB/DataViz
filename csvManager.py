@@ -1,4 +1,5 @@
 # from curses import meta
+import datetime
 from importlib.metadata import files, metadata
 import json
 from itertools import chain
@@ -13,6 +14,7 @@ class csvManager:
         self.path = ""
         self.df = ""
         self.Measure = {}
+        self.typeDate = {}
         self.filter = {}
         self.Head = []
         self.usemes = []
@@ -21,6 +23,8 @@ class csvManager:
     def setPath(self):
         pathBuf = os.path.join(self.path,self.selectFile) 
         self.df = self.readFile(pathBuf)
+        self.Measure = self.readMeasure()
+        self.typeDate = self.readDate()
     
     def isMeasure(self,di):
         if (self.df.dtypes[di] == 'int64' or self.df.dtypes[di] == 'float64'):
@@ -40,7 +44,18 @@ class csvManager:
                 #print(fileExtension[-1])
                 df = pd.read_excel(path, engine = "openpyxl")
             return df
-
+    def readDate(self):
+        # print(self.df.columns)
+        dateDic = {}
+        for i in self.df.columns.tolist():
+            try:
+                self.df[i] =  pd.to_datetime(self.df[i],format='%d/%m/%Y')
+                dateDic[i] = 'year'
+            except ValueError:
+                pass
+        # print(dateList)
+        return dateDic
+    
     def filterDate(self,Dimension,typ): #Date only
 
         self.df[Dimension] = pd.to_datetime(self.df[Dimension],format='%d/%m/%Y')
@@ -128,12 +143,15 @@ class csvManager:
     def readMeasure(self):
         dic = {}
         # print(list(self.df.columns)[::-1])
-        for head in list(self.df.columns)[::-1]:
-            if (self.df.dtypes[head] == 'int64' or self.df.dtypes[head] == 'float64'):
-                dic[head] = "sum"
-            else:
-                break
-        return dic
+        if self.df.empty :
+            pass
+        else:
+            for head in list(self.df.columns)[::-1]:
+                if (self.df.dtypes[head] == 'int64' or self.df.dtypes[head] == 'float64'):
+                    dic[head] = "sum"
+                else:
+                    break
+            return dic
                 
     def getMeasure(self): # is Measure
         Dimen = []

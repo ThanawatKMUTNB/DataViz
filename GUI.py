@@ -318,7 +318,7 @@ class filterDimenWindow(QMainWindow):
                 # print(self.sheet.col())
             else :
                 self.filtered[self.dimen] = list(set(self.sheet[self.dimen].values))
-        print(self.filtered)
+        # print(self.filtered)
     
     def setList(self):
         _translate = QtCore.QCoreApplication.translate
@@ -345,17 +345,17 @@ class filterDimenWindow(QMainWindow):
             for i in cm.df[self.dimen+' '+mainW.typeDate[self.dimen]].drop_duplicates():
                 print(i)
                 # print(i in self.filtered[self.dimen])
-                item2 = QtWidgets.QListWidgetItem()
+                self.item2 = QtWidgets.QListWidgetItem()
                 if i in self.filtered[self.dimen] :
-                    item2.setCheckState(QtCore.Qt.Checked) #2
+                    self.item2.setCheckState(QtCore.Qt.Checked) #2
                 else:
-                    item2.setCheckState(QtCore.Qt.Unchecked) #0
-                self.filterItemListWidget.addItem(item2)
+                    self.item2.setCheckState(QtCore.Qt.Unchecked) #0
+                self.filterItemListWidget.addItem(self.item2)
             n=0
             for i in cm.df[self.dimen+' '+mainW.typeDate[self.dimen]].drop_duplicates():
                 # print(str(i))
-                item2 = self.filterItemListWidget.item(n)
-                item2.setText(_translate("MainWindow", str(i)))
+                self.item2 = self.filterItemListWidget.item(n)
+                self.item2.setText(_translate("MainWindow", str(i)))
                 n+=1
                 
 class WebEngineView(QtWebEngineWidgets.QWebEngineView):
@@ -634,7 +634,7 @@ class mainWindow(QMainWindow):
         self.isInterRow = ''
         self.isInterCol = ''
         self.typeChart = ['Bar','Line', 'Pie']
-        self.typeDate = {'Order Date':"year",'Ship Date':"year"}
+        self.typeDate = {}
         self.fileNameList = []
         self.selectFile = []
         self.dataSheet = ""
@@ -695,34 +695,46 @@ class mainWindow(QMainWindow):
         strItem = self.filterList.item(filterItem)
         self.selectFil(strItem.text())
     
-    def clickFunc(self,menu):
-        print(menu.text())
+    def clickFunc(self):
+        menu = self.sender()
+        # print(self.item2.text(), menu.text())
+        # self.filDic[self.item2.text()] = menu.text()
+        self.Measure[self.item2.text()] = menu.text()
+        # print(self.filDic)
+        for i in self.acList:
+            if self.item2.text() == i.text():
+                i.setChecked(True)
+            else:
+                i.setChecked(False)
+        self.subMenu.setTitle('Measure ('+self.Measure[self.item2.text()]+')')
+        self.rowcolChange()
+        
         
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and (source is self.filterList or source is self.ColList or source is self.RowList):
             menu = QMenu()
-            item2 = source.itemAt(event.pos())
-            if item2 != None:
-                # print("---",item2.text(),"---")
+            self.item2 = source.itemAt(event.pos())
+            if self.item2 != None:
+                # print("---",self.item2.text(),"---")
                 filterAc = menu.addAction('Filter')
-                if item2.text() in list(self.Measure.keys()):
-                    # mesAc = menu.addAction('Measure ('+self.Measure[item2.text()]+')')
-                    # subMenu = QMenu('Measure ('+self.Measure[item2.text()]+')')
-                    avgAc = menu.addAction("average")
-                    sumAc = menu.addAction("sum")
-                    medAc = menu.addAction("median")
-                    countAc = menu.addAction("count")
-                    maxAc = menu.addAction("max")
-                    minAc = menu.addAction("min")
-                    acList = [avgAc,sumAc,medAc,countAc,maxAc,minAc]
-                    for i in acList:
+                if self.item2.text() in list(self.Measure.keys()):
+                    # mesAc = menu.addAction('Measure ('+self.Measure[self.item2.text()]+')')
+                    self.subMenu = QMenu('Measure ('+self.Measure[self.item2.text()]+')')
+                    avgAc = self.subMenu.addAction("average",self.clickFunc)
+                    sumAc = self.subMenu.addAction("sum",self.clickFunc)
+                    medAc = self.subMenu.addAction("median",self.clickFunc)
+                    countAc = self.subMenu.addAction("count",self.clickFunc)
+                    maxAc = self.subMenu.addAction("max",self.clickFunc)
+                    minAc = self.subMenu.addAction("min",self.clickFunc)
+                    self.acList = [avgAc,sumAc,medAc,countAc,maxAc,minAc]
+                    for i in self.acList:
                         i.setCheckable(True)
-                        if self.Measure[item2.text()] == i.text():
+                        if self.Measure[self.item2.text()] == i.text():
                             i.setChecked(True)
                         else:
                             i.setChecked(False)
                     # print(sumAc.text())
-                    # menu.addMenu(subMenu)+
+                    menu.addMenu(self.subMenu)
                     # print(menu.exec_(event.globalPos()).text())
                 if menu.exec_(event.globalPos()) == filterAc:
                     item = source.itemAt(event.pos())
@@ -733,47 +745,6 @@ class mainWindow(QMainWindow):
                         self.filDic[item.text()] = ""
                         # print(self.filDic)
                     self.selectFil(item.text())
-                if menu.exec_(event.globalPos()) == avgAc:
-                    item = source.itemAt(event.pos())
-                    self.clickFunc(item)
-                if menu.exec_(event.globalPos()) == sumAc:
-                    item = source.itemAt(event.pos())
-                    self.clickFunc(item)
-                if menu.exec_(event.globalPos()) == medAc:
-                    item = source.itemAt(event.pos())
-                    self.clickFunc(item)
-                if menu.exec_(event.globalPos()) == countAc:
-                    item = source.itemAt(event.pos())
-                    self.clickFunc(item)
-                if menu.exec_(event.globalPos()) == maxAc:
-                    item = source.itemAt(event.pos())
-                    self.clickFunc(item)
-                if menu.exec_(event.globalPos()) == minAc:
-                    item = source.itemAt(event.pos())
-                    self.clickFunc(item)
-                    # item = source.itemAt(event.pos())
-                    # print(menu.exec_(event.globalPos()).text())
-                    # print(subMenu.exec_(event.globalPos()).text())
-                    # if subMenu.exec_(event.globalPos()) == countAc:
-                    #     print("ok1")
-                    # if menu.exec_(event.globalPos()) == countAc:
-                    #     print("ok")
-                    # else:
-                    #     print("try")
-                    # print(subMenu.exec_(event.globalPos()).text())
-                    # print(self.Measure)
-                    # # for i in acList:
-                    # #     print("---")
-                    # #     print(i.text(),menu.exec_(event.globalPos()).text())
-                    #     # if i.text() == menu.exec_(event.globalPos()).text():
-                    #         # print(i.text())
-                    # menu.exec_(event.globalPos()).setChecked(True)
-                    # self.Measure[item2.text()] = menu.exec_(event.globalPos()).text()
-                    # print(self.Measure)
-                    # for j in acList:
-                    #     if j.text() != menu.exec_(event.globalPos()).text() :
-                    #         j.setChecked(False)
-                    #         # print(self.Measure)
                 return True
         return super().eventFilter(source, event)
     
@@ -789,6 +760,7 @@ class mainWindow(QMainWindow):
         
     def selectFil(self,dimen):
         self.diForFil = dimen
+        
         if dimen in list(self.Measure.keys()):
             self.windowM()
         else:
@@ -911,6 +883,9 @@ class mainWindow(QMainWindow):
             if tmpc[i] in self.Measure.keys():
                 func = str(self.Measure[tmpc[i]])
                 tmpc[i] = func.upper()+"("+str(tmpc[i])+")"
+            if tmpc[i] in self.typeDate.keys():
+                func = str(self.typeDate[tmpc[i]])
+                tmpc[i] = func.upper()+"("+str(tmpc[i])+")"
         self.ColList.addItems(tmpc)
         
         self.RowList.clear()
@@ -919,29 +894,34 @@ class mainWindow(QMainWindow):
             if tmpr[i] in self.Measure.keys():
                 func = str(self.Measure[tmpr[i]])
                 tmpr[i] = func.upper()+"("+str(tmpr[i])+")"
+            if tmpr[i] in self.typeDate.keys():
+                func = str(self.typeDate[tmpr[i]])
+                tmpr[i] = func.upper()+"("+str(tmpr[i])+")"
         self.RowList.addItems(tmpr)
-        
+        # print(self.colHeader)
+        # print(tmpr,tmpc)
         for i in range(len(tmpr)):
             self.RowList.item(i).setForeground(QtGui.QColor('white'))
-            if str(self.RowList.item(i).text()) in self.colHeader :
-                self.RowList.item(i).setBackground(QtGui.QColor('#4996b2'))
-            else: 
+            m = self.getDi(str(self.RowList.item(i).text()))
+            if m in self.Measure.keys() :
                 self.RowList.item(i).setBackground(QtGui.QColor('#00b180'))
+            else: 
+                self.RowList.item(i).setBackground(QtGui.QColor('#4996b2'))
         
         for i in range(len(tmpc)):
             self.ColList.item(i).setForeground(QtGui.QColor('white'))
-            if str(self.ColList.item(i).text()) in self.colHeader:
-                self.ColList.item(i).setBackground(QtGui.QColor('#4996b2'))
-            else: 
+            m = self.getDi(str(self.ColList.item(i).text()))
+            if m in self.Measure.keys():
                 self.ColList.item(i).setBackground(QtGui.QColor('#00b180'))
+            else: 
+                self.ColList.item(i).setBackground(QtGui.QColor('#4996b2'))
                 
         self.RowChoose = tmpr
         self.ColChoose = tmpc
         
         self.RowChoose = self.getRow()
         self.ColChoose = self.getCol()
-        print(self.RowChoose,self.ColChoose)
-        
+        # print(self.RowChoose,self.ColChoose)
         self.setplot()
         
     def filChangeD(self):
@@ -950,12 +930,10 @@ class mainWindow(QMainWindow):
         self.filChange()
         
     def filChange(self):
-        
         # print(self.filDic)
         itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
         itemsTextList =  list(set(itemsTextList))
         # print(itemsTextList)
-        
         while (itemsTextList.count('')):
             itemsTextList.remove('')
             
@@ -965,7 +943,7 @@ class mainWindow(QMainWindow):
             
             for i in itemsTextList:
                 if i not in list(self.filDic.keys()):
-                    self.filDic[i] = ""
+                    self.filDic[i] = "sum"
             # print(self.filDic)
             
     def showSheet(self):
@@ -979,6 +957,12 @@ class mainWindow(QMainWindow):
         self.model = TableModel2(buf)
         # self.model = TableModel2(self.dataSheet)
         self.sheetTable.setModel(self.model)
+    
+    def getDi(self,n):
+        if n[-1] == ")":
+            j = n.index("(")
+            n = n[j+1:len(n)-1]
+        return n
     
     def getRow(self):
         listHaveMes = self.RowChoose
@@ -1023,7 +1007,7 @@ class mainWindow(QMainWindow):
         # print("Row Col after set sheet",self.RowChoose,self.ColChoose)
     
     def sheetPageRowAndCol(self,Row,Col):
-        print("Start",Row,Col,len(set(Row)),len(set(Col)))
+        print("Start",Row,Col)
         if Row!=[] or Col!=[]:
             cm.filter = self.filDic
             # print("BF table",self.filDic)
@@ -1049,7 +1033,6 @@ class mainWindow(QMainWindow):
         itemsTextList =  [str(self.FileListChoose.item(i).text()) for i in range(self.FileListChoose.count())]
         self.selectFile = itemsTextList
         # print(self.selectFile)
-        
         while (self.selectFile.count('')):
             self.selectFile.remove('')
         itemsTextList =  [str(self.FileList.item(i).text()) for i in range(self.FileList.count())]
@@ -1153,8 +1136,8 @@ class mainWindow(QMainWindow):
         cm.path = self.folderpath
         cm.selectFile = self.selectFile
         cm.setPath()
-        cm.Measure = cm.readMeasure()
-        self.Measure = cm.readMeasure()
+        self.Measure = cm.Measure
+        self.typeDate = cm.typeDate
         # print(self.selectFile,self.data)
         # print(response[0])
         if response[0] != "":

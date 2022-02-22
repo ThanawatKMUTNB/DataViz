@@ -5,6 +5,15 @@ ex = csvManager()
 ex.Measure = {'Sales':"sum",'Quantity':"sum",'Discount':"sum",'Profit':"sum"}        
 ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
 ex.getHead()
+ex.readDate()
+def getDi(n):
+    if n[-1] == ")":
+        j = n.index("(")
+        n = n[j+1:len(n)-1]
+    print(n)
+    return n
+
+getDi('YEAR(Order Date)')
 # ex.readMeasure()
 # ex.setRowAndColumn(["Segment"],[])
 # ex.setRowAndColumn([],["Segment"])
