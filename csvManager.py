@@ -169,8 +169,8 @@ class csvManager:
     def readMeasure(self):
         dic = {}
         # print(list(self.df.columns)[::-1])
-        print("-------------ERROR-----------")
-        print(self.df)
+        # print("-------------ERROR-----------")
+        # print(self.df)
         
         if type(self.df) != None:
             for head in list(self.df.columns)[::-1]:
@@ -541,7 +541,6 @@ class csvManager:
                 k = k.replace(np.nan, '')
         # print(type(k))
         #print(k.index.tolist())
-        
         if type(k) == pd.Series :
             k = k.to_frame()
         print(k)

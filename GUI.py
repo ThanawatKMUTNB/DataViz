@@ -246,14 +246,16 @@ class filterDimenWindow(QMainWindow):
         self.filterItemListWidget.itemChanged.connect(self.checked)
         self.filterItemListWidget.doubleClicked.connect(self.reverseCheck)
         self.setUp()
-        self.setList()
+        # self.setList()
         self.resetBut()
         self.show()
     
     def ApplyBut(self):
         self.filtered[self.dimen] = self.checkedList
         mainW.filDic = self.filtered
-        mainW.setSheetTable()
+        print(mainW.filDic)
+        mainW.setplot()
+        # mainW.setSheetTable()
         self.close()
         
     def cancleBut(self):
@@ -298,32 +300,25 @@ class filterDimenWindow(QMainWindow):
         for i in range(self.filterItemListWidget.count()):
             if self.filterItemListWidget.item(i).checkState() == 2:
                 self.checkedList.append(self.filterItemListWidget.item(i).text())
-            
             cc.append(self.filterItemListWidget.item(i).checkState())
             ck.append(self.filterItemListWidget.item(i).text())
         # print(cc)
         # print(ck)
         
     def setUp(self):
+        print("Filter Page",mainW.diForFil)
         self.dimen = mainW.getPlainText(mainW.diForFil)
         self.sheet = cm.df
         self.filtered = mainW.filDic
         print("BF--------",self.filtered)
-        if self.filtered[self.dimen] == "":
-            if self.dimen in mainW.typeDate.keys():
-                self.filtered[self.dimen] = cm.getDateByFunc(self.dimen,mainW.typeDate[self.dimen])
-                # self.dimen = self.dimen+' '+mainW.typeDate[self.dimen]
-                # print(cm.getDateByFunc(self.dimen,mainW.typeDate[self.dimen]))
-                # print(self.sheet.col())
-            else :
-                self.filtered[self.dimen] = list(set(self.sheet[self.dimen].values))
-        # print(self.filtered)
+        self.setList()
     
     def setList(self):
         _translate = QtCore.QCoreApplication.translate
-        print(self.dimen,mainW.typeDate.keys())
-        if self.dimen not in mainW.typeDate.keys():
-            for i in self.sheet[self.dimen].drop_duplicates():
+        # print("Check",self.dimen,mainW.typeDate.keys())
+        if self.dimen not in list(mainW.typeDate.keys()):
+            print("Di")
+            for i in self.sheet[self.dimen].drop_duplicates().to_list():
                 # print(type(self.filtered[self.dimen]))
                 item = QtWidgets.QListWidgetItem()
                 if i in self.filtered[self.dimen] :
@@ -332,26 +327,30 @@ class filterDimenWindow(QMainWindow):
                     item.setCheckState(QtCore.Qt.Unchecked) #0
                 self.filterItemListWidget.addItem(item)
             n=0
-            for i in self.sheet[self.dimen].drop_duplicates():
+            for i in self.sheet[self.dimen].drop_duplicates().to_list():
                 # print(str(i))
                 item = self.filterItemListWidget.item(n)
                 item.setText(_translate("MainWindow", str(i)))
                 n+=1
         else:
             print("Date")
-            print(self.filtered[self.dimen])
-            # print(cm.df[self.dimen+' '+mainW.typeDate[self.dimen]].drop_duplicates())
-            for i in cm.df[self.dimen+' '+mainW.typeDate[self.dimen]].drop_duplicates():
-                print(i)
-                # print(i in self.filtered[self.dimen])
+            # print(self.filtered[self.dimen])
+            print(cm.df[self.dimen+' '+mainW.typeDate[self.dimen]].drop_duplicates().to_list())
+            for i in cm.df[self.dimen+' '+mainW.typeDate[self.dimen]].drop_duplicates().to_list():
+                # print(i)
+                
+                print(self.dimen)
+                print(self.filtered[self.dimen])
+                
                 self.item2 = QtWidgets.QListWidgetItem()
                 if i in self.filtered[self.dimen] :
+                    # print("Check ////")
                     self.item2.setCheckState(QtCore.Qt.Checked) #2
                 else:
                     self.item2.setCheckState(QtCore.Qt.Unchecked) #0
                 self.filterItemListWidget.addItem(self.item2)
             n=0
-            for i in cm.df[self.dimen+' '+mainW.typeDate[self.dimen]].drop_duplicates():
+            for i in cm.df[self.dimen+' '+mainW.typeDate[self.dimen]].drop_duplicates().to_list():
                 # print(str(i))
                 self.item2 = self.filterItemListWidget.item(n)
                 self.item2.setText(_translate("MainWindow", str(i)))
@@ -495,6 +494,7 @@ class filListClass(QtWidgets.QListWidget):
         # QDropEvent.setDropAction(QtCore.Qt.MoveAction)
         for i in items:
             source_Widget.takeItem(source_Widget.indexFromItem(i).row())
+            mainW.filJustAdd = i.text()
             self.addItem(i)
         mainW.setFileListDimension()
         mainW.filChange()
@@ -527,7 +527,11 @@ class TableModel2(QtCore.QAbstractTableModel):
         # section is the index of the column/row.
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal: #x
+                # if self._data.size != 0:
+                # print(self._data.columns)
+                # print("---------head--------",self._data.columns[section])
                 if type(self._data.columns[section]) == tuple:
+                    self._data.columns[section] = tuple(map( str , self._data.columns[section]) )
                     head = self._data.columns.names
                     head = [ "%s" % x for x in list(head) ]
                     if len(head) > 1 :head = ["\\".join(head)]
@@ -706,7 +710,7 @@ class mainWindow(QMainWindow):
     def clickFunc(self):
         menu = self.sender()
         pt = self.getPlainText(str(self.item2.text()))
-        print(menu.text().lower())
+        # print(menu.text().lower())
         if pt in list(self.typeDate.keys()):
             self.typeDate[pt] = menu.text().lower()
             self.subMenuDate.setTitle(pt+'('+self.typeDate[pt]+')')
@@ -797,7 +801,10 @@ class mainWindow(QMainWindow):
                             tmpr =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
                             tmpr.append(item.text())
                             self.filterList.addItems(tmpr)
-                            self.filDic[self.getPlainText(item.text())] = ""
+                            
+                            # self.filDic[self.getPlainText(item.text())] = ""
+                            self.setFilterValue(self.filJustAdd)
+                            
                             # print(self.filDic)
                         self.selectFil(item.text())
                     self.rowcolChange()
@@ -842,9 +849,9 @@ class mainWindow(QMainWindow):
         return [r,c]
             
     def setplot(self):
-        # print("--------R C",self.RowChoose,self.ColChoose)
-        self.setChart()
+        print("--------R C",self.RowChoose,self.ColChoose)
         self.setSheetTable()
+        self.setChart()
         if self.typeChart != []:
             self.showChart()
     
@@ -1008,16 +1015,26 @@ class mainWindow(QMainWindow):
         if self.filJustAdd in self.filDic.keys():
             del self.filDic[self.filJustAdd]
         self.filChange()
+    
+    def setFilterValue(self,key):
+        if key in list(self.typeDate.keys()):        
+            self.filDic[key] = cm.getDateByFunc(key,self.typeDate[key])
+        elif key in list(self.Measure.keys()):
+            self.filDic[key] = [min(self.dataSheet[key]),max(self.dataSheet[key])]
         
     def filChange(self):
         # print(self.filDic)
-        print(self.filterList.count())
+        # print(self.filterList.count())
         itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
         itemsTextList =  list(set(itemsTextList))
         # print(itemsTextList)
         while (itemsTextList.count('')):
             itemsTextList.remove('')
-            
+        
+        print(self.filJustAdd)
+        self.setFilterValue(self.filJustAdd)
+        print(self.filDic)
+        
         if itemsTextList != []:
             self.filterList.clear()
             self.filterList.addItems(itemsTextList)
@@ -1028,6 +1045,7 @@ class mainWindow(QMainWindow):
                         self.filDic[i] = "sum"
                     if i in self.Measure.keys():
                         self.filDic[i] = "year"
+            
             # print(self.filDic)
             
     def showSheet(self):
@@ -1100,11 +1118,13 @@ class mainWindow(QMainWindow):
     def sheetPageRowAndCol(self,Row,Col):
         # print("Start",Row,Col)
         if Row!=[] or Col!=[]:
+            
             cm.filter = self.filDic
             cm.Measure = self.Measure
             cm.typeDate = self.typeDate
-            # print("BF table",self.filDic,self.Measure,self.typeDate)
+            print("BF table",self.filDic,self.Measure,self.typeDate)
             self.dataSheet = cm.setRowAndColumn(Row,Col)
+            print(self.dataSheet)
     
     def setColH(self,colname):
         colname = list(set(colname))
@@ -1137,15 +1157,15 @@ class mainWindow(QMainWindow):
         if self.selectFile != []:
             self.setForDataSource()
             self.dataSource()
-            print("Path : ",cm.path)
-            print("File : ",cm.selectFile)
-            print("Dimen : ",cm.di)
-            print("Date : ",cm.typeDate)
-            print("Meas : ",cm.Measure)
-            print("Filter : ",cm.filter)
-            print("Row : ",self.RowChoose)
-            print("Row : ",self.ColChoose)
-            print("\n---------------------\n")
+            # print("Path : ",cm.path)
+            # print("File : ",cm.selectFile)
+            # print("Dimen : ",cm.di)
+            # print("Date : ",cm.typeDate)
+            # print("Meas : ",cm.Measure)
+            # print("Filter : ",cm.filter)
+            # print("Row : ",self.RowChoose)
+            # print("Row : ",self.ColChoose)
+            # print("\n---------------------\n")
         else: 
             self.setNull()
             self.dataSource()
