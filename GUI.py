@@ -884,6 +884,7 @@ class mainWindow(QMainWindow):
         # self.chartType_2.addItems(self.typeChart)
     
     def showChart(self):
+        #cm.print()
         # vbox = QtWidgets.QVBoxLayout(self)
         # vbox.setContentsMargins(0, 0, 0, 0)
         self.chartTypeS = self.chartType.currentText()
