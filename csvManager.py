@@ -21,15 +21,25 @@ class csvManager:
         self.Head = []
         self.usemes = []
         self.func = []
+        self.di = []
         self.colHeader = []
         self.Dimen = []
     
     def setPath(self):
+        # print(self.path,self.selectFile)
         pathBuf = os.path.join(self.path,self.selectFile) 
         self.df = self.readFile(pathBuf)
         self.Measure = self.readMeasure()
         self.typeDate = self.readDate()
-    
+        self.colHeader = self.getHead()
+        self.di = self.getOnlyDi()
+        
+    def getOnlyDi(self):
+        tmp = self.getHead()
+        for i in list(self.Measure.keys()):
+            tmp.remove(i)
+        return tmp
+        
     def isMeasure(self,di):
         if (self.df.dtypes[di] == 'int64' or self.df.dtypes[di] == 'float64'):
             return True
@@ -70,7 +80,7 @@ class csvManager:
                     dateDic[i] = 'year'
                 except ValueError:
                     pass
-        # print(dateDic)
+        print(dateDic)
         return dateDic
     
     def filterDate(self,data,Dimension,typ): #Date only
@@ -87,12 +97,15 @@ class csvManager:
             
     
     def getHead(self):
-        self.Head = list(self.df.columns)
-        return list(self.df.columns)
+        if type(self.df) != str:
+            self.Head = list(self.df.columns)
+            return list(self.df.columns)
+        else:
+            return []
 
 
     def getDateByFunc(self,head,func):
-        dfD = self.filterDate(head,func)
+        dfD = self.filterDate(self.df,head,func)
         return list(dfD.drop_duplicates())
         
 
@@ -156,9 +169,10 @@ class csvManager:
     def readMeasure(self):
         dic = {}
         # print(list(self.df.columns)[::-1])
-        if self.df.empty :
-            pass
-        else:
+        print("-------------ERROR-----------")
+        print(self.df)
+        
+        if type(self.df) != None:
             for head in list(self.df.columns)[::-1]:
                 if (self.df.dtypes[head] == 'int64' or self.df.dtypes[head] == 'float64'):
                     dic[head] = "sum"
@@ -224,7 +238,7 @@ class csvManager:
             if i not in tmp:
                 tmp.append(i)
         return len(tmp)
-    Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
+    # Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
     
     def setDataFilter(self,Row,Col):
         # print("filter",self.filter,Row+Col)
@@ -608,14 +622,6 @@ class csvManager:
                             indexSpan.append(tmp)
                 colindex += 1
         return indexSpan
-
-    '''def getDate(self) :
-        DateTime = []
-        for head in self.df.columns:
-            if (self.df.dtypes[head] == 'Order Date' or head == 'Ship Date' or head == 'Order Date' ):
-                #Date(Date.parse(head))
-                DateTime.append(head)
-        return DateTime'''
         
     def saveMetadata(self) :
         metadata = {}

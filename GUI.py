@@ -301,15 +301,14 @@ class filterDimenWindow(QMainWindow):
             
             cc.append(self.filterItemListWidget.item(i).checkState())
             ck.append(self.filterItemListWidget.item(i).text())
-        print(cc)
-        print(ck)
+        # print(cc)
+        # print(ck)
         
     def setUp(self):
-        self.dimen = mainW.diForFil
-            
+        self.dimen = mainW.getPlainText(mainW.diForFil)
         self.sheet = cm.df
         self.filtered = mainW.filDic
-        # print("BF--------",self.filtered,self.filtered[self.dimen])
+        print("BF--------",self.filtered)
         if self.filtered[self.dimen] == "":
             if self.dimen in mainW.typeDate.keys():
                 self.filtered[self.dimen] = cm.getDateByFunc(self.dimen,mainW.typeDate[self.dimen])
@@ -798,7 +797,7 @@ class mainWindow(QMainWindow):
                             tmpr =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
                             tmpr.append(item.text())
                             self.filterList.addItems(tmpr)
-                            self.filDic[item.text()] = ""
+                            self.filDic[self.getPlainText(item.text())] = ""
                             # print(self.filDic)
                         self.selectFil(item.text())
                     self.rowcolChange()
@@ -1012,6 +1011,7 @@ class mainWindow(QMainWindow):
         
     def filChange(self):
         # print(self.filDic)
+        print(self.filterList.count())
         itemsTextList =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
         itemsTextList =  list(set(itemsTextList))
         # print(itemsTextList)
@@ -1121,34 +1121,60 @@ class mainWindow(QMainWindow):
         self.dataSourceTable.setModel(self.model)
         
     def useFile(self):
-        # print("kk")
-        #self.__init__(MainWindow)
+        
         itemsTextList =  [str(self.FileListChoose.item(i).text()) for i in range(self.FileListChoose.count())]
         self.selectFile = itemsTextList
-        # print(self.selectFile)
+        
         while (self.selectFile.count('')):
             self.selectFile.remove('')
+            
         itemsTextList =  [str(self.FileList.item(i).text()) for i in range(self.FileList.count())]
         self.fileNameList = itemsTextList
         while (self.fileNameList.count('')):
             self.fileNameList.remove('')
-            
-        if self.selectFile != []:
-            self.colHeader = cm.getHead()
-            self.colHeader = self.setColH(self.colHeader)
-            cm.colHeader = self.colHeader
-            # print(self.colHeader)
-            self.setFileListDimension()
-        else: 
-            self.colHeader = []
-            self.dataSourceTable.reset()
-            self.FileListDimension.clear()
-            self.FileListDimension.addItems(self.colHeader)
-            self.FileListMes.clear()
-            self.FileListMes.addItems([])
-            
-        self.dataSource()
         
+        
+        if self.selectFile != []:
+            self.setForDataSource()
+            self.dataSource()
+            print("Path : ",cm.path)
+            print("File : ",cm.selectFile)
+            print("Dimen : ",cm.di)
+            print("Date : ",cm.typeDate)
+            print("Meas : ",cm.Measure)
+            print("Filter : ",cm.filter)
+            print("Row : ",self.RowChoose)
+            print("Row : ",self.ColChoose)
+            print("\n---------------------\n")
+        else: 
+            self.setNull()
+            self.dataSource()
+
+    def setNull(self):
+        cm.di = []
+        cm.typeDate = {}
+        cm.Measure = {}
+        cm.filter = {}
+        
+        self.colHeader = []
+        self.dataSourceTable.reset()
+        self.dataSourceTable.setModel(None)
+        self.sheetTable.reset()
+        self.sheetTable.setModel(None)
+        
+        self.FileListDimension.clear()
+        self.FileListDimension.addItems([])
+        self.FileListMes.clear()
+        self.FileListMes.addItems([])
+        
+        self.RowList.clear()
+        self.ColList.clear()
+        self.RowChoose = []
+        self.ColChoose = []
+        self.Measure = {}
+        self.filterList = []
+        self.filterList.clear()
+
     def setTable(self):
         # print("set data")
         # print(self.selectFile)
@@ -1159,34 +1185,24 @@ class mainWindow(QMainWindow):
             self.dataSourceTable.setModel(self.model)
             
     def dataSource(self):
-        # print(self.selectFile)
         if type(self.selectFile) != list:
             self.selectFile = [self.selectFile]
         if self.selectFile != [] :
             if len(self.selectFile)>1:
                 print("Union")
                 self.data = cm.unionFile(self.selectFile)
-                self.colHeader = cm.getHead()
-                self.colHeader = self.setColH(self.colHeader)
-                cm.colHeader = self.colHeader
-                self.setFileListDimension()
+                # self.setFileListDimension()
                 self.model = TableModel(self.data)
                 self.dataSourceTable.setModel(self.model)
             else:
-                print("Not Union")
+                # print("Not Union")
                 cm.path =self.folderpath
                 cm.selectFile = self.selectFile[0] 
-                cm.setPath()
                 self.data = cm.getDataWithPandas()
                 self.model = TableModel(self.data)
                 self.dataSourceTable.setModel(self.model)
         else:
-            self.RowList.clear()
-            self.ColList.clear()
-            self.RowChoose = []
-            self.ColChoose = []
-            self.dataSourceTable.reset()
-            self.dataSourceTable.setModel(None)
+            self.setNull()
         
     def setFileInDirectory(self):
         self.FileList.clear()
@@ -1203,7 +1219,7 @@ class mainWindow(QMainWindow):
             
     def launchDialog(self):
         file_filter = 'Excel File (*.xlsx *.csv *.xls)'
-        response = QFileDialog.getOpenFileName(
+        self.response = QFileDialog.getOpenFileName(
             #parent=self,
             caption='Select a data file',
             directory=os.getcwd(),
@@ -1218,8 +1234,8 @@ class mainWindow(QMainWindow):
         for i in filename:
             if i.endswith(".xls") or i.endswith(".csv") or i.endswith(".xlsx"):
                 tmp.append(i)
-        response = list(response)
-        self.selectFile = os.path.split(response[0])
+        self.response = list(self.response)
+        self.selectFile = os.path.split(self.response[0])
         # print(self.selectFile)
         self.selectFile = list(self.selectFile)[1]
         if self.selectFile in tmp:
@@ -1229,30 +1245,26 @@ class mainWindow(QMainWindow):
         self.path = os.path.join(self.folderpath,self.selectFile)
         cm.path = self.folderpath
         cm.selectFile = self.selectFile
+        print("Start")
+        self.setForDataSource()
+        if self.response[0] != "":
+            self.dataSource()
+        
+    def setForDataSource(self):
         cm.setPath()
-        self.dfOriginal = cm.df
+        self.colHeader = cm.getHead()
         self.Measure = cm.Measure
         self.typeDate = cm.typeDate
-        # print(self.selectFile,self.data)
-        # print(response[0])
-        if response[0] != "":
-            self.dataSource()
-            self.colHeader = cm.getHead()
-            print(self.colHeader)
-            self.colHeader = self.setColH(self.colHeader)
-            cm.colHeader = self.colHeader.copy()
-            # print(cm.colHeader)
-            # print()
+        if self.response[0] != "":
             self.setFileListDimension()
             self.setFileInDirectory()
             self.setFileChoose()
         
     def setFileListDimension(self):
         self.FileListDimension.clear()
-        print(cm.colHeader)
-        self.FileListDimension.addItems(cm.colHeader)
+        self.FileListDimension.addItems(cm.di)
         self.FileListMes.clear()
-        self.FileListMes.addItems(list(self.Measure.keys()))
+        self.FileListMes.addItems(list(cm.Measure.keys()))
 
 app = QApplication(sys.argv)
 # widget = QtWidgets.QStackedWidget()
