@@ -763,7 +763,7 @@ class mainWindow(QMainWindow):
                         yearAc = self.subMenuDate.addAction("Year",self.clickFunc)
                         # quarterAc = self.subMenuDate.addAction("Quarter",self.clickFunc)
                         mounthAc = self.subMenuDate.addAction("Month",self.clickFunc)
-                        dayAc = self.subMenuDate.addAction("Day",self.clickFunc)
+                        dayAc = self.subMenuDate.addAction("Date",self.clickFunc)
                         self.acList = [yearAc,mounthAc,dayAc]
                         # print(self.typeDate)
                         for i in self.acList:

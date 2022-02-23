@@ -82,7 +82,7 @@ class csvManager:
             tmpData[Dimension] = pd.to_datetime(tmpData[Dimension],format='%d/%m/%Y')
             tmpData[Dimension+' year'] = tmpData[Dimension].dt.year
             tmpData[Dimension+' month'] = tmpData[Dimension].dt.month
-            tmpData[Dimension+' day'] = tmpData[Dimension].dt.day
+            tmpData[Dimension+' date'] = tmpData[Dimension].dt.day
         return tmpData[s]
             
     
