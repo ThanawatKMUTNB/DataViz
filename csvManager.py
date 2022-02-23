@@ -171,6 +171,13 @@ class csvManager:
             if (self.df.dtypes[head] == 'int64' or self.df.dtypes[head] == 'float64') and head != 'Row ID' and head != 'Postal Code':
                 Meas.append(head)
         return Meas
+    
+    def getDimension(self):
+        Dimen = []
+        for head in self.df.columns:
+            if (self.df.dtypes[head] == 'object' or head == 'Row ID' or head == 'Postal Code') and head != 'Order Date' or head != 'Ship Date':
+                Dimen.append(head)
+        return Dimen
 
     def isDimension(self,header):
         Dimen = []
