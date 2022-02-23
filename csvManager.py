@@ -567,34 +567,50 @@ class csvManager:
                             indexSpan.append(tmp)
                 colindex += 1
         return indexSpan
-    def savedata(self,filename) :
-        filename = 'metadata.json'
+    def getDate(self) :
+        DateTime = []
+        for head in self.df.columns:
+            if (self.df.dtypes[head] == 'Order Date' or head == 'Ship Date' or head == 'Order Date' ):
+                #Date(Date.parse(head))
+                DateTime.append(head)
+        return DateTime
+
+    def saveMetadata(self) :
         metadata = {}
-        metadata["Filepath"] = self.path + "\\" + self.selectFile
-        #metadata[self.selectFile] = {}
-        metadata["Dimension"] = self.getDimension()
-        metadata["Measurement"] = self.getMeasure()
-        
-        with open(filename, 'w') as exportFile:
+        metadata["Path"] = self.path 
+        HashFile = (hashlib.md5(self.selectFile.encode('UTF-8')).hexdigest())
+        metadata["FileName"] = HashFile
+        metadata["Dimen"] = self.getDimension()
+        metadata["Meas"] = self.getMeasure()
+        metadata["Date"] = self.getDate()
+        #print(date)
+        print(metadata)
+        with open("metadata.json", 'w') as exportFile:
             saveFile = json.dumps(metadata , indent= 4)
             exportFile.write(saveFile)
 
-    def loaddata(self,filename) :
-        filename = 'metadata.json'
-        with open(filename) as metadata_json:
+    def loadMetadata(self) :
+        with open('metadata.json') as metadata_json:
             metadata = json.load(metadata_json)
-        self.path = str(metadata["Filepath"])
-        self.Measure = list(metadata["Measurement"])
-        '''Path = []
+        Path = []
+        FileName = []
         Dimension = []
-        Measurment = []    
-        if "Path" in metadata :
-            Path = (metadata["Path"])
-        if "Dimen" in metadata :
-            Dimension = (metadata["Dimen"])
-        if "Meas" in metadata :
-            Measurment = (metadata["Meas"])
-        #print(self.df)
-        return Path,Dimension, Measurment'''
+        Measurment = []
+        HashFile = (hashlib.md5(self.selectFile.encode('UTF-8')).hexdigest()) 
+        if self.path == metadata["Path"] :        
+            if "Path" in metadata :
+                Path = (metadata["Path"])   
+            if "FileName" in metadata :
+                FileName = (metadata["FileName"])
+                if metadata["FileName"] == HashFile :
+                    if "Dimen" in metadata :
+                        Dimension = (metadata["Dimen"])
+                    if "Meas" in metadata :
+                        Measurment = (metadata["Meas"])
+                    return Path,FileName,Dimension, Measurment
+                else :
+                    print("Don't have file")
+        else :
+            print("Don't have file")
             
             #print(Path,Dimension,Measurment)
