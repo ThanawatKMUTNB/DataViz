@@ -3,9 +3,13 @@ from csvManager import csvManager
 
 ex = csvManager()
 ex.Measure = {'Sales':"sum",'Quantity':"sum",'Discount':"sum",'Profit':"average"}        
-ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
+# ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
+
+ex.df = pd.read_csv("all-states-history.csv", encoding='windows-1252')
+
 ex.getHead()
-ex.readDate()
+ex.typeDate = ex.readDate()
+# print(ex.typeDate)
 # def getDi(n):
 #     if n[-1] == ")":
 #         j = n.index("(")
@@ -51,4 +55,5 @@ ex.readDate()
 # ex.setRowAndColumn(["Segment",["Sales","sum"]],["Category","Region"])
 # ex.setRowAndColumn(["Category","Region"],["Segment",["Sales","sum"]])
 
-# ex.setRowAndColumn(["Region"] , ["Segment",["Sales","sum"]])
+# ex.setRowAndColumn(['Region'],[['Order Date', 'year'], ['Discount', 'sum']])
+# ex.setRowAndColumn(['Region'],[['Order Date', 'month'], ['Discount', 'sum']])

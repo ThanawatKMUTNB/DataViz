@@ -5,6 +5,7 @@ import json
 from itertools import chain
 import os
 from re import S
+import re
 import numpy as np
 import pandas as pd
 #import mPageByCookie
@@ -47,33 +48,41 @@ class csvManager:
             return df
         
     def readDate(self):
-        # print(self.df.columns)
+        # print(self.df.columns.tolist())
         dateDic = {}
         for i in self.df.columns.tolist():
-            try:
-                self.df[i] =  pd.to_datetime(self.df[i],format='%d/%m/%Y')
-                dateDic[i] = 'year'
-            except ValueError:
-                pass
-        # print(dateList)
+            exam = self.df.loc[[0],[i]].values[0][0]
+            intForm = re.findall('\d+', str(exam))
+            strForm = re.findall('\W', str(exam))
+            # print(intForm,strForm)
+            if len(intForm) == 3 and len(set(strForm))==1: 
+                # print(intForm)
+                if int(intForm[0]) < int(intForm[2]):
+                    formatSet = '%d'+list(set(strForm))[0]+'%m'+list(set(strForm))[0]+'%Y'
+                else:
+                    formatSet = '%Y'+list(set(strForm))[0]+'%m'+list(set(strForm))[0]+'%d'
+                    # print(formatSet)
+                try:
+                    self.df[i] =  pd.to_datetime(self.df[i],format=str(formatSet))
+                    # print(i)
+                    dateDic[i] = 'year'
+                except ValueError:
+                    pass
+        # print(dateDic)
         return dateDic
     
-    def filterDate(self,Dimension,typ): #Date only
-
-        self.df[Dimension] = pd.to_datetime(self.df[Dimension],format='%d/%m/%Y')
-
-        if typ == 'year':
-            s = str(Dimension+' year')
-            self.df[s] = self.df[Dimension].dt.year
-            return self.df[s]
-        elif typ == 'month':
-            s = str(Dimension+' month')
-            self.df[s] = self.df[Dimension].dt.month
-            return self.df[s]
-        elif typ == 'day':
-            s = str(Dimension+' day')
-            self.df[s] = self.df[Dimension].dt.day
-            return self.df[s]
+    def filterDate(self,data,Dimension,typ): #Date only
+        print("filterDate --- ", Dimension,typ)
+        tmpData = data
+        s = str(Dimension+' '+typ)
+        if s not in tmpData.columns.tolist():
+            # print("----------------------------------------IN")
+            tmpData[Dimension] = pd.to_datetime(tmpData[Dimension],format='%d/%m/%Y')
+            tmpData[Dimension+' year'] = tmpData[Dimension].dt.year
+            tmpData[Dimension+' month'] = tmpData[Dimension].dt.month
+            tmpData[Dimension+' day'] = tmpData[Dimension].dt.day
+        return tmpData[s]
+            
     
     def getHead(self):
         self.Head = list(self.df.columns)
@@ -246,32 +255,52 @@ class csvManager:
     def setRowAndColumn(self,Row,Col):
         print(self.filter)
         Rowdi = ''
-        # print("CMS")
-        # print(Row,Col)
+        print("CMS")
+        print(Row,Col)
+        
+        ############## Filter di ############
         usedata = self.df
         if self.filter != {}:
             self.setDataFilter(Row,Col)
             usedata = self.dfFil
+        ###################################
         oriRow = Row
         oriCal = Col
         
+        ############## Filter date ############
+        # print(usedata)
+        # print(self.typeDate)
         for i in range(len(Row)):
+            # print("find list")
             # print(i)
             if type(Row[i]) == list:
                 # print(Row[i])
-                Row[i]=Row[i][0]
+                # print("in")
+                if Row[i][0] in list(self.typeDate.keys()):
+                    fildate = self.filterDate(usedata,Row[i][0],Row[i][1])
+                    usedata[Row[i][0]] = fildate
+                    #usedata
+                    # print(Row[i])
+                    # print(fildate)
+                    Row[i]=Row[i][0]
+                else:
+                    Row[i]=Row[i][0]
         
         for i in range(len(Col)):
             # print(i)
             if type(Col[i]) == list:
-                # print(Col[i])
-                Col[i]=Col[i][0]
-                
-        # print(Row,Col)
-        
-        # self.df = pd.DataFrame({'col1': [0, 1, 2], 'col2': [10, 11, 12]})
-        # isInterRow = list(set.intersection(set(Row) & set(self.Measure.keys())))
-        # isInterCol = list(set.intersection(set(Col) & set(self.Measure.keys())))
+                # print("in col",Col[i][0], list(self.typeDate.keys()))
+                if Col[i][0] in list(self.typeDate.keys()):
+                    fildate = self.filterDate(usedata,Col[i][0],Col[i][1])
+                    usedata[Col[i][0]] = fildate
+                    #usedata
+                    # print(Col[i])
+                    # print("---------",fildate)
+                    Col[i]=Col[i][0]
+                else:
+                    # print(Col[i])
+                    Col[i]=Col[i][0]
+        #####################################
         isInterRow = list(set(Row).intersection(set(self.Measure.keys())))
         isInterCol = list(set(Col).intersection(set(self.Measure.keys())))
         # if len(isInterRow+isInterCol) != []:
@@ -492,8 +521,11 @@ class csvManager:
         
         if type(k) == pd.Series :
             k = k.to_frame()
-        # print(k)
+        print(k)
         return k
+
+
+
 
     def setRowForSpan(self,data,Rowdi):
         k = data

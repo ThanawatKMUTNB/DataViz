@@ -58,10 +58,10 @@ class graphManager():
         #self.df['Order Date'] = pd.to_datetime(self.df['Order Date'],format='%d/%m/%Y')
         #self.df['Ship Date'] = pd.to_datetime(self.df['Ship Date'],format='%d/%m/%Y')
         
-        for d in ['Order Date','Ship Date']:
-            self.filterDate(d,'year')
-            self.filterDate(d,'month')
-            self.filterDate(d,'day')
+        # for d in ['Order Date','Ship Date']:
+        #     self.filterDate(d,'year')
+        #     self.filterDate(d,'month')
+        #     self.filterDate(d,'day')
     
     def chooseChart(self,chart):
         row = self.RowChoose
@@ -221,22 +221,22 @@ class graphManager():
                         chart.append(self.plotLine(row,[column[0],column[c+1]],column[c+1],l,mes))
                     return alt.vconcat(*chart)
     
-    def filterDate(self,Dimension,typ): #Date inly
+    # def filterDate(self,Dimension,typ): #Date inly
+    #     # print(Dimension,typ)
+    #     self.df[Dimension] = pd.to_datetime(self.df[Dimension],format='%d/%m/%Y')
 
-        self.df[Dimension] = pd.to_datetime(self.df[Dimension],format='%d/%m/%Y')
-
-        if typ == 'year':
-            s = str(Dimension+' year')
-            self.df[s] = self.df[Dimension].dt.year
-            return self.df[s]
-        elif typ == 'month':
-            s = str(Dimension+' month')
-            self.df[s] = self.df[Dimension].dt.month
-            return self.df[s]
-        elif typ == 'day':
-            s = str(Dimension+' day')
-            self.df[s] = self.df[Dimension].dt.day
-            return self.df[s]
+    #     if typ == 'year':
+    #         s = str(Dimension+' year')
+    #         self.df[s] = self.df[Dimension].dt.year
+    #         return self.df[s]
+    #     elif typ == 'month':
+    #         s = str(Dimension+' month')
+    #         self.df[s] = self.df[Dimension].dt.month
+    #         return self.df[s]
+    #     elif typ == 'day':
+    #         s = str(Dimension+' day')
+    #         self.df[s] = self.df[Dimension].dt.day
+    #         return self.df[s]
 
     def rangeScale(self,Di,Meas):
         fil = Meas[1]
