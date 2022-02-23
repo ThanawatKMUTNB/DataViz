@@ -92,7 +92,7 @@ class csvManager:
             tmpData[Dimension] = pd.to_datetime(tmpData[Dimension],format='%d/%m/%Y')
             tmpData[Dimension+' year'] = tmpData[Dimension].dt.year
             tmpData[Dimension+' month'] = tmpData[Dimension].dt.month
-            tmpData[Dimension+' day'] = tmpData[Dimension].dt.day
+            tmpData[Dimension+' date'] = tmpData[Dimension].dt.day
         return tmpData[s]
             
     
@@ -181,7 +181,7 @@ class csvManager:
             return dic
                 
     def getMeasure(self): # is Measure
-        Dimen = []
+        #Dimen = []
         Meas = []
         for head in self.df.columns:
             if (self.df.dtypes[head] == 'int64' or self.df.dtypes[head] == 'float64') and head != 'Row ID' and head != 'Postal Code':
@@ -666,7 +666,17 @@ class csvManager:
             print("Don't have file")'''
             
             #print(Path,Dimension,Measurment)
-    
+    def SwapDiMeas(self,obj):
+        rdf = len(self.df.columns)
+        if obj in self.getDimension:
+            movecolumn = self.df.pop(obj)
+            self.df.insert(rdf-1,obj,movecolumn)
+        elif obj in self.getMeasure:
+            movecolumn = self.df.pop(obj)
+            self.df.insert(0,obj,movecolumn)
+
+        return self.df
+
     def print(self):
         print('\n--------------------------------------\n')
         print('path = ',self.path)
