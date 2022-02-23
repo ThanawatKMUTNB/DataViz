@@ -22,6 +22,7 @@ class graphManager():
         self.MeasureDic = {}
         self.RowChoose = []
         self.ColChoose = []
+        self.DateDict = {}
         self.Chart = None
 
     def setMes(self):
@@ -45,13 +46,37 @@ class graphManager():
                 tmp.append(self.ColChoose[i])
                 tmp.append(self.MeasureDic[self.ColChoose[i]])
                 self.ColChoose[i] = tmp
+
+    def setDate(self):
+        for i in list(self.DateDict.keys()):
+            tmp = []
+            tmp.append(i)
+            tmp.append(self.DateDict[i])
+            self.Measure.append(tmp)
+
+        for i in range(len(self.RowChoose)):
+            tmp = []
+            print("------>",i,self.RowChoose[i])
+            if self.RowChoose[i] in list(self.DateDict.keys()):
+                tmp.append(self.RowChoose[i])
+                tmp.append(self.DateDict[self.RowChoose[i]])
+                self.RowChoose[i] = tmp
+                
+        for i in range(len(self.ColChoose)):
+            tmp = []
+            if self.ColChoose[i] in list(self.DateDict.keys()):
+                tmp.append(self.ColChoose[i])
+                tmp.append(self.DateDict[self.ColChoose[i]])
+                self.ColChoose[i] = tmp
         
-    def setList(self,row,col,mes,dataSheet):
+    def setList(self,row,col,mes,dataSheet,dateDic):
         self.MeasureDic = mes
         self.RowChoose = row
         self.ColChoose = col
+        self.DateDict = dateDic
         # self.Measure = list(self.MeasureDic.keys())
         self.setMes()
+        self.setDate()
         self.df = dataSheet
         print("Graph")
         # print(self.MeasureDic,self.Measure,self.RowChoose,self.ColChoose)
@@ -302,7 +327,8 @@ class graphManager():
         return [lr,lc]
 
     def plotBar(self,row,column,meas,di,mes):
-
+        print('\n\n',row,column,'\n\n')
+        print(self.df['Order Date'])
         df = self.df
         Measure = self.Measure
         l = self.functionRC(row,column)

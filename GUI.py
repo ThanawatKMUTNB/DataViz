@@ -650,6 +650,7 @@ class mainWindow(QMainWindow):
         self.chartTypeS = ""
         self.diForFil = ''
         self.filJustAdd = ''
+        self.dfOriginal = None
         
         # defind
         self.openDirecButton = self.findChild(QPushButton,"openDirecButton")
@@ -843,8 +844,8 @@ class mainWindow(QMainWindow):
             
     def setplot(self):
         # print("--------R C",self.RowChoose,self.ColChoose)
-        self.setSheetTable()
         self.setChart()
+        self.setSheetTable()
         if self.typeChart != []:
             self.showChart()
     
@@ -854,7 +855,7 @@ class mainWindow(QMainWindow):
         # self.isInterRow = [value for value in self.RowChoose if value in [self.Measure.keys()]]
         # self.isInterCol = [value for value in self.ColChoose if value in [self.Measure.keys()]]
         # print("--------IR IC",self.isInterRow,self.isInterCol)
-        gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data)
+        gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.dfOriginal,self.typeDate)
         Measure = list(self.Measure.keys())
         self.typeChart = []
         print("--->",self.isInterRow,self.isInterCol)
@@ -893,7 +894,7 @@ class mainWindow(QMainWindow):
         if self.chartTypeS != "": 
             # if self.chartTypeS != "":
             # print("----------------",self.chartTypeS)
-            gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data)
+            gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.dfOriginal,self.typeDate)
             self.Chart = gm.chooseChart(str(self.chartTypeS))
     
             # self.widget.setLayout(self.view)
@@ -1229,6 +1230,7 @@ class mainWindow(QMainWindow):
         cm.path = self.folderpath
         cm.selectFile = self.selectFile
         cm.setPath()
+        self.dfOriginal = cm.df
         self.Measure = cm.Measure
         self.typeDate = cm.typeDate
         # print(self.selectFile,self.data)

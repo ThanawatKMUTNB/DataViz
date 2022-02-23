@@ -636,6 +636,7 @@ class csvManager:
             metadata = json.load(metadata_json)
         self.path = metadata['Path']
         HashFile = metadata['Filename']
+        #self.selectFile = hashlib.md5(self.selectFile.encode('UTF-8')).hexdigest()
         self.Dimen = metadata['Dimension']
         self.Measure = metadata['Measurement']
         '''Path = []
