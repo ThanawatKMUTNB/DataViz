@@ -69,15 +69,15 @@ class graphManager():
                 tmp.append(self.DateDict[self.ColChoose[i]])
                 self.ColChoose[i] = tmp
         
-    def setList(self,row,col,mes,dataSheet,dateDic):
+    def setList(self,row,col,mes,dataSheet,dateDic,dfOriginal):
         self.MeasureDic = mes
         self.RowChoose = row
         self.ColChoose = col
         self.DateDict = dateDic
+        self.df = dataSheet
         # self.Measure = list(self.MeasureDic.keys())
         self.setMes()
         self.setDate()
-        self.df = dataSheet
         print("Graph")
         # print(self.MeasureDic,self.Measure,self.RowChoose,self.ColChoose)
         #self.df['Order Date'] = pd.to_datetime(self.df['Order Date'],format='%d/%m/%Y')
@@ -246,22 +246,22 @@ class graphManager():
                         chart.append(self.plotLine(row,[column[0],column[c+1]],column[c+1],l,mes))
                     return alt.vconcat(*chart)
     
-    # def filterDate(self,Dimension,typ): #Date inly
-    #     # print(Dimension,typ)
-    #     self.df[Dimension] = pd.to_datetime(self.df[Dimension],format='%d/%m/%Y')
+    def filterDate(self,Dimension,typ): #Date inly
+        # print(Dimension,typ)
+        self.df[Dimension] = pd.to_datetime(self.df[Dimension],format='%d/%m/%Y')
 
-    #     if typ == 'year':
-    #         s = str(Dimension+' year')
-    #         self.df[s] = self.df[Dimension].dt.year
-    #         return self.df[s]
-    #     elif typ == 'month':
-    #         s = str(Dimension+' month')
-    #         self.df[s] = self.df[Dimension].dt.month
-    #         return self.df[s]
-    #     elif typ == 'day':
-    #         s = str(Dimension+' day')
-    #         self.df[s] = self.df[Dimension].dt.day
-    #         return self.df[s]
+        if typ == 'year':
+            s = str(Dimension+' year')
+            self.df[s] = self.df[Dimension].dt.year
+            return self.df[s]
+        elif typ == 'month':
+            s = str(Dimension+' month')
+            self.df[s] = self.df[Dimension].dt.month
+            return self.df[s]
+        elif typ == 'day':
+            s = str(Dimension+' day')
+            self.df[s] = self.df[Dimension].dt.day
+            return self.df[s]
 
     def rangeScale(self,Di,Meas):
         fil = Meas[1]
@@ -296,6 +296,7 @@ class graphManager():
             x = Di[1]
             col = Di[0]
         #print(col,x,Meas[0])
+        #print(df.columns.tolist())
         tmax = df.groupby([col,x], as_index=False)[Meas[0]].agg(fil).max()[2]
         tmin = df.groupby([col,x], as_index=False)[Meas[0]].agg(fil).min()[2]
         
@@ -327,8 +328,7 @@ class graphManager():
         return [lr,lc]
 
     def plotBar(self,row,column,meas,di,mes):
-        print('\n\n',row,column,'\n\n')
-        print(self.df['Order Date'])
+        print('\n\n\n',row,column)
         df = self.df
         Measure = self.Measure
         l = self.functionRC(row,column)

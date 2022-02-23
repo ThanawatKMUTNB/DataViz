@@ -854,7 +854,8 @@ class mainWindow(QMainWindow):
         # self.isInterRow = [value for value in self.RowChoose if value in [self.Measure.keys()]]
         # self.isInterCol = [value for value in self.ColChoose if value in [self.Measure.keys()]]
         # print("--------IR IC",self.isInterRow,self.isInterCol)
-        gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.dfOriginal,self.typeDate)
+        #gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.dfOriginal,self.typeDate)
+        gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data,self.typeDate,self.dfOriginal)
         Measure = list(self.Measure.keys())
         self.typeChart = []
         print("--->",self.isInterRow,self.isInterCol)
@@ -866,7 +867,7 @@ class mainWindow(QMainWindow):
                 self.typeChart = ['Bar','Pie','Line']
             elif (len(self.RowChoose)==2 and len(self.isInterCol)>0 and self.lenDimen(self.RowChoose,self.ColChoose)[1] == 0) or (len(self.ColChoose)==2 and len(self.isInterRow)>0 and self.lenDimen(self.RowChoose,self.ColChoose)[0] == 0):
                 self.typeChart = ['Bar','Line']
-            elif (self.lenDimen(self.RowChoose,self.ColChoose)[0] == 2 and  self.lenDimen(self.RowChoose,self.ColChoose)[1] == 1) or (self.lenDimen(self.RowChoose,self.ColChoose)[0] == 1 and  self.lenDimen(self.RowChoose,self.ColChoose)[1] == 2):    #don't check
+            elif (self.lenDimen(self.RowChoose,self.ColChoose)[0] == 2 and  self.lenDimen(self.RowChoose,self.ColChoose)[1] == 1) or (self.lenDimen(self.RowChoose,self.ColChoose)[0] == 1 and  self.lenDimen(self.RowChoose,self.ColChoose)[1] == 2):
                 self.typeChart = ['Bar','Line']
             elif ((self.lenDimen(self.RowChoose,self.ColChoose)[0] == 1 and len(self.isInterRow)>0) or (self.lenDimen(self.RowChoose,self.ColChoose)[1] == 1and len(self.isInterCol)>0)):
                 self.typeChart = ['Bar']
@@ -893,7 +894,8 @@ class mainWindow(QMainWindow):
         if self.chartTypeS != "": 
             # if self.chartTypeS != "":
             # print("----------------",self.chartTypeS)
-            gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.dfOriginal,self.typeDate)
+            #gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.dfOriginal,self.typeDate)
+            gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data,self.typeDate,self.dfOriginal)
             self.Chart = gm.chooseChart(str(self.chartTypeS))
     
             # self.widget.setLayout(self.view)
