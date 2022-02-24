@@ -508,7 +508,7 @@ class csvManager:
                         # print("c")
                         if len(isInterCol) == 1:
                             # print("c")
-                            print(k)
+                            # print(k)
                             print(type(k.columns))
                             if type(k.columns) == pd.MultiIndex:
                                 olddi = [list(ele) for ele in k.columns]

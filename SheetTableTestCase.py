@@ -24,22 +24,22 @@ p = ex.getDataWithPandasByHead("Region")
 # ex.readMeasure()
 
 
-# ex.setRowAndColumn(["Segment"],[])
-# ex.setRowAndColumn([],["Segment"])
+ex.setRowAndColumn(["Segment"],[])
+ex.setRowAndColumn([],["Segment"])
 
-# ex.setRowAndColumn([],["Sales"])
-# ex.setRowAndColumn(["Sales"],[])
+ex.setRowAndColumn([],["Sales"])
+ex.setRowAndColumn(["Sales"],[])
 
-# ex.setRowAndColumn([],["Sales","Profit"])
-# ex.setRowAndColumn(["Sales","Profit"],[])
+ex.setRowAndColumn([],["Sales","Profit"])
+ex.setRowAndColumn(["Sales","Profit"],[])
 
-# ex.setRowAndColumn(["Segment","Sales"],[])
-# ex.setRowAndColumn([],["Segment","Sales"])
+ex.setRowAndColumn(["Segment","Sales"],[])
+ex.setRowAndColumn([],["Segment","Sales"])
 
-# ex.setRowAndColumn(["Segment"],["Sales","Profit"])
-# ex.setRowAndColumn(["Sales","Profit"],["Segment"])
-# /
-# ex.setRowAndColumn(["Ship Mode","Segment"],["Sales"])
+ex.setRowAndColumn(["Segment"],["Sales","Profit"])
+ex.setRowAndColumn(["Sales","Profit"],["Segment"])
+
+ex.setRowAndColumn(["Ship Mode","Segment"],["Sales"])
 ex.setRowAndColumn(["Sales"],["Ship Mode","Segment"])
 
 ex.setRowAndColumn(["Ship Mode","Segment"],["Sales","Profit"])
