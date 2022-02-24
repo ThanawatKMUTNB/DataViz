@@ -69,15 +69,20 @@ class graphManager():
                 tmp.append(self.DateDict[self.ColChoose[i]])
                 self.ColChoose[i] = tmp
         
-    def setList(self,row,col,mes,dataSheet,dateDic,dfOriginal):
+    def setList(self,row,col,mes,dataSheet,dateDic):
+        #print(dataSheet.columns.tolist())
+        print('-----------------------\n\n',dataSheet.columns)
+        #print(dataSheet['Region'].value_counts())
         self.MeasureDic = mes
         self.RowChoose = row
         self.ColChoose = col
         self.DateDict = dateDic
         self.df = dataSheet
+        #self.df = pd.read_csv('Superstore.csv', encoding='windows-1252')
+        self.setDate()
         # self.Measure = list(self.MeasureDic.keys())
         self.setMes()
-        #self.setDate()
+        
         print("Graph")
         # print(self.MeasureDic,self.Measure,self.RowChoose,self.ColChoose)
         #self.df['Order Date'] = pd.to_datetime(self.df['Order Date'],format='%d/%m/%Y')
@@ -89,6 +94,7 @@ class graphManager():
         #     self.filterDate(d,'day')
     
     def chooseChart(self,chart):
+        #print(self.df['Category'].value_counts())
         row = self.RowChoose
         column = self.ColChoose
         Measure = []
