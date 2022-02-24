@@ -12,7 +12,7 @@ ex.typeDate = ex.readDate()
 
 p = ex.getDataWithPandasByHead("Region")
 
-print(p.drop_duplicates().to_list())
+# print(p.drop_duplicates().to_list())
 # def getDi(n):
 #     if n[-1] == ")":
 #         j = n.index("(")

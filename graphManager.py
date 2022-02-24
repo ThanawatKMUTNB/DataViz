@@ -24,6 +24,7 @@ class graphManager():
         self.ColChoose = []
         self.DateDict = {}
         self.Chart = None
+        self.dataFiltered = None
 
     def setMes(self):
         for i in list(self.MeasureDic.keys()):
