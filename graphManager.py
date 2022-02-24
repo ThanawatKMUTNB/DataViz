@@ -70,17 +70,19 @@ class graphManager():
                 tmp.append(self.DateDict[self.ColChoose[i]])
                 self.ColChoose[i] = tmp
         
-    def setList(self,row,col,mes,dataSheet,dateDic):
+    def setList(self,row,col,mes,dataSheet,dateDic,fil):
         #print(dataSheet.columns.tolist())
-        print('-----------------------\n\n',dataSheet.columns)
+        #print('-----------------------\n\n',dataSheet.columns)
         #print(dataSheet['Region'].value_counts())
         self.MeasureDic = mes
         self.RowChoose = row
         self.ColChoose = col
         self.DateDict = dateDic
         self.df = dataSheet
-        if self.dataFiltered != None:
-            print(self.dataFiltered)
+        if type(fil) != dict:
+            self.df = fil
+        #print('#####################################\n\n',fil)
+
         #self.df = pd.read_csv('Superstore.csv', encoding='windows-1252')
         self.setDate()
         # self.Measure = list(self.MeasureDic.keys())
@@ -360,7 +362,6 @@ class graphManager():
         return [lr,lc]
 
     def plotBar(self,row,column,meas,di,mes):
-        print('\n\n\n',self.df.info())
         df = self.df
         Measure = self.Measure
         l = self.functionRC(row,column)

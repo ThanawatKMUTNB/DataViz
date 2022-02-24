@@ -27,6 +27,7 @@ class csvManager:
         self.di = []
         self.colHeader = []
         self.Dimen = []
+        self.dataFiltered = {}
     
     def setPath(self):
         # print(self.path,self.selectFile)
@@ -286,8 +287,8 @@ class csvManager:
         if self.filter != {}:
             self.setDataFilter(Row,Col)
             usedata = self.dfFil
-            gm.dataFiltered = usedata
-            #print('\n\ndatafilter',usedata)
+            self.dataFiltered = usedata
+            #print(self.dataFiltered)
         ###################################
         oriRow = Row
         oriCal = Col
@@ -500,28 +501,42 @@ class csvManager:
                         k.index = isInterRow
                         k=k.unstack()
                 else: #mes in col
+                    print("meas in col")
                     k = pd.pivot_table(results,columns = colNum[len(Rowdi):beforMesual], index= colNum[:len(Rowdi)],values = colNum[beforMesual:],aggfunc=np.sum)
                     k = k.round(0)
+                    # print(k)
                     if oriRow != []:
+                        # print("c")
                         if len(isInterCol) == 1:
-                            isInterCol = isInterCol*len(k.columns)
-                            k.columns = isInterCol
+                            # print("c")
+                            # print(k.columns)
+                            olddi = [list(ele) for ele in k.columns]
+                            # isInterCol = k.columns.tolist()
                             # print(isInterCol)
+                            # isInterCol = isInterCol*len(k.columns)
+                            for i in range(len(k.columns)):
+                                buf = str(isInterCol[0])+" "+str(olddi[i][1])
+                                olddi[i] = buf
+                            # print(olddi)
+                            k.columns = olddi
+                            # print(k.columns)
                         else:
+                            # print(k.columns)
                             # print(oriRow,oriCal)
                             # print(k)
                             # print(Coldi,k.columns,isInterCol)
                             # print(Rowdi,k.index,isInterRow)
-                                if isInterCol != [] and Coldi == []:
-                                    k.columns = isInterCol
-                                if isInterCol != [] and Coldi != []:
-                                    # print(dict(k.index))
-                                    changname = dict(k.columns)
-                                    for i,j in zip(list(changname.keys()),isInterCol):
-                                        changname[i] = j 
-                                    k = k.rename(columns = changname)
+                            if isInterCol != [] and Coldi == []:
+                                k.columns = isInterCol
+                            if isInterCol != [] and Coldi != []:
+                                # print(dict(k.index))
+                                changname = dict(k.columns)
+                                for i,j in zip(list(changname.keys()),isInterCol):
+                                    changname[i] = j 
+                                k = k.rename(columns = changname)
                         # print(k)
                     else :
+                        # print("c")
                         # print("cc",beforMesual)
                         # if type(results) == pd.Series :
                         #     results = results.to_frame()
