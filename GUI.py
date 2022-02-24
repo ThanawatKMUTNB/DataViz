@@ -156,13 +156,13 @@ class filterMesWindow(QMainWindow):
         self.setRC()
         # print(self.dimen,mainW.RowChoose,mainW.ColChoose)
         if (self.dimen in self.row) or (self.dimen in self.col):
-            # print("K")
             self.sheet = mainW.dataSheet
         else :
-            # print("J")
             self.sheet = mainW.data
         self.filtered = mainW.filDic
         print("start",self.filtered)
+        # print(mainW.dataSheet)
+        # print(mainW.data)
         # self.filtered[self.dimen] = [min(self.sheet[self.dimen]),max(self.sheet[self.dimen])]
         # if self.filtered[self.dimen] == "" or len(self.filtered[self.dimen])>2:
         #     self.filtered[self.dimen] = [min(self.sheet[self.dimen]),max(self.sheet[self.dimen])]
