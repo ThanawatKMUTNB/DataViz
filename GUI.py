@@ -765,7 +765,7 @@ class mainWindow(QMainWindow):
                     if event.type() == QEvent.ContextMenu and (source is self.FileListDimension) :
                         # print('Convert to Measure')
                         if type(pt) == list:
-                            self.Hierarchy = menu.addAction('Creat Hierarchy')
+                            self.Hierarchy = menu.addAction('Create Hierarchy')
                         else:
                             if cm.isMeasure(pt):
                                 self.cvAc = menu.addAction('Convert to Measure')

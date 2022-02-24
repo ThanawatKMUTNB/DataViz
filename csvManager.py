@@ -83,19 +83,6 @@ class csvManager:
         print(dateDic)
         return dateDic
     
-    def filterDate(self,data,Dimension,typ): #Date only
-        print("filterDate --- ", Dimension,typ)
-        tmpData = data
-        s = str(Dimension+' '+typ)
-        if s not in tmpData.columns.tolist():
-            # print("----------------------------------------IN")
-            tmpData[Dimension] = pd.to_datetime(tmpData[Dimension],format='%d/%m/%Y')
-            tmpData[Dimension+' year'] = tmpData[Dimension].dt.year
-            tmpData[Dimension+' month'] = tmpData[Dimension].dt.month
-            tmpData[Dimension+' date'] = tmpData[Dimension].dt.day
-        return tmpData[s]
-            
-    
     def getHead(self):
         if type(self.df) != str:
             self.Head = list(self.df.columns)
@@ -275,11 +262,21 @@ class csvManager:
             #     self.dfFil = self.dfFil.loc[self.dfFil[i] < self.filter[i][1]] 
             #     # print(self.dfFil)
             
+    def filterDate(self,data,Dimension,typ): #Date only
+        # print("filterDate --- ", Dimension,typ)
+        tmpData = data
+        s = str(Dimension+' '+typ)
+        # print("----------------------------------------IN")
+        tmpData[Dimension] = pd.to_datetime(tmpData[Dimension],format='%d/%m/%Y')
+        tmpData[Dimension+' year'] = tmpData[Dimension].dt.year
+        tmpData[Dimension+' month'] = tmpData[Dimension].dt.month
+        tmpData[Dimension+' date'] = tmpData[Dimension].dt.day
+        return tmpData
+    
     def setRowAndColumn(self,Row,Col):
-        print(self.filter)
-        Rowdi = ''
-        print("CMS")
-        print(Row,Col)
+        # print(self.filter)
+        # print("CMS")
+        # print(Row,Col)
         
         ############## Filter di ############
         usedata = self.df
@@ -289,41 +286,35 @@ class csvManager:
         ###################################
         oriRow = Row
         oriCal = Col
-        
+        # print(usedata.columns.tolist())
         ############## Filter date ############
-        # print(usedata)
-        # print(self.typeDate)
-        for i in range(len(Row)):
-            # print("find list")
-            # print(i)
-            if type(Row[i]) == list:
-                # print(Row[i])
-                # print("in")
-                if Row[i][0] in list(self.typeDate.keys()):
-                    fildate = self.filterDate(usedata,Row[i][0],Row[i][1])
-                    usedata[Row[i][0]] = fildate
-                    #usedata
-                    # print(Row[i])
-                    # print(fildate)
-                    Row[i]=Row[i][0]
-                else:
-                    Row[i]=Row[i][0]
         
+        for i in range(len(Row)):
+            if type(Row[i]) == list:
+                if Row[i][0] in list(self.typeDate.keys()):
+                    if Row[i][0]+" "+Row[i][1] not in usedata.columns.tolist():
+                        usedata = self.filterDate(usedata,Row[i][0],Row[i][1])
+                    s = Row[i][0]+" "+Row[i][1]
+                    Row[i] = s
+                    oriRow[i] = s
+                else:
+                    Row[i] = Row[i][0]
         for i in range(len(Col)):
             # print(i)
             if type(Col[i]) == list:
-                # print("in col",Col[i][0], list(self.typeDate.keys()))
                 if Col[i][0] in list(self.typeDate.keys()):
-                    fildate = self.filterDate(usedata,Col[i][0],Col[i][1])
-                    usedata[Col[i][0]] = fildate
-                    #usedata
-                    # print(Col[i])
-                    # print("---------",fildate)
-                    Col[i]=Col[i][0]
+                    if Col[i][0]+" "+Col[i][1] not in usedata.columns.tolist():
+                        usedata = self.filterDate(usedata,Col[i][0],Col[i][1])
+                    s = Col[i][0]+" "+Col[i][1]
+                    Col[i] = s
+                    oriCal[i] = s
                 else:
-                    # print(Col[i])
-                    Col[i]=Col[i][0]
+                    Col[i] = Col[i][0]
+        # print("\n",oriRow,oriCal)
+        # print(Row,Col)
+        # print(usedata.columns.tolist())
         #####################################
+        
         isInterRow = list(set(Row).intersection(set(self.Measure.keys())))
         isInterCol = list(set(Col).intersection(set(self.Measure.keys())))
         # if len(isInterRow+isInterCol) != []:
@@ -527,7 +518,6 @@ class csvManager:
                                     k = k.rename(columns = changname)
                     else :
                         # print("cc",beforMesual)
-                        
                         # if type(results) == pd.Series :
                         #     results = results.to_frame()
                         # results = results.groupby(0).sum().round(0).stack()
