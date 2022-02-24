@@ -189,6 +189,7 @@ class Ui_MainWindow(object):
         self.FileListDimension.setDragDropOverwriteMode(True)
         self.FileListDimension.setDragDropMode(QAbstractItemView.DragOnly)
         self.FileListDimension.setDefaultDropAction(Qt.CopyAction)
+        self.FileListDimension.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.FileListDimension.setBatchSize(100)
         self.FileListDimension.setWordWrap(False)
         self.FileListDimension.setSortingEnabled(True)

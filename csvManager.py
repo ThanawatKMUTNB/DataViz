@@ -546,9 +546,6 @@ class csvManager:
         print(k)
         return k
 
-
-
-
     def setRowForSpan(self,data,Rowdi):
         k = data
         if type(k) == pd.Series :

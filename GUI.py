@@ -157,11 +157,15 @@ class filterMesWindow(QMainWindow):
         # print(self.dimen,mainW.RowChoose,mainW.ColChoose)
         if (self.dimen in self.row) or (self.dimen in self.col):
             self.sheet = mainW.dataSheet
+            tmp = self.sheet.values.tolist()
+            self.filtered[self.dimen] = tmp[0]
+            self.filtered[self.dimen] = [min(self.filtered[self.dimen]),max(self.filtered[self.dimen])]
         else :
             self.sheet = mainW.data
-        self.filtered = mainW.filDic
+            self.filtered = mainW.filDic
         print("start",self.filtered)
-        # print(mainW.dataSheet)
+        print(self.sheet)
+        print(self.sheet.values.tolist())
         # print(mainW.data)
         # self.filtered[self.dimen] = [min(self.sheet[self.dimen]),max(self.sheet[self.dimen])]
         # if self.filtered[self.dimen] == "" or len(self.filtered[self.dimen])>2:
@@ -512,7 +516,7 @@ class TableModel2(QtCore.QAbstractTableModel):
         super(TableModel2, self).__init__()
         #self.itemClicked.connect(self.handleItemClick)
         self._data = data
-        #print(data)
+        # print(data)
         #Ui_MainWindow.connectButton()
 
     def data(self, index, role):
@@ -740,31 +744,43 @@ class mainWindow(QMainWindow):
             print( pt +" can convert to dimension")
             
         # print("cc")
+    
+    def creatHierarchy(self):
+        print(self.HierList)
         
     def eventFilter(self, source, event):
+        items = self.FileListDimension.selectedItems()
+        pt = []
+        for i in items:
+            pt.append(self.getPlainText(str(i.text())))
+        if len(pt) == 1:
+            pt = pt[0]
+        else:
+            self.HierList = pt
         if event.type() == QEvent.ContextMenu and (source is self.FileListDimension or source is self.FileListMes or source is self.filterList or source is self.ColList or source is self.RowList):
             menu = QMenu()
-            self.item2 = source.itemAt(event.pos())
-            # pt = self.getPlainText(str(self.item2.text()))
-            if self.item2 != None:
-                pt = self.getPlainText(str(self.item2.text()))
+            if pt != None:
                 if event.type() == QEvent.ContextMenu and (source is self.FileListDimension or source is self.FileListMes ):
                     # print("Convert")
                     if event.type() == QEvent.ContextMenu and (source is self.FileListDimension) :
                         # print('Convert to Measure')
-                        if cm.isMeasure(pt):
-                            self.cvAc = menu.addAction('Convert to Measure')
-                            self.where = 'di'
+                        if type(pt) == list:
+                            self.Hierarchy = menu.addAction('Creat Hierarchy')
                         else:
-                            self.cvAc = menu.addAction('Convert to Measure')
-                            self.where = ' '
+                            if cm.isMeasure(pt):
+                                self.cvAc = menu.addAction('Convert to Measure')
+                                self.where = 'di'
+                            else:
+                                self.cvAc = menu.addAction('Convert to Measure')
+                                self.where = ' '
                     else:
                         # print('Convert to Dimension')
                         self.cvAc = menu.addAction('Convert to Dimension')
                         self.where = 'mes'
+                    if menu.exec_(event.globalPos()) == self.Hierarchy:
+                        self.creatHierarchy()
                     if menu.exec_(event.globalPos()) == self.cvAc:
-                        if self.where != ' ':
-                            self.toConvert()
+                        self.toConvert()
                     # menu.addMenu(cvAc)
                 else:
                     filterAc = menu.addAction('Filter')
