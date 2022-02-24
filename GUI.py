@@ -897,9 +897,9 @@ class mainWindow(QMainWindow):
             elif (len(self.RowChoose)==1 and len(self.isInterCol)>0) or (len(self.ColChoose)==1 and len(self.isInterRow)>0):
                 self.typeChart = ['Bar','Pie','Line']
             elif (len(self.RowChoose)==2 and len(self.isInterCol)>0 and self.lenDimen(self.RowChoose,self.ColChoose)[1] == 0) or (len(self.ColChoose)==2 and len(self.isInterRow)>0 and self.lenDimen(self.RowChoose,self.ColChoose)[0] == 0):
-                self.typeChart = ['Bar','Line']
+                self.typeChart = ['Bar','Pie','Line']
             elif (self.lenDimen(self.RowChoose,self.ColChoose)[0] == 2 and  self.lenDimen(self.RowChoose,self.ColChoose)[1] == 1) or (self.lenDimen(self.RowChoose,self.ColChoose)[0] == 1 and  self.lenDimen(self.RowChoose,self.ColChoose)[1] == 2):
-                self.typeChart = ['Bar','Line']
+                self.typeChart = ['Bar','Pie','Line']
             elif ((self.lenDimen(self.RowChoose,self.ColChoose)[0] == 1 and len(self.isInterRow)>0) or (self.lenDimen(self.RowChoose,self.ColChoose)[1] == 1and len(self.isInterCol)>0)):
                 self.typeChart = ['Bar']
             elif (len(self.RowChoose)==3 and len(self.isInterCol)==1) or (len(self.ColChoose)==3 and len(self.isInterRow)==1):

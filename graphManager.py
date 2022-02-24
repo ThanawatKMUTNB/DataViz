@@ -96,16 +96,6 @@ class graphManager():
         for m in self.Measure:
             Measure.append(m[0])
         Measure = list(set(Measure))
-
-        def checkMeasure(R,C):      #True when row is measure
-            for r in R:
-                if type(r) == type([]):
-                    if r[0] in Measure:
-                        return True
-                    else:
-                        return False
-                else:
-                    return False
         #print(self.MeasureDic,self.Measure,self.RowChoose,self.ColChoose)
         
         if chart == 'Bar':
@@ -189,18 +179,51 @@ class graphManager():
 
 
         elif chart == 'Pie':
-            if checkMeasure(row,column):    #row is measure
-                print('row is measurement')
+            mes = 'col'
+            for r in row:
+                if type(r) == type(['list']):
+                    if r[0] in Measure:
+                        mes = 'row'
+            #print(mes)
+            if mes == 'row':
                 chart = []
-                for r in row:
-                    chart.append(self.plotPie(r,column,'row'))
-                return alt.vconcat(*chart)
+                if type(row[0]) == type(['list']):  #Datetime and Meas
+                    if row[0][0] not in Measure:    #Datetime
+                        l = [*column]
+                        l.append(row[0])
+                        for r in range(len(row)-1):
+                            chart.append(self.plotPie([row[0],row[r+1]],column,row[r+1],l,mes))
+                        return alt.vconcat(*chart).resolve_scale(theta = 'independent',color = 'independent')
+                    else:                           #Measure
+                        for r in range(len(row)):
+                            chart.append(self.plotPie([row[r]],column,row[r],[*column],mes))
+                        return alt.vconcat(*chart).resolve_scale(theta = 'independent',color = 'independent')
+                else:                               #Dimension
+                    l = [*column]
+                    l.append(row[0])
+                    for r in range(len(row)-1):
+                        chart.append(self.plotPie([row[0],row[r+1]],column,row[r+1],l,mes))
+                    return alt.vconcat(*chart).resolve_scale(theta = 'independent',color = 'independent')
             else:
-                print('column is measurement')
                 chart = []
-                for c in column:
-                    chart.append(self.plotPie(row,c,'column'))
-                return alt.hconcat(*chart)
+                if type(column[0]) == type(['list']):
+                    if column[0][0] not in Measure:
+                        l = [*row]
+                        l.append(column[0])
+                        for c in range(len(column)-1):
+                            chart.append(self.plotPie(row,[column[0],column[c+1]],column[c+1],l,mes))
+                        return alt.vconcat(*chart).resolve_scale(theta = 'independent',color = 'independent')
+                    else:
+                        for c in range(len(column)):
+                            chart.append(self.plotPie(row,[column[c]],column[c],[*row],mes))
+                        return alt.vconcat(*chart).resolve_scale(theta = 'independent',color = 'independent')
+                else:
+                    l = [*row]
+                    l.append(column[0])
+                    for c in range(len(column)-1):
+                        chart.append(self.plotPie(row,[column[0],column[c+1]],column[c+1],l,mes))
+                    return alt.vconcat(*chart).resolve_scale(theta = 'independent',color = 'independent')
+
         elif chart == 'Line':
             mes = 'col'
             for r in row:
@@ -581,27 +604,80 @@ class graphManager():
                 self.Chart = c
         return self.Chart
 
-    def plotPie(self,row,column,mes):
-        if mes == 'row':
-            Mes = row[0]
-            fil = row[1]
-            Di = column[0]
-        elif mes == 'column':
-            Mes = column[0]
-            fil = column[1]
-            Di = row[0]
+    def plotPie(self,row,column,meas,di,mes):
+        df = self.df
+        l = self.functionRC(row,column)
+        lr = l[0]
+        lc = l[1]
+        if len(lr) == 1 and len(lc) == 1:
+            if mes == 'row':
+                M = lr[-1]
+                Di = lc
+            else:
+                M = lc[-1]
+                Di = lr
+            c = alt.Chart(df).mark_arc().encode(
+                alt.Theta(M), 
+                alt.Color(Di[-1], type="nominal"),
+                tooltip = [M,Di[-1]]
+            ).resolve_scale(theta = 'independent',color = 'independent')
+            self.Chart = c
+            
+        elif len(lr) == 2 and len(lc) == 1:             
+            if mes == 'row':
+                c = alt.Chart(df).mark_arc().encode(
+                    alt.Theta(lr[-1]), 
+                    alt.Color(lc[-1], type="nominal"),
+                    alt.Row(lr[-2]),
+                    tooltip = [lr[-2],lc[-1],lr[-1]]
+                ).resolve_scale(theta = 'independent',color = 'independent')
+                self.Chart = c
+            else:
+                c = alt.Chart(df).mark_arc().encode(
+                    alt.Theta(lc[-1]), 
+                    alt.Color(lr[-1], type="nominal"),
+                    alt.Row(lr[-2]),
+                    tooltip = [lr[-2],lc[-1],lr[-1]]
+                ).resolve_scale(theta = 'independent',color = 'independent')
+                self.Chart = c
 
-        if type(Di) == type([]):
-            s = str(Di[1]+'('+Di[0]+'):T')
-        else:
-            s = str(Di+':N')
+        elif len(lr) == 1 and len(lc) == 2:     #dimension2 date error
+            if mes == 'row':   
+                c = alt.Chart(df).mark_arc().encode(
+                    alt.Theta(lr[-1]), 
+                    alt.Color(lc[-1], type="nominal"),
+                    alt.Column(lc[-2]),
+                    tooltip = [lc[-2],lc[-1],lr[-1]]
+                ).resolve_scale(theta = 'independent',color = 'independent')
+                self.Chart = c
+            else:
+                c = alt.Chart(df).mark_arc().encode(
+                    alt.Theta(lc[-1]), 
+                    alt.Color(lr[-1], type="nominal"),
+                    alt.Column(lc[-2]),
+                    tooltip = [lc[-2],lr[-1],lc[-1]]
+                ).resolve_scale(theta = 'independent',color = 'independent')
+                self.Chart = c
 
-        base = alt.Chart(self.df).mark_arc().encode(
-            theta=alt.Theta(str(fil+'('+Mes+'):Q')), 
-            color=alt.Color(s, type="nominal"), 
-            tooltip = [s,str(fil+'('+Mes+'):Q')]
-        )
+        elif len(lr) == 2 and len(lc) == 2:             ###################
+            if mes == 'row':
+                c = alt.Chart(df).mark_arc().encode(
+                    alt.Theta(lr[-1]), 
+                    alt.Color(lc[-1], type="nominal"),
+                    alt.Row(lr[-2]),
+                    alt.Column(lc[-2]),
+                    tooltip = [lr[-2],lc[-2],lc[-1],lr[-1]]
+                ).resolve_scale(theta = 'independent',color = 'independent')
+                self.Chart = c
+            else:
+                c = alt.Chart(df).mark_arc().encode(
+                    alt.Theta(lc[-1]), 
+                    alt.Color(lr[-1], type="nominal"),
+                    alt.Row(lr[-2]),
+                    alt.Column(lc[-2]),
+                    tooltip = [lr[-2],lc[-2],lr[-1],lc[-1]]
+                ).resolve_scale(theta = 'independent',color = 'independent')
+                self.Chart = c
 
-        self.Chart = base
         return self.Chart
         #self.plotChart()
