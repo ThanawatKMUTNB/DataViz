@@ -27,7 +27,7 @@ class csvManager:
         self.di = []
         self.colHeader = []
         self.Dimen = []
-        self.str(olddi[i][1]) = ""
+        self.dataFiltered = {}
     
     def setPath(self):
         # print(self.path,self.selectFile)
@@ -511,12 +511,12 @@ class csvManager:
                             # print(k.columns)
                             olddi = [list(ele) for ele in k.columns]
                             # isInterCol = k.columns.tolist()
-                            print(isInterCol)
+                            # print(isInterCol)
                             # isInterCol = isInterCol*len(k.columns)
                             for i in range(len(k.columns)):
                                 buf = str(isInterCol[0])+" "+str(olddi[i][1])
                                 olddi[i] = buf
-                            print(olddi)
+                            # print(olddi)
                             k.columns = olddi
                             # print(k.columns)
                         else:
