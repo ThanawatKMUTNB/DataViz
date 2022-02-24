@@ -79,6 +79,8 @@ class graphManager():
         self.ColChoose = col
         self.DateDict = dateDic
         self.df = dataSheet
+        if self.dataFiltered != None:
+            print(self.dataFiltered)
         #self.df = pd.read_csv('Superstore.csv', encoding='windows-1252')
         self.setDate()
         # self.Measure = list(self.MeasureDic.keys())
@@ -358,7 +360,7 @@ class graphManager():
         return [lr,lc]
 
     def plotBar(self,row,column,meas,di,mes):
-        print('\n\n\n',row,column)
+        print('\n\n\n',self.df.info())
         df = self.df
         Measure = self.Measure
         l = self.functionRC(row,column)

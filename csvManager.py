@@ -287,6 +287,7 @@ class csvManager:
             self.setDataFilter(Row,Col)
             usedata = self.dfFil
             gm.dataFiltered = usedata
+            #print('\n\ndatafilter',usedata)
         ###################################
         oriRow = Row
         oriCal = Col

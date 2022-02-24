@@ -887,6 +887,8 @@ class mainWindow(QMainWindow):
         # print("--------IR IC",self.isInterRow,self.isInterCol)
         #gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.dfOriginal,self.typeDate)
         gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data,self.typeDate)
+        if gm.dataFiltered != None:
+            gm.setList(self.RowChoose,self.ColChoose,self.Measure,gm.dataFiltered,self.typeDate)
         Measure = list(self.Measure.keys())
         self.typeChart = []
         print("--->",self.isInterRow,self.isInterCol)
