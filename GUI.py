@@ -1044,6 +1044,7 @@ class mainWindow(QMainWindow):
         self.filChange()
     
     def setFilterValue(self,key):
+        key = self.getPlainText(key)
         print("Key : ",key)
         print("Date Key : ",list(self.typeDate.keys()))
         print("Measure Key : ",list(self.Measure.keys()))

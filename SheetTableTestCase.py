@@ -22,6 +22,8 @@ p = ex.getDataWithPandasByHead("Region")
 
 # getDi('YEAR(Order Date)')
 # ex.readMeasure()
+
+
 ex.setRowAndColumn(["Segment"],[])
 ex.setRowAndColumn([],["Segment"])
 
