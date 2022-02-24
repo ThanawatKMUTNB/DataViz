@@ -9,6 +9,9 @@ from re import S
 import re
 import numpy as np
 import pandas as pd
+import graphManager
+
+gm = graphManager.graphManager()
 #import mPageByCookie
 class csvManager:
     def __init__(self):
@@ -283,12 +286,13 @@ class csvManager:
         if self.filter != {}:
             self.setDataFilter(Row,Col)
             usedata = self.dfFil
+            gm.dataFiltered = usedata
         ###################################
         oriRow = Row
         oriCal = Col
         # print(usedata.columns.tolist())
-        ############## Filter date ############
         
+        ############## Filter date ############
         for i in range(len(Row)):
             if type(Row[i]) == list:
                 if Row[i][0] in list(self.typeDate.keys()):
@@ -299,6 +303,7 @@ class csvManager:
                     oriRow[i] = s
                 else:
                     Row[i] = Row[i][0]
+                    
         for i in range(len(Col)):
             # print(i)
             if type(Col[i]) == list:
@@ -494,11 +499,9 @@ class csvManager:
                         k.index = isInterRow
                         k=k.unstack()
                 else: #mes in col
-                    print("mes in col")
-                    
-                    if Rowdi != []:
-                        k = pd.pivot_table(results,columns = colNum[len(Rowdi):beforMesual], index= colNum[:len(Rowdi)],values = colNum[beforMesual:],aggfunc=np.sum)
-                        k = k.round(0)
+                    k = pd.pivot_table(results,columns = colNum[len(Rowdi):beforMesual], index= colNum[:len(Rowdi)],values = colNum[beforMesual:],aggfunc=np.sum)
+                    k = k.round(0)
+                    if oriRow != []:
                         if len(isInterCol) == 1:
                             isInterCol = isInterCol*len(k.columns)
                             k.columns = isInterCol
@@ -516,6 +519,7 @@ class csvManager:
                                     for i,j in zip(list(changname.keys()),isInterCol):
                                         changname[i] = j 
                                     k = k.rename(columns = changname)
+                        # print(k)
                     else :
                         # print("cc",beforMesual)
                         # if type(results) == pd.Series :

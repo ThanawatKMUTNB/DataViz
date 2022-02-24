@@ -58,5 +58,5 @@ p = ex.getDataWithPandasByHead("Region")
 # ex.setRowAndColumn(["Segment",["Sales","sum"]],["Category","Region"])
 # ex.setRowAndColumn(["Category","Region"],["Segment",["Sales","sum"]])
 
-ex.setRowAndColumn(['Region'],[['Order Date', 'year'], ['Discount', 'sum']])
+# ex.setRowAndColumn(['Region'],[['Order Date', 'year'], ['Discount', 'sum']])
 # ex.setRowAndColumn(['Region'],[['Order Date', 'month'], ['Discount', 'sum']])
