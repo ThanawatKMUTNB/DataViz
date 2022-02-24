@@ -508,16 +508,18 @@ class csvManager:
                         # print("c")
                         if len(isInterCol) == 1:
                             # print("c")
-                            # print(k.columns)
-                            olddi = [list(ele) for ele in k.columns]
-                            # isInterCol = k.columns.tolist()
-                            # print(isInterCol)
-                            # isInterCol = isInterCol*len(k.columns)
-                            for i in range(len(k.columns)):
-                                buf = str(isInterCol[0])+" "+str(olddi[i][1])
-                                olddi[i] = buf
-                            # print(olddi)
-                            k.columns = olddi
+                            print(k)
+                            print(type(k.columns))
+                            if type(k.columns) == pd.MultiIndex:
+                                olddi = [list(ele) for ele in k.columns]
+                                # isInterCol = k.columns.tolist()
+                                # print(isInterCol)
+                                # isInterCol = isInterCol*len(k.columns)
+                                for i in range(len(k.columns)):
+                                    buf = str(isInterCol[0])+" "+str(olddi[i][1])
+                                    olddi[i] = buf
+                                # print(olddi)
+                                k.columns = olddi
                             # print(k.columns)
                         else:
                             # print(k.columns)
@@ -552,6 +554,8 @@ class csvManager:
         #print(k.index.tolist())
         if type(k) == pd.Series :
             k = k.to_frame()
+        print(Row)
+        print(Col)
         print(k)
         return k
 
