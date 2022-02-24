@@ -163,18 +163,20 @@ class filterMesWindow(QMainWindow):
             self.sheet = mainW.data
         self.filtered = mainW.filDic
         print("start",self.filtered)
-        if self.filtered[self.dimen] == "" or len(self.filtered[self.dimen])>2:
-            self.filtered[self.dimen] = [min(self.sheet[self.dimen]),max(self.sheet[self.dimen])]
+        # self.filtered[self.dimen] = [min(self.sheet[self.dimen]),max(self.sheet[self.dimen])]
+        # if self.filtered[self.dimen] == "" or len(self.filtered[self.dimen])>2:
+        #     self.filtered[self.dimen] = [min(self.sheet[self.dimen]),max(self.sheet[self.dimen])]
         print("set up",self.filtered)
-        self.maxVa = float(max(self.sheet[self.dimen]))
-        self.minVa = float(min(self.sheet[self.dimen]))
+        
+        self.maxVa = float(self.filtered[self.dimen][1])
+        self.minVa = float(self.filtered[self.dimen][0])
         # print(self.dimen)
         # print(self.filtered)
         format(self.maxVa, '.2f')
         format(self.minVa, '.2f')
         
-        maxVa = float(max(self.sheet[self.dimen]))
-        minVa = float(min(self.sheet[self.dimen]))
+        maxVa = float(self.filtered[self.dimen][1])
+        minVa = float(self.filtered[self.dimen][0])
         format(maxVa, '.2f')
         format(minVa, '.2f')
         
@@ -531,15 +533,18 @@ class TableModel2(QtCore.QAbstractTableModel):
             if orientation == Qt.Horizontal: #x
                 # if self._data.size != 0:
                 # print(self._data.columns)
-                # print("---------head--------",self._data.columns[section])
+                # print(str(self._data.columns))
+                # print("---------head--------",type(self._data.columns[section]))
                 if type(self._data.columns[section]) == tuple:
-                    self._data.columns[section] = tuple(map( str , self._data.columns[section]) )
+                    # self._data.columns[section] = tuple(map( str , self._data.columns[section]) )
                     head = self._data.columns.names
                     head = [ "%s" % x for x in list(head) ]
+                    print(head)
                     if len(head) > 1 :head = ["\\".join(head)]
                     colN = [ "%s" % x for x in list(self._data.columns[section]) ]
                     colN = "\n".join(colN)
                 else: 
+                    print("To str")
                     colN = str(self._data.columns[section])
                 return colN
                 
@@ -805,7 +810,7 @@ class mainWindow(QMainWindow):
                             self.filterList.addItems(tmpr)
                             
                             # self.filDic[self.getPlainText(item.text())] = ""
-                            self.setFilterValue(self.filJustAdd)
+                            # self.setFilterValue(self.filJustAdd)
                             
                             # print(self.filDic)
                         self.selectFil(item.text())
@@ -825,8 +830,9 @@ class mainWindow(QMainWindow):
         
     def selectFil(self,dimen):
         self.diForFil = dimen
-        
-        if dimen in list(self.Measure.keys()):
+        self.diForFil = self.getPlainText(self.diForFil)
+        self.setFilterValue(self.diForFil)
+        if self.diForFil in list(self.Measure.keys()):
             self.windowM()
         else:
             self.windowD()
@@ -1024,13 +1030,17 @@ class mainWindow(QMainWindow):
         print("Key : ",key)
         print("Date Key : ",list(self.typeDate.keys()))
         print("Measure Key : ",list(self.Measure.keys()))
-        if key in list(self.typeDate.keys()):        
-            self.filDic[key] = cm.getDateByFunc(key,self.typeDate[key])
-        elif key in list(self.Measure.keys()):
-            self.filDic[key] = [min(self.dataSheet[key]),max(self.dataSheet[key])]
-        else:
-            buf = cm.getDataWithPandasByHead(key)
-            self.filDic[key] = buf.drop_duplicates().to_list()
+        if key != '':
+            if key in list(self.typeDate.keys()):        
+                self.filDic[key] = cm.getDateByFunc(key,self.typeDate[key])
+            elif key in list(self.Measure.keys()):
+                if key in self.RowChoose or key in self.ColChoose:
+                    self.filDic[key] = [min(self.dataSheet[key]),max(self.dataSheet[key])]
+                else:
+                    self.filDic[key] = [min(self.data[key]),max(self.data[key])]
+            else:
+                buf = cm.getDataWithPandasByHead(key)
+                self.filDic[key] = buf.drop_duplicates().to_list()
         print("Filter : ",self.filDic)
         
     def filChange(self):
