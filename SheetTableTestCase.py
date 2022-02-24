@@ -3,13 +3,16 @@ from csvManager import csvManager
 
 ex = csvManager()
 ex.Measure = {'Sales':"sum",'Quantity':"sum",'Discount':"sum",'Profit':"average"}        
-# ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
+ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
 
-ex.df = pd.read_csv("all-states-history.csv", encoding='windows-1252')
+# ex.df = pd.read_csv("all-states-history.csv", encoding='windows-1252')
 
 ex.getHead()
 ex.typeDate = ex.readDate()
-# print(ex.typeDate)
+
+p = ex.getDataWithPandasByHead("Region")
+
+print(p.drop_duplicates().to_list())
 # def getDi(n):
 #     if n[-1] == ")":
 #         j = n.index("(")

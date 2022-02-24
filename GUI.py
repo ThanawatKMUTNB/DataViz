@@ -246,7 +246,7 @@ class filterDimenWindow(QMainWindow):
         self.filterItemListWidget.itemChanged.connect(self.checked)
         self.filterItemListWidget.doubleClicked.connect(self.reverseCheck)
         self.setUp()
-        # self.setList()
+        self.setList()
         self.resetBut()
         self.show()
     
@@ -311,13 +311,15 @@ class filterDimenWindow(QMainWindow):
         self.sheet = cm.df
         self.filtered = mainW.filDic
         print("BF--------",self.filtered)
-        self.setList()
+        # self.setList()
     
     def setList(self):
         _translate = QtCore.QCoreApplication.translate
         # print("Check",self.dimen,mainW.typeDate.keys())
         if self.dimen not in list(mainW.typeDate.keys()):
             print("Di")
+            print(self.dimen)
+            print(self.filtered[self.dimen])
             for i in self.sheet[self.dimen].drop_duplicates().to_list():
                 # print(type(self.filtered[self.dimen]))
                 item = QtWidgets.QListWidgetItem()
@@ -1019,10 +1021,17 @@ class mainWindow(QMainWindow):
         self.filChange()
     
     def setFilterValue(self,key):
+        print("Key : ",key)
+        print("Date Key : ",list(self.typeDate.keys()))
+        print("Measure Key : ",list(self.Measure.keys()))
         if key in list(self.typeDate.keys()):        
             self.filDic[key] = cm.getDateByFunc(key,self.typeDate[key])
         elif key in list(self.Measure.keys()):
             self.filDic[key] = [min(self.dataSheet[key]),max(self.dataSheet[key])]
+        else:
+            buf = cm.getDataWithPandasByHead(key)
+            self.filDic[key] = buf.drop_duplicates().to_list()
+        print("Filter : ",self.filDic)
         
     def filChange(self):
         # print(self.filDic)
