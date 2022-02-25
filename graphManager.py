@@ -35,7 +35,7 @@ class graphManager():
             
         for i in range(len(self.RowChoose)):
             tmp = []
-            print("------>",i,self.RowChoose[i])
+            # print("------>",i,self.RowChoose[i])
             if self.RowChoose[i] in list(self.MeasureDic.keys()):
                 tmp.append(self.RowChoose[i])
                 tmp.append(self.MeasureDic[self.RowChoose[i]])
@@ -57,7 +57,7 @@ class graphManager():
 
         for i in range(len(self.RowChoose)):
             tmp = []
-            print("------>",i,self.RowChoose[i])
+            # print("------>",i,self.RowChoose[i])
             if self.RowChoose[i] in list(self.DateDict.keys()):
                 tmp.append(self.RowChoose[i])
                 tmp.append(self.DateDict[self.RowChoose[i]])
@@ -72,7 +72,7 @@ class graphManager():
         
     def setList(self,row,col,mes,dataSheet,dateDic):
         #print(dataSheet.columns.tolist())
-        print('-----------------------\n\n',dataSheet.columns)
+        # print('-----------------------\n\n',dataSheet.columns)
         #print(dataSheet['Region'].value_counts())
         self.MeasureDic = mes
         self.RowChoose = row
@@ -84,7 +84,7 @@ class graphManager():
         # self.Measure = list(self.MeasureDic.keys())
         self.setMes()
         
-        print("Graph")
+        # print("Graph")
         # print(self.MeasureDic,self.Measure,self.RowChoose,self.ColChoose)
         #self.df['Order Date'] = pd.to_datetime(self.df['Order Date'],format='%d/%m/%Y')
         #self.df['Ship Date'] = pd.to_datetime(self.df['Ship Date'],format='%d/%m/%Y')
@@ -110,7 +110,7 @@ class graphManager():
                 if type(r) == type(['list']):
                     if r[0] in Measure:
                         mes = 'row'
-            print(row,column)
+            # print(row,column)
             if mes == 'row':
                 chart = []
                 if type(row[0]) == type(['list']):  #Datetime and Meas

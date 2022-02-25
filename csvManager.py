@@ -10,7 +10,6 @@ import re
 import numpy as np
 import pandas as pd
 import graphManager
-
 gm = graphManager.graphManager()
 #import mPageByCookie
 class csvManager:
@@ -28,6 +27,9 @@ class csvManager:
         self.colHeader = []
         self.Dimen = []
         self.dataFiltered = {}
+        self.RowChoose = []
+        self.ColChoose = []
+        
     
     def setPath(self):
         # print(self.path,self.selectFile)
@@ -84,7 +86,7 @@ class csvManager:
                     dateDic[i] = 'year'
                 except ValueError:
                     pass
-        print(dateDic)
+        # print(dateDic)
         return dateDic
     
     def getHead(self):
@@ -230,9 +232,33 @@ class csvManager:
                 tmp.append(i)
         return len(tmp)
     # Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
-    
-    def setDataFilter(self,Row,Col):
-        # print("filter",self.filter,Row+Col)
+    def unList(self,l):
+        for i in range(len(l)):
+            if type(l[i]) == list and ' '.join(l[i][:-1]) in list(self.typeDate.keys()):
+                l[i] = ' '.join(l[i])
+            if type(l[i]) == list and l[i][0] in list(self.Measure.keys()):
+                l[i] = l[i][0]
+        return l
+                
+    def setDataFilter(self,data,Row,Col):
+        self.dfFil = data
+        print("\n\nFilter",self.filter,Row,Col)
+        # print(self.dfFil.columns.tolist())
+        Row = self.unList(Row)
+        Col = self.unList(Col)
+        print("Row+Col : ",Row+Col)
+        for i in Row+Col:
+            if i not in self.dfFil.columns.tolist() and i != None:
+                # print(i)
+                buf = i.split(" ")
+                first = ' '.join(buf[:-1])
+                if first in list(self.typeDate.keys()):
+                    if i not in list(self.filter.keys()):
+                        self.dfFil = self.filterDate(self.dfFil,first,self.typeDate[first])
+                        self.filter[i] = self.dfFil[i].drop_duplicates().to_list()
+                    self.filter[i] = [int(i) for i in self.filter[i]]
+                    self.dfFil = self.filterDate(self.dfFil,first,buf[-1])
+        # print(self.dfFil.columns.tolist())
         for i in list(self.filter.keys()):
             if i not in self.Measure.keys():
                 if i not in Row+Col:
@@ -245,26 +271,34 @@ class csvManager:
             if type(self.filter[i]) != list:
                 if self.filter[i] == "":
                     self.filter[i] = list(set(self.df[i].values))
-        self.dfFil = self.df
+        # self.dfFil = self.df
         # print(self.filter)
         for i in self.filter.keys():
             if i not in self.Measure.keys():
-                print("fil dimen")
-                self.dfFil = self.dfFil[self.dfFil[i].isin(self.filter[i])]
-            
+                print("fil dimen : ",i)
+                buf = i.split(" ")
+                first = ' '.join(buf[:-1])
+                if first in list(self.typeDate.keys()):
+                    print("Time Date : ",self.filter[i])
+                    self.filter[i] = [int(s) for s in self.filter[i]]
+                    # print("Time Date : ",self.filter[i])
+                    # for p in self.filter[i]:
+                    # print(self.dfFil)
+                    self.dfFil = self.dfFil[self.dfFil[i].isin(self.filter[i])]
+                    # print(self.dfFil)
+                    # self.dfFil = self.dfFil[self.dfFil[i].isin(self.filter[i])]
+                    # print(self.dfFil)
+                else:
+                    self.dfFil = self.dfFil[self.dfFil[i].isin(self.filter[i])]
+        return self.dfFil
+    
     def filterMes(self,data):
-        print(self.filter)
+        # print(self.filter)
         for i in self.filter.keys():
             if i in self.Measure.keys():
-                print("fil mes")
+                # print("fil mes")
                 data = data.loc[data[i].between(min(self.filter[i]), max(self.filter[i]))]
         return data
-            # else:
-            #     # print(i)
-            #     # print(self.filter[i][0])
-            #     self.dfFil = self.dfFil.loc[self.dfFil[i] > self.filter[i][0]]
-            #     self.dfFil = self.dfFil.loc[self.dfFil[i] < self.filter[i][1]] 
-            #     # print(self.dfFil)
             
     def filterDate(self,data,Dimension,typ): #Date only
         # print("filterDate --- ", Dimension,typ)
@@ -277,50 +311,72 @@ class csvManager:
         tmpData[Dimension+' date'] = tmpData[Dimension].dt.day
         return tmpData
     
-    def setRowAndColumn(self,Row,Col):
-        # print(self.filter)
-        # print("CMS")
-        # print(Row,Col)
+    def setRowCol(self,Row,Col):
+        self.RowChoose = Row
+        self.ColChoose = Col
+    
+    def getRow(self):
+        return self.RowChoose
+    
+    def getCol(self):
+        return self.ColChoose
+    
+    def setRowAndColumn(self):
+        Row = self.getRow()
+        Col = self.getCol()
+        print("\n\nCMS")
+        print(self.filter)
+        print(Row,Col)
+        # print(self.df)
         
         ############## Filter di ############
         usedata = self.df
+        # print("Before Filter\n",usedata)
         if self.filter != {}:
-            self.setDataFilter(Row,Col)
-            usedata = self.dfFil
+            usedata = self.setDataFilter(usedata,Row,Col)
+            # usedata = self.dfFil
             self.dataFiltered = usedata
         ###################################
-        oriRow = Row
-        oriCal = Col
-        # print(usedata.columns.tolist())
+        oriRow = Row.copy()
+        oriCal = Col.copy()
+        # print("After Filter",usedata)
         
         ############## Filter date ############
         for i in range(len(Row)):
             if type(Row[i]) == list:
                 if Row[i][0] in list(self.typeDate.keys()):
-                    if Row[i][0]+" "+Row[i][1] not in usedata.columns.tolist():
+                    s = ' '.join(Row[i])
+                    if s not in usedata.columns.tolist():
                         usedata = self.filterDate(usedata,Row[i][0],Row[i][1])
-                    s = Row[i][0]+" "+Row[i][1]
                     Row[i] = s
-                    oriRow[i] = s
                 else:
                     Row[i] = Row[i][0]
-                    
+        
+        # print(Col)
         for i in range(len(Col)):
-            # print(i)
             if type(Col[i]) == list:
+                # print("Col")
+                s = ' '.join(Col[i])
                 if Col[i][0] in list(self.typeDate.keys()):
-                    if Col[i][0]+" "+Col[i][1] not in usedata.columns.tolist():
+                    if s not in usedata.columns.tolist():
                         usedata = self.filterDate(usedata,Col[i][0],Col[i][1])
-                    s = Col[i][0]+" "+Col[i][1]
                     Col[i] = s
-                    oriCal[i] = s
                 else:
                     Col[i] = Col[i][0]
+            # print(Col[i])  
+            if Col[i] not in usedata.columns.tolist():
+                buf = Col[i].split(" ")
+                first = ' '.join(buf[:-1])
+                if first in list(self.typeDate.keys()):
+                    # print(self.filter)
+                    self.filter[Col[i]] = [int(i) for i in self.filter[Col[i]]]
+                    usedata = self.filterDate(usedata,first,buf[-1])
+            # print(Col[i])
         # print("\n",oriRow,oriCal)
-        # print(Row,Col)
+        # print("-------",Row,Col)
         # print(usedata.columns.tolist())
         #####################################
-        
+        # print("\n\n",usedata)
         isInterRow = list(set(Row).intersection(set(self.Measure.keys())))
         isInterCol = list(set(Col).intersection(set(self.Measure.keys())))
         # if len(isInterRow+isInterCol) != []:
@@ -351,6 +407,12 @@ class csvManager:
                 k = k.T
             if Row == [] and Col != []:
                 k = k.T
+                
+            if type(k.columns) == pd.MultiIndex:
+                k.columns.names = Coldi
+
+            if len(Coldi) == 1:
+                k.columns.name = Col[0]
         else: # Have Mes 
             # print("c",Row,Col)
             # print("isin",isInterRow,isInterCol)
@@ -359,8 +421,8 @@ class csvManager:
             # Rowdi = Row.copy()
             # Coldi = Col.copy()
             # print(self.Head)
-            Rowdi = Row.copy()
-            Coldi = Col.copy()
+            Rowdi = oriRow.copy()
+            Coldi = oriCal.copy()
             # print("caf",Rowdi,Coldi)
             intersec = ''
             if isInterRow != []:
@@ -509,7 +571,7 @@ class csvManager:
                         if len(isInterCol) == 1:
                             # print("c")
                             # print(k)
-                            print(type(k.columns))
+                            # print(type(k.columns))
                             if type(k.columns) == pd.MultiIndex:
                                 olddi = [list(ele) for ele in k.columns]
                                 # isInterCol = k.columns.tolist()
@@ -554,8 +616,6 @@ class csvManager:
         #print(k.index.tolist())
         if type(k) == pd.Series :
             k = k.to_frame()
-        print(Row)
-        print(Col)
         print(k)
         return k
 

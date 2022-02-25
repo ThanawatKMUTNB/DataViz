@@ -9,7 +9,6 @@ ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
 
 ex.getHead()
 ex.typeDate = ex.readDate()
-
 p = ex.getDataWithPandasByHead("Region")
 
 # print(p.drop_duplicates().to_list())
@@ -24,41 +23,47 @@ p = ex.getDataWithPandasByHead("Region")
 # ex.readMeasure()
 
 
-ex.setRowAndColumn(["Segment"],[])
-ex.setRowAndColumn([],["Segment"])
+# ex.setRowCol(["Segment"],[])
+# ex.setRowCol([],["Segment"])
 
-ex.setRowAndColumn([],["Sales"])
-ex.setRowAndColumn(["Sales"],[])
+# ex.setRowCol([],["Sales"])
+# ex.setRowCol(["Sales"],[])
 
-ex.setRowAndColumn([],["Sales","Profit"])
-ex.setRowAndColumn(["Sales","Profit"],[])
+# ex.setRowCol([],["Sales","Profit"])
+# ex.setRowCol(["Sales","Profit"],[])
 
-ex.setRowAndColumn(["Segment","Sales"],[])
-ex.setRowAndColumn([],["Segment","Sales"])
+# ex.setRowCol(["Segment","Sales"],[])
+# ex.setRowCol([],["Segment","Sales"])
 
-ex.setRowAndColumn(["Segment"],["Sales","Profit"])
-ex.setRowAndColumn(["Sales","Profit"],["Segment"])
+# ex.setRowCol(["Segment"],["Sales","Profit"])
+# ex.setRowCol(["Sales","Profit"],["Segment"])
 
-ex.setRowAndColumn(["Ship Mode","Segment"],["Sales"])
-ex.setRowAndColumn(["Sales"],["Ship Mode","Segment"])
+# ex.setRowCol(["Ship Mode","Segment"],["Sales"])
+# ex.setRowCol(["Sales"],["Ship Mode","Segment"])
 
-ex.setRowAndColumn(["Ship Mode","Segment"],["Sales","Profit"])
-ex.setRowAndColumn(["Sales","Profit"],["Ship Mode","Segment"])
+# ex.setRowCol(["Ship Mode","Segment"],["Sales","Profit"])
+# ex.setRowCol(["Sales","Profit"],["Ship Mode","Segment"])
 
-ex.setRowAndColumn(["Segment","Sales","Profit"],["Region"])
-ex.setRowAndColumn(["Region"],["Segment","Sales","Profit"])
+# ex.setRowCol(["Segment","Sales","Profit"],["Region"])
+# ex.setRowCol(["Region"],["Segment","Sales","Profit"])
 
-ex.setRowAndColumn(["Region","Segment"],["Region","Sales","Profit"])
-ex.setRowAndColumn(["Segment","Region"],["Ship Mode",["Profit","sum"],["Sales","sum"]])
-ex.setRowAndColumn(["Segment","Region","Sales","Profit"],[])
+# ex.setRowCol(["Region","Segment"],["Region","Sales","Profit"])
+# ex.setRowCol(["Segment","Region"],["Ship Mode",["Profit","sum"],["Sales","sum"]])
+# ex.setRowCol(["Segment","Region","Sales","Profit"],[])
 
-ex.setRowAndColumn(["Segment","Profit","Sales"],[])
-ex.setRowAndColumn([],["Segment","Profit","Sales"])
-# ex.filter = {'Discount': [0.0, 0.8], 'Profit': [50, 219.0], 'Region': ['East','South']}
-ex.setRowAndColumn(["Ship Mode",["Profit","sum"],["Sales","sum"]],["Segment","Region"])
+# ex.setRowCol(["Segment","Profit","Sales"],[])
+# ex.setRowCol([],["Segment","Profit","Sales"])
+# ex.setRowCol(["Ship Mode",["Profit","sum"],["Sales","sum"]],["Segment","Region"])
 
-ex.setRowAndColumn(["Segment",["Sales","sum"]],["Category","Region"])
-ex.setRowAndColumn(["Category","Region"],["Segment",["Sales","sum"]])
+# ex.setRowCol(["Segment",["Sales","sum"]],["Category","Region"])
+# ex.setRowCol(["Category","Region"],["Segment",["Sales","sum"]])
 
-ex.setRowAndColumn(['Region'],[['Order Date', 'year'], ['Discount', 'sum']])
-ex.setRowAndColumn(['Region'],[['Order Date', 'month'], ['Discount', 'sum']])
+# ex.setRowCol(['Region'],[['Order Date', 'year'], ['Discount', 'sum']])
+
+# ex.filter = {'Region': ['South', 'West', 'Central'], 'Ship Date year': ['2019', '2020']}
+# ex.setRowCol([],['Region', 'Ship Date year'])
+# ex.setRowAndColumn()
+
+ex.filter = {'Region': ['South', 'West'], 'Ship Date year': ['2019', '2020']}
+ex.setRowCol([],['Region', 'Ship Date year'])
+ex.setRowAndColumn()
