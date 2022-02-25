@@ -716,7 +716,12 @@ class mainWindow(QMainWindow):
         pt = self.item2
         # print(menu.text().lower())
         if pt in list(self.typeDate.keys()):
+            # print("Just Chang Func : ",self.filDic)
+            # del self.filDic[pt+" "+self.typeDate[pt]]
             self.typeDate[pt] = menu.text().lower()
+            # self.filDic[pt+" "+self.typeDate[pt]] = 
+            # self.setFilterValue(pt) #Date dont have day month year
+            # print("Just Chang Func : ",self.filDic)
             self.subMenuDate.setTitle(pt+'('+self.typeDate[pt]+')')
         if pt in list(self.Measure.keys()):
             self.Measure[pt] = menu.text().lower()
@@ -1070,6 +1075,7 @@ class mainWindow(QMainWindow):
             if key not in list(self.filDic.keys()):    
                 if key in list(self.typeDate.keys()):  
                     buf = key+" "+self.typeDate[key] 
+                    print("Buf : ",buf)
                     if buf not in self.data.columns.tolist():
                         self.data = cm.filterDate(self.data,key,self.typeDate[key])
                     self.filDic[buf] = self.data[buf].drop_duplicates().to_list()
@@ -1111,13 +1117,15 @@ class mainWindow(QMainWindow):
             self.filterList.addItems(itemsTextList)
             
             for i in itemsTextList:
-                if i not in list(self.filDic.keys()):
+                if i not in list(self.filDic.keys()) and i not in list(self.typeDate.keys()):
                     # self.filDic[i] = ''
                     self.setFilterValue(i)
                     if i in self.Measure.keys():
                         self.Measure[i] = "sum"
                     if i in self.typeDate.keys():
                         self.typeDate[i] = "year"
+                else:# Date
+                    self.setFilterValue(i)
             
             # print(self.filDic)
             
