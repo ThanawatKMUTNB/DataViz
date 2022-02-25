@@ -336,6 +336,7 @@ class csvManager:
             usedata = self.setDataFilter(usedata,Row,Col)
             # usedata = self.dfFil
             self.dataFiltered = usedata
+            #print(self.dataFiltered)
         ###################################
         oriRow = Row.copy()
         oriCal = Col.copy()

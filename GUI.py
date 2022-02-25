@@ -898,7 +898,8 @@ class mainWindow(QMainWindow):
         # self.isInterCol = [value for value in self.ColChoose if value in [self.Measure.keys()]]
         # print("--------IR IC",self.isInterRow,self.isInterCol)
         #gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.dfOriginal,self.typeDate)
-        gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data,self.typeDate)
+        #print('-------------\n\n\n',cm.dataFiltered,'\n\n\n-----------------')
+        gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data,self.typeDate,cm.dataFiltered)
         Measure = list(self.Measure.keys())
         self.typeChart = []
         # print("--->",self.isInterRow,self.isInterCol)
@@ -938,7 +939,7 @@ class mainWindow(QMainWindow):
             # if self.chartTypeS != "":
             # print("----------------",self.chartTypeS)
             #gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.dfOriginal,self.typeDate)
-            gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data,self.typeDate)
+            gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data,self.typeDate,cm.dataFiltered)
             self.Chart = gm.chooseChart(str(self.chartTypeS))
     
             # self.widget.setLayout(self.view)
