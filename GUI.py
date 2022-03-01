@@ -1210,9 +1210,9 @@ class mainWindow(QMainWindow):
             cm.Measure = self.Measure
             cm.typeDate = self.typeDate
             # print("BF table",self.filDic,self.Measure,self.typeDate)
-            cm.setRowCol(Row,Col)
+            
             # print("\nStart",Row,Col)
-            self.dataSheet = cm.setRowAndColumn()
+            self.dataSheet = cm.setRowAndColumn(Row,Col)
             # Row = cm.RowChoose
             # Col = cm.ColChoose
             # print(self.dataSheet)

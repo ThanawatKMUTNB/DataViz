@@ -29,7 +29,8 @@ class csvManager:
         self.dataFiltered = {}
         self.RowChoose = []
         self.ColChoose = []
-        
+        self.MeaFunc = {}
+        self.MeaFuncChoose = {}
     
     def setPath(self):
         # print(self.path,self.selectFile)
@@ -231,25 +232,65 @@ class csvManager:
             if i not in tmp:
                 tmp.append(i)
         return len(tmp)
-    # Measure = ['Sales', 'Quantity', 'Discount', 'Profit']
+    
+    def setMesInPrivot(self,listIndexName,listIndex):
+        print(listIndex,listIndexName)
+        buf = {}
+        for i,j in zip(listIndex,listIndexName):
+            buf[i] = self.MeaFunc[j]
+        return buf
+            
+            
+    def getMesFuncOnlyMes(self,mesFrame,useKey):
+        # print(self.MeaFuncChoose)
+        if self.MeaFuncChoose[useKey] == 'sum':
+            buf = mesFrame[useKey].sum().round(1)
+        elif self.MeaFuncChoose[useKey] == 'average':
+            buf = mesFrame[useKey].mean().round(1)
+        elif self.MeaFuncChoose[useKey] == 'median':
+            buf = mesFrame[useKey].median().round(1)
+        elif self.MeaFuncChoose[useKey] == 'count':
+            buf = len(mesFrame[useKey])
+        elif self.MeaFuncChoose[useKey] == 'max':
+            buf = mesFrame[useKey].max().round(1)
+        elif self.MeaFuncChoose[useKey] == 'min':
+            buf = mesFrame[useKey].min().round(1)
+        self.colList[useKey] = buf
+    
+    def setMesFunc(self,listOfMes):
+        # print("setMesFunc ",listOfMes)
+        self.MeaFuncChoose[listOfMes[0]] = listOfMes[1]
+        if listOfMes[1] == 'sum':
+            self.MeaFunc[listOfMes[0]] = np.sum
+        elif listOfMes[1] == 'average':
+            self.MeaFunc[listOfMes[0]] = np.average
+        elif listOfMes[1] == 'median':
+            self.MeaFunc[listOfMes[0]] = np.median
+        elif listOfMes[1] == 'count':
+            self.MeaFunc[listOfMes[0]] = np.sum
+        elif listOfMes[1] == 'max':
+            self.MeaFunc[listOfMes[0]] = max
+        elif listOfMes[1] == 'min':
+            self.MeaFunc[listOfMes[0]] = min
+        # print("Set Meas Func : ",self.MeaFunc)
+        
     def unList(self,l):
         for i in range(len(l)):
             if type(l[i]) == list and ' '.join(l[i][:-1]) in list(self.typeDate.keys()):
                 l[i] = ' '.join(l[i])
+                # print(l[i])
+                # self.setDateInColumn(l[i])
             if type(l[i]) == list and l[i][0] in list(self.Measure.keys()):
+                self.setMesFunc(l[i])
                 l[i] = l[i][0]
         return l
-                
+    
     def setDataFilter(self,data,Row,Col):
         self.dfFil = data
         print("\n\nFilter",self.filter,Row,Col)
-        # print(self.dfFil.columns.tolist())
-        Row = self.unList(Row)
-        Col = self.unList(Col)
-        print("Row+Col : ",Row+Col)
+        
         for i in Row+Col:
             if i not in self.dfFil.columns.tolist() and i != None:
-                # print(i)
                 buf = i.split(" ")
                 first = ' '.join(buf[:-1])
                 if first in list(self.typeDate.keys()):
@@ -258,7 +299,7 @@ class csvManager:
                         self.filter[i] = self.dfFil[i].drop_duplicates().to_list()
                     self.filter[i] = [int(i) for i in self.filter[i]]
                     self.dfFil = self.filterDate(self.dfFil,first,buf[-1])
-        # print(self.dfFil.columns.tolist())
+        
         for i in list(self.filter.keys()):
             if i not in self.Measure.keys():
                 if i not in Row+Col:
@@ -290,14 +331,22 @@ class csvManager:
                     # print(self.dfFil)
                 else:
                     self.dfFil = self.dfFil[self.dfFil[i].isin(self.filter[i])]
+        # print(self.dfFil)
+        # self.dfFil = self.filterMes(self.dfFil)
         return self.dfFil
     
     def filterMes(self,data):
         # print(self.filter)
-        for i in self.filter.keys():
-            if i in self.Measure.keys():
-                # print("fil mes")
-                data = data.loc[data[i].between(min(self.filter[i]), max(self.filter[i]))]
+        for i in list(self.filter.keys()):
+            if i in list(self.Measure.keys()):
+                # print("fil mes ",i,self.filter)
+                # print([data.loc[i].between(min(self.filter[i]), max(self.filter[i]))])
+                # print(data.loc[i].between(min(self.filter[i]), max(self.filter[i])))
+                s = data.loc[i].between(min(self.filter[i]), max(self.filter[i]), inclusive = True)
+                # print("-s-",s)
+                # print("-data-",data)
+                data = data.loc[s]
+                # print(data)
         return data
             
     def filterDate(self,data,Dimension,typ): #Date only
@@ -321,28 +370,31 @@ class csvManager:
     def getCol(self):
         return self.ColChoose
     
-    def setRowAndColumn(self):
+    def setRowAndColumn(self,Row,Col):
+        self.setRowCol(Row,Col)
         Row = self.getRow()
         Col = self.getCol()
         print("\n\nCMS")
-        print(self.filter)
-        print(Row,Col)
+        # print(self.filter)
+        # print(Row,Col)
         # print(self.df)
+        
+        Col = self.unList(Col)
+        Row = self.unList(Row)
         
         ############## Filter di ############
         usedata = self.df
         # print("Before Filter\n",usedata)
         if self.filter != {}:
             usedata = self.setDataFilter(usedata,Row,Col)
-            # usedata = self.dfFil
             self.dataFiltered = usedata
-            #print(self.dataFiltered)
         ###################################
         oriRow = Row.copy()
-        oriCal = Col.copy()
+        oriCol = Col.copy()
         # print("After Filter",usedata)
         
         ############## Filter date ############
+        # print("-------",Row,Col)
         for i in range(len(Row)):
             if type(Row[i]) == list:
                 if Row[i][0] in list(self.typeDate.keys()):
@@ -369,11 +421,14 @@ class csvManager:
                 buf = Col[i].split(" ")
                 first = ' '.join(buf[:-1])
                 if first in list(self.typeDate.keys()):
-                    # print(self.filter)
-                    self.filter[Col[i]] = [int(i) for i in self.filter[Col[i]]]
+                    print(self.filter)
+                    # print(Row,Col)
+                    # print("Col[i] ",Col[i])
+                    if Col[i] in list(self.filter.keys()):
+                        self.filter[Col[i]] = [int(i) for i in self.filter[Col[i]]]
                     usedata = self.filterDate(usedata,first,buf[-1])
             # print(Col[i])
-        # print("\n",oriRow,oriCal)
+        # print("\n",oriRow,oriCol)
         # print("-------",Row,Col)
         # print(usedata.columns.tolist())
         #####################################
@@ -383,6 +438,7 @@ class csvManager:
         # if len(isInterRow+isInterCol) != []:
         #     usedata = self.setDataFilterMes(usedata,isInterRow+isInterCol)
         # print("****",isInterRow,isInterCol)
+        # print("-------",Row,Col)
         if isInterRow == [] and isInterCol == []: #No Mes
             Rowdi = Row.copy()
             Coldi = Col.copy()
@@ -418,13 +474,8 @@ class csvManager:
             # print("c",Row,Col)
             # print("isin",isInterRow,isInterCol)
             intersecAt = ''
-            filterChoose = "sum"
-            # Rowdi = Row.copy()
-            # Coldi = Col.copy()
-            # print(self.Head)
-            Rowdi = oriRow.copy()
-            Coldi = oriCal.copy()
-            # print("caf",Rowdi,Coldi)
+            Rowdi = Row.copy()
+            Coldi = Col.copy()
             intersec = ''
             if isInterRow != []:
                 # for i in Row:
@@ -434,7 +485,8 @@ class csvManager:
                 # print("c2",Row,Col)
                 for i in isInterRow:
                     if i in Rowdi:
-                        Rowdi.remove(i)
+                        while Rowdi.count(i) >0:
+                            Rowdi.remove(i)
                 intersecAt = 'Row'
                 intersec = isInterRow
                 
@@ -445,43 +497,41 @@ class csvManager:
                 #         Coldi.append(i)
                 for i in isInterCol:
                     if i in Coldi:
-                        Coldi.remove(i)
+                        while Coldi.count(i) >0:
+                            Coldi.remove(i)
                 intersecAt = 'Col'
                 intersec = isInterCol
+            
             packDf = []
             # print("caf",Rowdi,Coldi)
             # print("isin ",isInterRow,isInterCol)
             if Rowdi == [] and Coldi == []: #Only mes
-                #print(Rowdi,Coldi)
-                colList = usedata[intersec]
-                if filterChoose == "sum":
-                    colList = colList.sum().round(0)
-                #print(colList.sum().round(0))
+                print("Only mes")
+                # print(Row+Col)
+                # intersec = Row+Col
+                # print(self.MeaFunc)
+                self.colList = {}
+                for i in intersec:
+                    self.getMesFuncOnlyMes(usedata[intersec],i)
+                self.colList = pd.Series(self.colList)
+                self.colList = self.colList.to_frame()
                 
-                if intersecAt == 'Row':
-                    colList = colList.to_frame()
-                    k = colList
-                    # k = k.rename({0:"sum"})
-                    k = k[list(k.columns)].astype(str)
-                    # if filterChoose == "sum":
-                    #     k.rename(in)
-                    if type(k) == pd.Series :
-                        k = k.to_frame()
-                    changname = zip(list(k.columns), [filterChoose*len(list(k.columns))])
-                    # print(dict(k.columns))
-                else:
-                    colList = colList.to_frame()
-                    k = colList
-                    k = k[list(k.columns)].astype(str)
-                    if type(k) == pd.Series :
-                        k = k.to_frame()
-                    k = colList.T
-                    # print(k.index)
-                    changname = zip(list(k.index), [filterChoose*len(list(k.index))])
+                k = self.colList
+                k = k[list(k.columns)].astype(str)
+                if type(k) == pd.Series :
+                    k = k.to_frame()
                 
-                changname = (dict(changname))
-                
-                k = k.rename(columns=changname,index=changname)
+                # print(k.index.tolist())
+                # print(k)
+                changname = k.index.tolist()
+                for i in range(len(changname)):
+                    changname[i] = changname[i] +" "+ self.MeaFuncChoose[changname[i]]
+                k.index = changname
+                # print(k)
+                if intersecAt == 'Col':
+                    k = self.colList.T
+                    k.columns = changname
+                # print(k)
             else: # di mes
                 # print(Row,Col)
                 if Rowdi != [] and Coldi == []:
@@ -505,12 +555,23 @@ class csvManager:
                 beforMesual = (-1)*len(intersec)
                 
                 if isInterRow != [] and isInterCol == []: #mes in row
-                    # print(Row,Col)
-                    print("meas in row")
-                    k = pd.pivot_table(results,index = colNum[len(Rowdi):beforMesual], columns = colNum[:len(Rowdi)],values = colNum[beforMesual:],aggfunc=np.sum)
-                    k = k.round(0)
-                    # print(k.unstack())
-                    if oriCal != []:
+                    # print(Rowdi,Coldi)
+                    print("\nmeas in row")
+                    # print("isInterRow : ",isInterRow)
+                    # print("beforMesual : ",colNum[beforMesual:])
+                    # print(Rowdi,Coldi)
+                    # print(colNum)
+                    # print(self.MeaFunc)
+                    Func = self.setMesInPrivot(isInterRow,colNum[beforMesual:])
+                    # print("Func : ",Func)
+                    k = pd.pivot_table(results,index = colNum[len(Rowdi):beforMesual], columns = colNum[:len(Rowdi)],values = colNum[beforMesual:],aggfunc=Func)
+                    # k = pd.pivot_table(results,index = colNum[len(Rowdi):beforMesual], columns = colNum[:len(Rowdi)],values = colNum[beforMesual:])                    
+                    k = k.round(1)
+                    # print(k)
+                    # print(k.index)
+                    # k.index = isInterRow
+                    # print(oriRow,oriCol)
+                    if oriCol != [] and oriRow == []:
                         k=k.T
                         # print(dict(k.columns))
                         # print("----",isInterRow)
@@ -525,7 +586,7 @@ class csvManager:
                                 # print(isInterCol)
                             else:
                                 # print("CC")
-                                # print(oriRow,oriCal)
+                                # print(oriRow,oriCol)
                                 # print(k)
                                 # print(Coldi,k.columns,isInterCol)
                                 # print(Rowdi,k.index,isInterRow)
@@ -547,25 +608,47 @@ class csvManager:
                         else:
                             if Coldi != []:
                                 if Rowdi != []:
-                                    print("Error",k.index)
-                                    d = dict(k.index)
-                                    d[list(d.keys())[0]] = isInterRow[0]
-                                    k = k.rename(index=d)
+                                    if type(k.index) == pd.MultiIndex:
+                                        print("Not fix yet")
+                                        print(k.index.names)
+                                        print(k.columns.names)
+                                        # print(k)
+                                    else:
+                                        d = dict(k.index)
+                                        d[list(d.keys())[0]] = isInterRow[0]
+                                        k = k.rename(index=d)
                                 else:
                                     k.index = isInterRow
                             if Rowdi != []:
                                 # k.columns = Rowdi
-                                d = dict(k.index)
-                                d[list(d.keys())[0]] = isInterRow[0]
-                                k = k.rename(index=d)
-                                # print(k)
+                                if type(k.index) == pd.MultiIndex:
+                                    dicName = k.index.tolist()
+                                    resultsDict = {}
+                                    for i in dicName:  
+                                        resultsDict.setdefault(i[0],[]).append(i[1:])
+                                    print(resultsDict)
+                                    # k = k.rename(index=d)
+                                    # print(k)
+                                else:
+                                    d = dict(k.index)
+                                    d[list(d.keys())[0]] = isInterRow[0]
+                                    k = k.rename(index=d)
+                                    # print(k)
                     else:
+                        # print("in")
                         k.index = isInterRow
+                        # print(k)
+                        # print(k.index)
+                        # print(isInterRow)
+                        # k.index = isInterRow
                         k=k.unstack()
                 else: #mes in col
                     print("meas in col")
-                    k = pd.pivot_table(results,columns = colNum[len(Rowdi):beforMesual], index= colNum[:len(Rowdi)],values = colNum[beforMesual:],aggfunc=np.sum)
-                    k = k.round(0)
+                    # print(self.MeaFunc)
+                    Func = self.setMesInPrivot(isInterCol,colNum[beforMesual:])
+                    # print(Func)
+                    k = pd.pivot_table(results,columns = colNum[len(Rowdi):beforMesual], index= colNum[:len(Rowdi)],values = colNum[beforMesual:],aggfunc=Func)
+                    k = k.round(1)
                     # print(k)
                     if oriRow != []:
                         # print("c")
@@ -574,6 +657,7 @@ class csvManager:
                             # print(k)
                             # print(type(k.columns))
                             if type(k.columns) == pd.MultiIndex:
+                                print("c")
                                 olddi = [list(ele) for ele in k.columns]
                                 # isInterCol = k.columns.tolist()
                                 # print(isInterCol)
@@ -582,11 +666,11 @@ class csvManager:
                                     buf = str(isInterCol[0])+" "+str(olddi[i][1])
                                     olddi[i] = buf
                                 # print(olddi)
-                                k.columns = olddi
+                                # k.columns = olddi
                             # print(k.columns)
                         else:
                             # print(k.columns)
-                            # print(oriRow,oriCal)
+                            # print(oriRow,oriCol)
                             # print(k)
                             # print(Coldi,k.columns,isInterCol)
                             # print(Rowdi,k.index,isInterRow)
@@ -604,19 +688,28 @@ class csvManager:
                         # print("cc",beforMesual)
                         # if type(results) == pd.Series :
                         #     results = results.to_frame()
-                        # results = results.groupby(0).sum().round(0).stack()
+                        # results = results.groupby(0).sum().round(1).stack()
+                        # print(self.MeaFunc)
+                        Func = self.setMesInPrivot(isInterCol,colNum[beforMesual:])
                         
-                        k = pd.pivot_table(results,columns = colNum[:beforMesual],values = colNum[beforMesual:],aggfunc=np.sum)
-                        k = k.round(0)
+                        k = pd.pivot_table(results,columns = colNum[:beforMesual],values = colNum[beforMesual:],aggfunc=Func)
+                        k = k.round(1)
                         
                         k.index = isInterCol
                         # print("-------")
-                        # k = k.unstack()
+                        k = k.unstack()
+                        if type(k) == pd.Series :
+                            k = k.to_frame()
+                        k = k.T
                 k = k.replace(np.nan, '')
         # print(type(k))
         #print(k.index.tolist())
         if type(k) == pd.Series :
             k = k.to_frame()
+        # print(k)
+        # print(self.MeaFunc)
+        if isInterCol!=[] or isInterRow!=[]:
+            k = self.filterMes(k)
         print(k)
         return k
 
