@@ -3,7 +3,7 @@ import datetime
 import hashlib
 from importlib.metadata import files, metadata
 import json
-from itertools import chain
+from itertools import chain, count
 import os
 from re import S
 import re
@@ -267,7 +267,7 @@ class csvManager:
         elif listOfMes[1] == 'median':
             self.MeaFunc[listOfMes[0]] = np.median
         elif listOfMes[1] == 'count':
-            self.MeaFunc[listOfMes[0]] = np.sum
+            self.MeaFunc[listOfMes[0]] = count
         elif listOfMes[1] == 'max':
             self.MeaFunc[listOfMes[0]] = max
         elif listOfMes[1] == 'min':
@@ -387,7 +387,7 @@ class csvManager:
         # print("Before Filter\n",usedata)
         if self.filter != {}:
             usedata = self.setDataFilter(usedata,Row,Col)
-            self.dataFiltered = usedata
+            # self.dataFiltered = usedata
         ###################################
         oriRow = Row.copy()
         oriCol = Col.copy()
@@ -401,6 +401,7 @@ class csvManager:
                     s = ' '.join(Row[i])
                     if s not in usedata.columns.tolist():
                         usedata = self.filterDate(usedata,Row[i][0],Row[i][1])
+                        # self.dataFiltered = usedata
                     Row[i] = s
                 else:
                     Row[i] = Row[i][0]
@@ -710,7 +711,8 @@ class csvManager:
         # print(self.MeaFunc)
         if isInterCol!=[] or isInterRow!=[]:
             k = self.filterMes(k)
-        print(k)
+        self.dataFiltered = k
+        # print(k)
         return k
 
     def setRowForSpan(self,data,Rowdi):

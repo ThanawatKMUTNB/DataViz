@@ -79,7 +79,7 @@ p = ex.getDataWithPandasByHead("Region")
 # ex.setRowAndColumn(['Region',["Profit",'average'],["Profit",'average']],[])
 # ex.setRowAndColumn([],['Region',["Profit",'average'],["Profit",'average']])
 
-ex.setRowAndColumn(['Region',["Profit",'sum'],["Sales",'average']],[])
-# ex.setRowAndColumn([],['Region',["Profit",'sum'],["Sales",'average']])
+# ex.setRowAndColumn(['Region',["Profit",'sum'],["Sales",'average']],[])
+ex.setRowAndColumn(['Region',["Profit",'count']],[])
 
 # ex.setRowAndColumn([],['Region',['Ship Date', 'year']])
