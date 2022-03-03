@@ -4,6 +4,7 @@ from csvManager import csvManager
 ex = csvManager()
 ex.Measure = {'Sales':"sum",'Quantity':"sum",'Discount':"sum",'Profit':"average"}        
 ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
+# ex.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
 
 # ex.df = pd.read_csv("all-states-history.csv", encoding='windows-1252')
 
@@ -69,7 +70,7 @@ p = ex.getDataWithPandasByHead("Region")
 # ex.setRowAndColumn([],['Region', 'Ship Date year'])
 
 ###
-# ex.filter = {'Discount': [300, 558], 'Region': ['West', 'South', 'East', 'Central']}
+# ex.filter = {'Region': ['South', 'East', 'Central']}
 # ex.filter = {'Ship Date year': [2019, 2018, 2017, 2020]}
 # ex.setRowAndColumn([['Sales', 'sum']],[['Ship Date','year']])
 
@@ -80,6 +81,11 @@ p = ex.getDataWithPandasByHead("Region")
 # ex.setRowAndColumn([],['Region',["Profit",'average'],["Profit",'average']])
 
 # ex.setRowAndColumn(['Region',["Profit",'sum'],["Sales",'average']],[])
-ex.setRowAndColumn(['Region',["Profit",'count']],[])
+# ex.setRowAndColumn(['Region',["Profit",'count']],[])
 
-# ex.setRowAndColumn([],['Region',['Ship Date', 'year']])
+# ex.setRowAndColumn([["Profit",'sum']],['Region','Segment'])
+ex.filter = {'Region': ['South', 'East', 'Central'],'Segment':['Consumer']}
+ex.setRowAndColumn([["Profit",'sum']],['Region','Segment'])
+
+
+

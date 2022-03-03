@@ -287,7 +287,7 @@ class csvManager:
     
     def setDataFilter(self,data,Row,Col):
         self.dfFil = data
-        print("\n\nFilter",self.filter,Row,Col)
+        print("\n\nFilter",self.filter,Row,Col,'\n')
         
         for i in Row+Col:
             if i not in self.dfFil.columns.tolist() and i != None:
@@ -299,21 +299,28 @@ class csvManager:
                         self.filter[i] = self.dfFil[i].drop_duplicates().to_list()
                     self.filter[i] = [int(i) for i in self.filter[i]]
                     self.dfFil = self.filterDate(self.dfFil,first,buf[-1])
+        # print("\n\nFilter",self.filter,Row,Col,'\n')
         
         for i in list(self.filter.keys()):
             if i not in self.Measure.keys():
                 if i not in Row+Col:
                     self.filter.pop(i)
-        for i in Row+Col:
-            if type(i) != list:
-                if i not in list(self.filter.keys()):
-                    self.filter[i] = ""
+                    
+        # for i in Row+Col:
+        #     if type(i) != list:
+        #         if i not in list(self.filter.keys()):
+        #             self.filter[i] = ""
+                    
         for i in list(self.filter.keys()):
             if type(self.filter[i]) != list:
                 if self.filter[i] == "":
                     self.filter[i] = list(set(self.df[i].values))
+        
+        print("\n\nFilter",self.filter,Row,Col,'\n')
+        
         # self.dfFil = self.df
         # print(self.filter)
+        
         for i in self.filter.keys():
             if i not in self.Measure.keys():
                 print("fil dimen : ",i)
@@ -340,9 +347,12 @@ class csvManager:
         for i in list(self.filter.keys()):
             if i in list(self.Measure.keys()):
                 # print("fil mes ",i,self.filter)
-                # print([data.loc[i].between(min(self.filter[i]), max(self.filter[i]))])
-                # print(data.loc[i].between(min(self.filter[i]), max(self.filter[i])))
+                # print("min : ",min(self.filter[i]))
+                # print("max : ",max(self.filter[i]))
+                print("-data-\n",data)
+                
                 s = data.loc[i].between(min(self.filter[i]), max(self.filter[i]), inclusive = True)
+                
                 # print("-s-",s)
                 # print("-data-",data)
                 data = data.loc[s]
@@ -375,7 +385,7 @@ class csvManager:
         Row = self.getRow()
         Col = self.getCol()
         print("\n\nCMS")
-        # print(self.filter)
+        print(self.filter)
         # print(Row,Col)
         # print(self.df)
         
@@ -388,6 +398,8 @@ class csvManager:
         if self.filter != {}:
             usedata = self.setDataFilter(usedata,Row,Col)
             # self.dataFiltered = usedata
+        print(self.filter)
+        
         ###################################
         oriRow = Row.copy()
         oriCol = Col.copy()
@@ -401,11 +413,10 @@ class csvManager:
                     s = ' '.join(Row[i])
                     if s not in usedata.columns.tolist():
                         usedata = self.filterDate(usedata,Row[i][0],Row[i][1])
-                        # self.dataFiltered = usedata
                     Row[i] = s
                 else:
                     Row[i] = Row[i][0]
-        
+        self.dataFiltered = usedata
         # print(Col)
         for i in range(len(Col)):
             if type(Col[i]) == list:
@@ -608,6 +619,7 @@ class csvManager:
                                     # k.index = Rowdi
                         else:
                             if Coldi != []:
+                                # print("c")
                                 if Rowdi != []:
                                     if type(k.index) == pd.MultiIndex:
                                         print("Not fix yet")
@@ -621,13 +633,14 @@ class csvManager:
                                 else:
                                     k.index = isInterRow
                             if Rowdi != []:
+                                # print("c")
                                 # k.columns = Rowdi
                                 if type(k.index) == pd.MultiIndex:
                                     dicName = k.index.tolist()
                                     resultsDict = {}
                                     for i in dicName:  
                                         resultsDict.setdefault(i[0],[]).append(i[1:])
-                                    print(resultsDict)
+                                    # print(resultsDict)
                                     # k = k.rename(index=d)
                                     # print(k)
                                 else:
@@ -637,12 +650,17 @@ class csvManager:
                                     # print(k)
                     else:
                         # print("in")
-                        k.index = isInterRow
-                        # print(k)
-                        # print(k.index)
-                        # print(isInterRow)
-                        # k.index = isInterRow
-                        k=k.unstack()
+                        if len(k.index) == len(isInterRow):
+                            k.index = isInterRow
+                            k=k.unstack()
+                        else:
+                            # print(isInterRow)
+                            print(self.Measure)
+                            tmp = []
+                            for i in isInterRow:
+                                tmp.append(i+" "+self.Measure[i])
+                            k.columns = tmp
+                            k=k.unstack()
                 else: #mes in col
                     print("meas in col")
                     # print(self.MeaFunc)
@@ -709,10 +727,12 @@ class csvManager:
             k = k.to_frame()
         # print(k)
         # print(self.MeaFunc)
+        print(self.filter)
         if isInterCol!=[] or isInterRow!=[]:
+            # print(isInterCol, isInterRow)
             k = self.filterMes(k)
-        self.dataFiltered = k
-        # print(k)
+        # self.dataFiltered = k
+        print(k)
         return k
 
     def setRowForSpan(self,data,Rowdi):

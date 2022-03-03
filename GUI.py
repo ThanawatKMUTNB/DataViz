@@ -735,7 +735,7 @@ class mainWindow(QMainWindow):
         self.rowcolChange()
     
     def toConvert(self):
-        pt = self.getPlainText(str(self.item2.text()))
+        pt = self.getPlainText(str(self.item2))
         if self.where == 'di':
             print( pt +" can convert to measure")
         else:
@@ -744,7 +744,7 @@ class mainWindow(QMainWindow):
         # print("cc")
     
     def creatHierarchy(self):
-        print(self.HierList)
+        print("can convert to measure")
         
     def eventFilter(self, source, event):
         items = self.FileListDimension.selectedItems()#for h
@@ -767,6 +767,8 @@ class mainWindow(QMainWindow):
                         # print('Convert to Measure')
                         if type(pt) == list:
                             self.Hierarchy = menu.addAction('Create Hierarchy')
+                            if menu.exec_(event.globalPos()) == self.Hierarchy:
+                                self.creatHierarchy()
                         else:
                             if cm.isMeasure(pt):
                                 self.cvAc = menu.addAction('Convert to Measure')
@@ -778,8 +780,8 @@ class mainWindow(QMainWindow):
                         # print('Convert to Dimension')
                         self.cvAc = menu.addAction('Convert to Dimension')
                         self.where = 'mes'
-                    if menu.exec_(event.globalPos()) == self.Hierarchy:
-                        self.creatHierarchy()
+                    # if menu.exec_(event.globalPos()) == self.Hierarchy:
+                    #     self.creatHierarchy()
                     if menu.exec_(event.globalPos()) == self.cvAc:
                         self.toConvert()
                     # menu.addMenu(cvAc)
@@ -1035,8 +1037,13 @@ class mainWindow(QMainWindow):
         self.RowChoose = self.getRow()
         self.ColChoose = self.getCol()
         
-        print("Before",self.RowChoose,self.ColChoose)
+        # print("Before",self.RowChoose,self.ColChoose)
         
+        ###################### Set Filter Out ###############
+        for i in list(self.filDic.keys()):
+            if i not in self.RowChoose+self.ColChoose:
+                del self.filDic[i]
+                
         ################ set func ##############
         
         for i in range(len(self.RowChoose)):
@@ -1053,7 +1060,8 @@ class mainWindow(QMainWindow):
             if buf in list(self.typeDate.keys()):
                 self.ColChoose[i] = [buf,self.typeDate[buf]]
                 
-        print("\n Row Col Change :",self.RowChoose,self.ColChoose)
+        # print("\n Row Col Change :",self.RowChoose,self.ColChoose)
+        
         self.setplot()
         
     def filChangeD(self):
@@ -1187,11 +1195,11 @@ class mainWindow(QMainWindow):
             if r == [] and c == []:
                 self.sheetTable.setModel(None)
             else:
-                print("\nTableModel2")
+                # print("\nTableModel2")
                 # print(self.RowChoose,self.ColChoose)
-                print(self.dataSheet)
+                # print(self.dataSheet)
                 self.sheetPageRowAndCol()
-                print(self.dataSheet)
+                # print(self.dataSheet)
                 # print(self.RowChoose,self.ColChoose)
                 self.model = TableModel2(self.dataSheet)
                 if self.isInterRow != [] and self.isInterCol !=[]:

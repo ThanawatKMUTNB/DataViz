@@ -307,7 +307,7 @@ class graphManager():
                 x = str(Di[0][0]+' '+Di[0][1])
             else:
                 x = Di[0]
-            #print([x])
+            print(df)
             tmax = df.groupby([x], as_index=False)[Meas[0]].agg(fil).max()[1]
             tmin = df.groupby([x], as_index=False)[Meas[0]].agg(fil).min()[1]
             
