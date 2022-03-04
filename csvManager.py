@@ -32,6 +32,7 @@ class csvManager:
         self.ColChoose = []
         self.MeaFunc = {}
         self.MeaFuncChoose = {}
+        self.obj = ''
     
     def setPath(self):
         # print(self.path,self.selectFile)
@@ -183,12 +184,12 @@ class csvManager:
                 Meas.append(head)
         return Meas
     
-    def getDimension(self):
-        Dimen = []
-        for head in self.df.columns:
-            if (self.df.dtypes[head] == 'object' or head == 'Row ID' or head == 'Postal Code'): #and head != 'Order Date' or head != 'Ship Date':
-                Dimen.append(head)
-        return Dimen
+    # def getDimension(self):
+    #     Dimen = []
+    #     for head in self.df.columns:
+    #         if (self.df.dtypes[head] == 'object' or head == 'Row ID' or head == 'Postal Code'): #and head != 'Order Date' or head != 'Ship Date':
+    #             Dimen.append(head)
+    #     return Dimen
 
     def isDimension(self,header):
         Dimen = []
@@ -885,20 +886,31 @@ class csvManager:
             print("Don't have file")'''
             
             #print(Path,Dimension,Measurment)
-    def SwapDiMeas(self,obj):
+    def setObj(self,n):
+        self.obj = str(n)
+        self.SwapDiMeas()
+        
+    def SwapDiMeas(self):
+        # print("SwapDiMeas",self.df.columns.tolist())
+        # print("Mes",list(self.Measure.keys()))
         rdf = len(self.df.columns)
-        if obj in self.getDimension:
-            movecolumn = self.df.pop(obj)
-            self.df.insert(rdf-1,obj,movecolumn)
-        elif obj in self.getMeasure:
-            movecolumn = self.df.pop(obj)
-            self.df.insert(0,obj,movecolumn)
+        if self.obj not in list(self.Measure.keys()):
+            movecolumn = self.df.pop(self.obj)
+            self.df.insert(rdf-1,self.obj,movecolumn)
+            self.Measure[self.obj] = 'sum'
+        else:
+            movecolumn = self.df.pop(self.obj)
+            self.df.insert(0,self.obj,movecolumn)
+            # print("BF ",self.Measure)
+            del self.Measure[self.obj]
+            # print("AF ",self.Measure)
+        self.di = self.getOnlyDi() 
+        
+        # return self.df
 
-        return self.df
-
-    def print(self):
-        print('\n--------------------------------------\n')
-        print('path = ',self.path)
-        print('hashfile =',(hashlib.md5(self.selectFile.encode('UTF-8')).hexdigest()))
-        print('Dimen = ',self.getDimension())
-        print('Meas = ',self.Measure)
+    # def print(self):
+    #     print('\n--------------------------------------\n')
+    #     print('path = ',self.path)
+    #     print('hashfile =',(hashlib.md5(self.selectFile.encode('UTF-8')).hexdigest()))
+    #     print('Dimen = ',self.getDimension())
+    #     print('Meas = ',self.Measure)
