@@ -84,8 +84,10 @@ p = ex.getDataWithPandasByHead("Region")
 # ex.setRowAndColumn(['Region',["Profit",'count']],[])
 
 # ex.setRowAndColumn([["Profit",'sum']],['Region','Segment'])
-ex.filter = {'Region': ['South', 'East', 'Central'],'Segment':['Consumer']}
-ex.setRowAndColumn([["Profit",'sum']],['Region','Segment'])
+# ex.filter = {'Region': ['South', 'East', 'Central'],'Segment':['Consumer']}
+# ex.setRowAndColumn([["Profit",'sum']],['Region','Segment'])
 
+ex.filter = {'Discount': [300, 560]}
+ex.setRowAndColumn(['Region', ["Discount",'sum'],["Sales",'average']],[])
 
 

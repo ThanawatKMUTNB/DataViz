@@ -413,19 +413,31 @@ class colListClass(QtWidgets.QListWidget):
     # def dragMoveEvent(self, event):
     #     #if event.mimeData().hasUrls():
     #     event.accept()
-            
-    def dropEvent(self, QDropEvent):
-        source_Widget=QDropEvent.source()
-        items=source_Widget.selectedItems()
-        QDropEvent.setDropAction(QtCore.Qt.MoveAction)
-        for i in items:
-            source_Widget.takeItem(source_Widget.indexFromItem(i).row())
-            self.addItem(i)
+    
+    
+    def dropEvent(self, event):
+        item = event.source().selectedItems()
+        for i in range(len(item)):
+            print(item[i].text(0))
+            self.addItem(item[i].text(0))
         mainW.setFileListDimension()
-        # mainW.filChange()
         mainW.rowcolChange()
-        # mainW.setChart()
-        # mainW.setplot()
+                    
+    # def dropEvent(self, QDropEvent):
+    #     source_Widget=QDropEvent.source()
+    #     items=source_Widget.selectedItems()
+    #     QDropEvent.setDropAction(QtCore.Qt.MoveAction)
+    #     for i in items:
+    #         print("dropEvent ",source_Widget)
+    #         # print("dropEvent ",source_Widget,type(source_Widget))
+    #         # print("dropEvent ",source_Widget.indexFromItem(i).row())
+    #         # source_Widget.takeItem(source_Widget.indexFromItem(i).row())
+    #         self.addItem(i)
+    #     mainW.setFileListDimension()
+    #     # mainW.filChange()
+    #     mainW.rowcolChange()
+    #     # mainW.setChart()
+    #     # mainW.setplot()
         
 class rowListClass(QtWidgets.QListWidget):
     def __init__(self,parent=None):
@@ -433,17 +445,25 @@ class rowListClass(QtWidgets.QListWidget):
         self.setAcceptDrops(True)
         self.setDragEnabled(True)
         # self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
-        
-    def dragLeaveEvent(self,event) -> None:
-        if self.count():
-            if self.item(self.currentRow()) != None:
-                mainW.filJustAdd = self.item(self.currentRow()).text()
-            self.takeItem(self.currentRow())
-            self.clearSelection()
-        # mainW.filChangeD()
+    
+    def dropEvent(self, event):
+        item = event.source().selectedItems()
+        for i in range(len(item)):
+            print(item[i].text(0))
+            self.addItem(item[i].text(0))
+        mainW.setFileListDimension()
         mainW.rowcolChange()
-        # mainW.setChart()
-        # mainW.setplot()
+          
+    # def dragLeaveEvent(self,event) -> None:
+    #     if self.count():
+    #         if self.item(self.currentRow()) != None:
+    #             mainW.filJustAdd = self.item(self.currentRow()).text()
+    #         self.takeItem(self.currentRow())
+    #         self.clearSelection()
+    #     # mainW.filChangeD()
+    #     mainW.rowcolChange()
+    #     # mainW.setChart()
+    #     # mainW.setplot()
 
     # def dragMoveEvent(self, event):
     #     #if event.mimeData().hasUrls():
@@ -669,7 +689,8 @@ class mainWindow(QMainWindow):
         
         self.sheetTable  = self.findChild(QTableView,"sheetTable")
         
-        self.FileListDimension = self.findChild(QListWidget,"FileListDimension")
+        self.FileListDimension = self.findChild(QTreeWidget,"FileListDimension")
+        self.FileListDimension.setHeaderHidden(True)
         self.FileListMes = self.findChild(QListWidget,"FileListMes")
         
         self.FileList = self.findChild(FileInDirec,"FileList")
@@ -747,11 +768,38 @@ class mainWindow(QMainWindow):
         print("can convert to measure")
         
     def eventFilter(self, source, event):
-        items = self.FileListDimension.selectedItems()#for h
-        if event.type() == QEvent.ContextMenu and (source is self.FileListDimension or source is self.FileListMes or source is self.filterList or source is self.ColList or source is self.RowList):
-            
+        menu = QMenu()
+        # if event.type() == QEvent.ContextMenu and (source is self.FileListDimension or source is self.FileListMes or source is self.filterList or source is self.ColList or source is self.RowList):
+        if event.type() == QEvent.ContextMenu and (source is self.FileListDimension):
+            # pt = source.itemAt(event.pos()).text(0)
+            ptl = source.selectedItems()
+            pt = [i.text(0) for i in ptl]
+            # print("Hierarchy",pt)
+            print("Hierarchy List",pt)
+            if type(pt) == list and len(pt)>1:
+                self.Hierarchy = menu.addAction('Create Hierarchy')
+                if menu.exec_(event.globalPos()) == self.Hierarchy:
+                    self.creatHierarchy()
+                    #     else:
+                    #         if cm.isMeasure(pt):
+                    #             self.cvAc = menu.addAction('Convert to Measure')
+                    #             self.where = 'di'
+                    #         else:
+                    #             self.cvAc = menu.addAction('Convert to Measure')
+                    #             self.where = ' '
+                    # else:
+                    #     # print('Convert to Dimension')
+                    #     self.cvAc = menu.addAction('Convert to Dimension')
+                    #     self.where = 'mes'
+                    # # if menu.exec_(event.globalPos()) == self.Hierarchy:
+                    # #     self.creatHierarchy()
+                    # if menu.exec_(event.globalPos()) == self.cvAc:
+                    #     self.toConvert()
+                    # # menu.addMenu(cvAc)
+                    
+        if event.type() == QEvent.ContextMenu and (source is self.filterList or source is self.ColList or source is self.RowList):
+               
             pt = source.itemAt(event.pos())
-            menu = QMenu()
             if pt != None:
                 # print(pt.text())
                 pt = self.getPlainText(pt.text())
@@ -761,87 +809,62 @@ class mainWindow(QMainWindow):
                 print("Filter Dict : ",self.filDic)
                 print("Type Date : ",self.typeDate)
                 # print(pt)
-                if event.type() == QEvent.ContextMenu and (source is self.FileListDimension or source is self.FileListMes ):
-                    # print("Convert")
-                    if event.type() == QEvent.ContextMenu and (source is self.FileListDimension) :
-                        # print('Convert to Measure')
-                        if type(pt) == list:
-                            self.Hierarchy = menu.addAction('Create Hierarchy')
-                            if menu.exec_(event.globalPos()) == self.Hierarchy:
-                                self.creatHierarchy()
+                print("Row Col")
+                filterAc = menu.addAction('Filter')
+                if pt in list(self.typeDate.keys()):
+                    self.subMenuDate = QMenu(pt+'('+self.typeDate[pt]+')')
+                    yearAc = self.subMenuDate.addAction("Year",self.clickFunc)
+                    mounthAc = self.subMenuDate.addAction("Month",self.clickFunc)
+                    dayAc = self.subMenuDate.addAction("Date",self.clickFunc)
+                    self.acList = [yearAc,mounthAc,dayAc]
+                    # print(self.typeDate)
+                    for i in self.acList:
+                        i.setCheckable(True)
+                        if self.typeDate[pt] == i.text().lower():
+                            i.setChecked(True)
                         else:
-                            if cm.isMeasure(pt):
-                                self.cvAc = menu.addAction('Convert to Measure')
-                                self.where = 'di'
-                            else:
-                                self.cvAc = menu.addAction('Convert to Measure')
-                                self.where = ' '
-                    else:
-                        # print('Convert to Dimension')
-                        self.cvAc = menu.addAction('Convert to Dimension')
-                        self.where = 'mes'
-                    # if menu.exec_(event.globalPos()) == self.Hierarchy:
-                    #     self.creatHierarchy()
-                    if menu.exec_(event.globalPos()) == self.cvAc:
-                        self.toConvert()
-                    # menu.addMenu(cvAc)
-                else:
-                    print("Row Col")
-                    filterAc = menu.addAction('Filter')
-                    if pt in list(self.typeDate.keys()):
-                        self.subMenuDate = QMenu(pt+'('+self.typeDate[pt]+')')
-                        yearAc = self.subMenuDate.addAction("Year",self.clickFunc)
-                        mounthAc = self.subMenuDate.addAction("Month",self.clickFunc)
-                        dayAc = self.subMenuDate.addAction("Date",self.clickFunc)
-                        self.acList = [yearAc,mounthAc,dayAc]
-                        # print(self.typeDate)
-                        for i in self.acList:
-                            i.setCheckable(True)
-                            if self.typeDate[pt] == i.text().lower():
-                                i.setChecked(True)
-                            else:
-                                i.setChecked(False)
-                        menu.addMenu(self.subMenuDate)
-                    if pt in list(self.Measure.keys()):
-                        # mesAc = menu.addAction('Measure ('+self.Measure[self.item2.text()]+')')
-                        self.subMenu = QMenu('Measure ('+self.Measure[pt]+')')
-                        avgAc = self.subMenu.addAction("Average",self.clickFunc)
-                        sumAc = self.subMenu.addAction("Sum",self.clickFunc)
-                        medAc = self.subMenu.addAction("Median",self.clickFunc)
-                        countAc = self.subMenu.addAction("Count",self.clickFunc)
-                        maxAc = self.subMenu.addAction("Max",self.clickFunc)
-                        minAc = self.subMenu.addAction("Min",self.clickFunc)
-                        self.acList = [avgAc,sumAc,medAc,countAc,maxAc,minAc]
-                        for i in self.acList:
-                            i.setCheckable(True)
-                            if self.Measure[pt] == i.text().lower():
-                                i.setChecked(True)
-                            else:
-                                i.setChecked(False)
-                        # print(sumAc.text())
-                        menu.addMenu(self.subMenu)
-                        # print(menu.exec_(event.globalPos()).text())
-                    if menu.exec_(event.globalPos()) == filterAc:
-                        item = source.itemAt(event.pos())
-                        if item != None:
-                            if item.text() not in list(self.filDic.keys()):
-                                if self.filterList != None:
-                                    tmpr =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
-                                    tmpr.append(self.getPlainText(item.text()))
-                                    self.filterList.addItems(tmpr)
-                                else: 
-                                    self.filterList.addItems([self.getPlainText(item.text())])
-                                
-                            self.setFilterValue(item.text())
-                            self.addFil(item.text())
-                            # print("\nfilChange1 : ",self.RowChoose,self.ColChoose)
-                            self.filChange()
+                            i.setChecked(False)
+                    menu.addMenu(self.subMenuDate)
+                if pt in list(self.Measure.keys()):
+                    # mesAc = menu.addAction('Measure ('+self.Measure[self.item2.text()]+')')
+                    self.subMenu = QMenu('Measure ('+self.Measure[pt]+')')
+                    avgAc = self.subMenu.addAction("Average",self.clickFunc)
+                    sumAc = self.subMenu.addAction("Sum",self.clickFunc)
+                    medAc = self.subMenu.addAction("Median",self.clickFunc)
+                    countAc = self.subMenu.addAction("Count",self.clickFunc)
+                    maxAc = self.subMenu.addAction("Max",self.clickFunc)
+                    minAc = self.subMenu.addAction("Min",self.clickFunc)
+                    self.acList = [avgAc,sumAc,medAc,countAc,maxAc,minAc]
+                    for i in self.acList:
+                        i.setCheckable(True)
+                        if self.Measure[pt] == i.text().lower():
+                            i.setChecked(True)
+                        else:
+                            i.setChecked(False)
+                    # print(sumAc.text())
+                    menu.addMenu(self.subMenu)
+                    # print(menu.exec_(event.globalPos()).text())
+                if menu.exec_(event.globalPos()) == filterAc:
+                    item = source.itemAt(event.pos())
+                    if item != None:
+                        if item.text() not in list(self.filDic.keys()):
+                            if self.filterList != None:
+                                tmpr =  [str(self.filterList.item(i).text()) for i in range(self.filterList.count())]
+                                tmpr.append(self.getPlainText(item.text()))
+                                self.filterList.addItems(tmpr)
+                            else: 
+                                self.filterList.addItems([self.getPlainText(item.text())])
                             
-                            print("\nBefore filter : ",item.text())
-                            # print(self.filDic)
-                            self.selectFil(item.text())
-                            # print(self.filDic)
-                    self.rowcolChange()
+                        self.setFilterValue(item.text())
+                        self.addFil(item.text())
+                        # print("\nfilChange1 : ",self.RowChoose,self.ColChoose)
+                        self.filChange()
+                        
+                        print("\nBefore filter : ",item.text())
+                        # print(self.filDic)
+                        self.selectFil(item.text())
+                        # print(self.filDic)
+                self.rowcolChange()
                 print("Filter Dict : ",self.filDic)
                 return True
         return super().eventFilter(source, event)
@@ -1283,7 +1306,7 @@ class mainWindow(QMainWindow):
         self.sheetTable.setModel(None)
         
         self.FileListDimension.clear()
-        self.FileListDimension.addItems([])
+        self.addFileListDimension([None])
         self.FileListMes.clear()
         self.FileListMes.addItems([])
         
@@ -1369,6 +1392,8 @@ class mainWindow(QMainWindow):
         self.setForDataSource()
         if self.response[0] != "":
             self.dataSource()
+            print(list(self.data.columns))
+            
         
     def setForDataSource(self):
         cm.setPath()
@@ -1379,10 +1404,17 @@ class mainWindow(QMainWindow):
             self.setFileListDimension()
             self.setFileInDirectory()
             self.setFileChoose()
+    def addFileListDimension(self,ListDimension):
+        for i in ListDimension:
+            a = QTreeWidgetItem([i])
+            # a.addChild(QTreeWidgetItem([i]))
+            self.FileListDimension.addTopLevelItem(a)
         
     def setFileListDimension(self):
         self.FileListDimension.clear()
-        self.FileListDimension.addItems(cm.di)
+        # self.FileListDimension.setText(0,"Dimension")
+        # self.FileListDimension.addItems(cm.di)
+        self.addFileListDimension(cm.di)
         self.FileListMes.clear()
         self.FileListMes.addItems(list(cm.Measure.keys()))
 

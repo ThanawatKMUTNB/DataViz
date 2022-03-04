@@ -4,6 +4,7 @@ import hashlib
 from importlib.metadata import files, metadata
 import json
 from itertools import chain, count
+from ntpath import join
 import os
 from re import S
 import re
@@ -267,7 +268,7 @@ class csvManager:
         elif listOfMes[1] == 'median':
             self.MeaFunc[listOfMes[0]] = np.median
         elif listOfMes[1] == 'count':
-            self.MeaFunc[listOfMes[0]] = count
+            self.MeaFunc[listOfMes[0]] = len
         elif listOfMes[1] == 'max':
             self.MeaFunc[listOfMes[0]] = max
         elif listOfMes[1] == 'min':
@@ -343,20 +344,47 @@ class csvManager:
         return self.dfFil
     
     def filterMes(self,data):
-        # print(self.filter)
+        print("Filter " ,self.filter)
         for i in list(self.filter.keys()):
             if i in list(self.Measure.keys()):
-                # print("fil mes ",i,self.filter)
-                # print("min : ",min(self.filter[i]))
-                # print("max : ",max(self.filter[i]))
-                print("-data-\n",data)
+                print("i : ",i)
+                print(data.to_records())
                 
-                s = data.loc[i].between(min(self.filter[i]), max(self.filter[i]), inclusive = True)
+                # data = data.filter(like = i, axis=0)
                 
-                # print("-s-",s)
-                # print("-data-",data)
-                data = data.loc[s]
-                # print(data)
+                # print(data.filter(like = self.ColChoose+self.RowChoose, axis=0) < min(self.filter[i]))
+                
+                # data = data.loc[(data.values >= min(self.filter[i])) & (data.values <= max(self.filter[i]))]
+                # data = data.unstack()
+                tmp = []
+                if type(data.index) == pd.MultiIndex:
+                    id = [list(p) for p in list(data.index)]
+                    for s in id :
+                        if i in s:    
+                            # print(i,s)
+                            tmp.append(tuple(s))
+                if type(data.columns) == pd.MultiIndex:
+                    cl = [",".join(p) for p in list(data.columns)]
+                    # id = [",".join(id)]
+                    print(cl)
+                
+                # print(tmp)
+                # for r in tmp:
+                #     mask = (data[r]>=min(self.filter[i])) & (data[r]<=max(self.filter[i]))
+                #     # data = data.loc[idx[mask,:,['C1','C3']],idx[:,'foo']]
+                    
+                #     print(r)
+                    # data = data.loc[(data.values >= min(self.filter[i])) & (data.values <= max(self.filter[i]))]
+                # data = data.filter(like = i, axis=0)
+                print(data)
+                
+                # # # print(col)
+                # # if i not in col:
+                # #     print('Not in')
+                # #     i = i + ' ' + self.Measure[i]
+                
+                # # s = data.loc[i].between(min(self.filter[i]), max(self.filter[i]), inclusive = True)
+                
         return data
             
     def filterDate(self,data,Dimension,typ): #Date only
@@ -582,7 +610,7 @@ class csvManager:
                     # print(k)
                     # print(k.index)
                     # k.index = isInterRow
-                    # print(oriRow,oriCol)
+                    # print("---- ",oriRow,oriCol)
                     if oriCol != [] and oriRow == []:
                         k=k.T
                         # print(dict(k.columns))
@@ -593,11 +621,14 @@ class csvManager:
                             # isInterRow = isInterRow*len(k.index)
                             # k.index = isInterRow
                             if len(isInterCol) == 1:
+                                # print("C")
+                                # print("Cbbbbbbbbbbbbbbbbb")
+                                
                                 isInterCol = isInterCol*len(k.columns)
                                 k.columns = isInterCol
                                 # print(isInterCol)
                             else:
-                                # print("CC")
+                                # print("Cbbbbbbbbbbbbbbbbb")
                                 # print(oriRow,oriCol)
                                 # print(k)
                                 # print(Coldi,k.columns,isInterCol)
@@ -618,6 +649,8 @@ class csvManager:
                             
                                     # k.index = Rowdi
                         else:
+                            print("Cbbbbbbbbbbbbbbbbb")
+                            
                             if Coldi != []:
                                 # print("c")
                                 if Rowdi != []:
