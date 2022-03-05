@@ -377,7 +377,7 @@ class csvManager:
                 #     print(r)
                     # data = data.loc[(data.values >= min(self.filter[i])) & (data.values <= max(self.filter[i]))]
                 # data = data.filter(like = i, axis=0)
-                print(data)
+                # print(data)
                 
                 # # # print(col)
                 # # if i not in col:
@@ -414,8 +414,8 @@ class csvManager:
         Row = self.getRow()
         Col = self.getCol()
         print("\n\nCMS")
-        print(self.filter)
-        # print(Row,Col)
+        # print(self.filter)
+        print(Row,Col)
         # print(self.df)
         
         Col = self.unList(Col)
@@ -427,7 +427,7 @@ class csvManager:
         if self.filter != {}:
             usedata = self.setDataFilter(usedata,Row,Col)
             # self.dataFiltered = usedata
-        print(self.filter)
+        # print(self.filter)
         
         ###################################
         oriRow = Row.copy()
@@ -438,15 +438,22 @@ class csvManager:
         # print("-------",Row,Col)
         for i in range(len(Row)):
             if type(Row[i]) == list:
+                s = ' '.join(Row[i])
                 if Row[i][0] in list(self.typeDate.keys()):
-                    s = ' '.join(Row[i])
                     if s not in usedata.columns.tolist():
                         usedata = self.filterDate(usedata,Row[i][0],Row[i][1])
                     Row[i] = s
                 else:
                     Row[i] = Row[i][0]
-        self.dataFiltered = usedata
-        # print(Col)
+            if Row[i] not in usedata.columns.tolist():
+                buf = Row[i].split(" ")
+                first = ' '.join(buf[:-1])
+                if first in list(self.typeDate.keys()):
+                    # print(self.filter)
+                    if Row[i] in list(self.filter.keys()):
+                        self.filter[Row[i]] = [int(i) for i in self.filter[Row[i]]]
+                    usedata = self.filterDate(usedata,first,buf[-1])
+        
         for i in range(len(Col)):
             if type(Col[i]) == list:
                 # print("Col")
@@ -462,12 +469,11 @@ class csvManager:
                 buf = Col[i].split(" ")
                 first = ' '.join(buf[:-1])
                 if first in list(self.typeDate.keys()):
-                    print(self.filter)
-                    # print(Row,Col)
-                    # print("Col[i] ",Col[i])
                     if Col[i] in list(self.filter.keys()):
                         self.filter[Col[i]] = [int(i) for i in self.filter[Col[i]]]
                     usedata = self.filterDate(usedata,first,buf[-1])
+        self.dataFiltered = usedata
+
             # print(Col[i])
         # print("\n",oriRow,oriCol)
         # print("-------",Row,Col)
@@ -479,7 +485,7 @@ class csvManager:
         # if len(isInterRow+isInterCol) != []:
         #     usedata = self.setDataFilterMes(usedata,isInterRow+isInterCol)
         # print("****",isInterRow,isInterCol)
-        # print("-------",Row,Col)
+        print("-------",Row,Col)
         if isInterRow == [] and isInterCol == []: #No Mes
             Rowdi = Row.copy()
             Coldi = Col.copy()
