@@ -765,9 +765,31 @@ class mainWindow(QMainWindow):
             
         # print("cc")
     
-    def creatHierarchy(self):
-        print("can convert to measure")
-        
+    def creatHierarchy(self,pt):
+        # print("creatHierarchy",cm.di,pt[0])
+        for i in range(len(cm.di)):
+            # print(cm.di[i])
+            if cm.di[i] == pt[0]:
+                cm.di[i] = pt
+                break
+        for j in pt:
+            if j in cm.di:
+                cm.di.remove(j)
+        self.setFileListDimension()
+    
+    def removeHierarchy(self,pt):
+        pt = pt.split(",")
+        print(cm.di)
+        for i in range(len(cm.di)):
+            # print(cm.di[i])
+            if cm.di[i] == pt:
+                for j in reversed(pt):
+                    cm.di.insert(i,j)
+                cm.di.remove(pt)
+                break
+        print(cm.di)
+        self.setFileListDimension()
+
     def eventFilter(self, source, event):
         menu = QMenu()
         if event.type() == QEvent.ContextMenu and (source is self.FileListDimension or source is self.FileListMes or source is self.filterList or source is self.ColList or source is self.RowList):
@@ -776,22 +798,29 @@ class mainWindow(QMainWindow):
             if event.type() == QEvent.ContextMenu and (source is self.FileListDimension):
                 ptl = source.selectedItems()
                 pt = [i.text(0) for i in ptl]
-                
                 if len(pt)==1:
                     pt = pt[0]
-                if type(pt) == list and (source is self.FileListDimension):
-                    print("Hierarchy List",pt)
-                    self.Hierarchy = menu.addAction('Create Hierarchy')
-                    # if menu.exec_(event.globalPos()) == self.Hierarchy:
-                    #     self.creatHierarchy()
-                if type(pt) != list and cm.isMeasure(pt) and (source is self.FileListDimension):
-                    print("Hierarchy",pt , cm.isMeasure(pt))
-                    print('Convert to Measure')
-                    cvAc = menu.addAction('Convert to Measure')
-                    if menu.exec_(event.globalPos()) == cvAc:
-                        cm.setObj(pt)
-                        self.setFileListDimension()
-                        self.dataSource()
+                if ptl[0].childCount()==0:
+                    # if type(pt) != list:
+                        # print("Child",source.selectedItems()[0].childCount())
+                    if type(pt) == list and (source is self.FileListDimension):
+                        print("Hierarchy List",pt)
+                        # self.creatHierarchy(pt)
+                        self.Hierarchy = menu.addAction('Create Hierarchy')
+                        if menu.exec_(event.globalPos()) == self.Hierarchy:
+                            self.creatHierarchy(pt)
+                    if type(pt) != list and cm.isMeasure(pt) and (source is self.FileListDimension):
+                        print("Hierarchy",pt , cm.isMeasure(pt))
+                        print('Convert to Measure')
+                        cvAc = menu.addAction('Convert to Measure')
+                        if menu.exec_(event.globalPos()) == cvAc:
+                            cm.setObj(pt)
+                            self.setFileListDimension()
+                            self.dataSource()
+                else:
+                    Hierarchy = menu.addAction('Remove Hierarchy')
+                    if menu.exec_(event.globalPos()) == Hierarchy:
+                        self.removeHierarchy(pt)
             if event.type() == QEvent.ContextMenu and (source is self.FileListMes):
                 pt = source.itemAt(event.pos()).text()
                 cvAc = menu.addAction('Convert to Dimension')
@@ -799,11 +828,6 @@ class mainWindow(QMainWindow):
                     cm.setObj(pt)
                     self.setFileListDimension()
                     self.dataSource()
-                    # self.FileListDimension.clear()
-                    # print('Convert to Measure')
-                    
-                    # menu.addMenu(cvAc)
-                # return True
             
             if event.type() == QEvent.ContextMenu and (source is self.filterList or source is self.ColList or source is self.RowList):
                 pt = source.itemAt(event.pos())
@@ -1413,10 +1437,14 @@ class mainWindow(QMainWindow):
             self.setFileChoose()
     def addFileListDimension(self,ListDimension):
         for i in ListDimension:
-            a = QTreeWidgetItem([i])
-            # a.addChild(QTreeWidgetItem([i]))
+            if type(i) == list:
+                a = QTreeWidgetItem([str(",".join(i))])
+                for j in i:
+                    a.addChild(QTreeWidgetItem([j]))
+            else:
+                a = QTreeWidgetItem([i])
             self.FileListDimension.addTopLevelItem(a)
-        
+            self.FileListDimension.expandAll()
     def setFileListDimension(self):
         self.FileListDimension.clear()
         self.addFileListDimension(cm.di)
