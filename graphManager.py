@@ -286,15 +286,15 @@ class graphManager():
 
         if typ == 'year':
             s = str(Dimension+' year')
-            self.df[s] = self.df[Dimension].dt.year
+            self.df[s] = self.df[Dimension].dt.year.astype(str)
             return self.df[s]
         elif typ == 'month':
             s = str(Dimension+' month')
-            self.df[s] = self.df[Dimension].dt.month
+            self.df[s] = self.df[Dimension].dt.month.astype(str)
             return self.df[s]
         elif typ == 'day':
             s = str(Dimension+' day')
-            self.df[s] = self.df[Dimension].dt.day
+            self.df[s] = self.df[Dimension].dt.day.astype(str)
             return self.df[s]
 
     def rangeScale(self,Di,Meas):
