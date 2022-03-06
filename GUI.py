@@ -714,14 +714,100 @@ class mainWindow(QMainWindow):
             self.filterList.doubleClicked.connect(self.whichClicked)
         if self.RowList != None:
             self.RowList.installEventFilter(self)
+            self.RowList.doubleClicked.connect(self.drewDownR)
         if self.ColList != None:
             self.ColList.installEventFilter(self)
-            
+            self.ColList.doubleClicked.connect(self.drewDownC)
         self.FileListDimension.installEventFilter(self)
         self.FileListMes.installEventFilter(self)
               
         self.chartType.activated.connect(self.showChart)
         # self.show()
+    def drewDownR(self):
+        filterItem = self.RowList.currentRow()
+        strItem = self.RowList.item(filterItem)
+        tmpr =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
+        
+        tmp = self.getDrewDown(tmpr,strItem)
+        # print("--------------- TMP ",tmp,tmp[0],tmp[1])
+        a = tmp[0]
+        b = tmp[1]
+        # print("AB",a,b)
+        self.RowChoose = a
+        self.RowList.clear()
+        self.RowList.addItems(b)
+
+        self.setForShow()
+        self.setplot()
+            
+    def drewDownC(self):
+        filterItem = self.ColList.currentRow()
+        strItem = self.ColList.item(filterItem)
+        tmpc =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
+        
+        tmp = self.getDrewDown(tmpc,strItem)
+        # print("--------------- TMP ",tmp,tmp[0],tmp[1])
+        try:
+            a = tmp[0]
+            b = tmp[1]
+            # print("AB",a,b)
+            self.ColChoose = a
+            self.ColList.clear()
+            self.ColList.addItems(b)
+            self.setForShow()
+            self.setplot()
+        except :
+            pass
+    
+    def setForShow(self):
+        tmpr = []
+        tmpr =  [str(self.RowList.item(i).text()) for i in range(self.RowList.count())]
+        tmpc = [] 
+        tmpc =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
+    
+    def getDrewDown(self,oldList,justDrewDown):
+        pt = self.getPlainText(justDrewDown.text())
+        if pt in list(self.typeDate.keys()):
+            tmp = self.dateDrewDown(oldList,justDrewDown.text())
+            # print("--------------- getDrewDown ",tmp)
+            return tmp
+        
+    def dateDrewDown(self,oldList,justDrewDown):
+        dateType = ["year","month","date"]
+        pt = self.getPlainText(justDrewDown)
+        typeDate = self.getDateType(justDrewDown)
+        idDateType = dateType.index(typeDate[1])
+        idOldList = oldList.index(justDrewDown)
+        # print("Old list ",oldList,idOldList)
+        if idDateType != len(dateType)-1 and oldList.count(justDrewDown) == 1 and oldList.count(str(dateType[idDateType+1].upper())+"("+str(pt)+")")==0:
+            # print("whichClicked : s",justDrewDown,dateType[idDateType],dateType[idDateType+1])
+            newList = oldList.copy()
+            # print("New list ",newList)
+            newList.insert(idOldList+1,str(dateType[idDateType+1].upper())+"("+str(pt)+")")
+            # print("New list ",newList)
+            listDateAndType = self.getDateTypeBylist(newList)
+            # print("listDateAndType",listDateAndType)
+            # oldList.insert(idOldList+1,[pt,dateType[idDateType+1]])
+            return [listDateAndType,newList]
+
+    def getDateType(self,chooseDate):
+        listHaveMes = chooseDate
+        if listHaveMes != []:
+            if listHaveMes[-1] == ")":
+                j = listHaveMes.index("(")
+                listHaveMes = [listHaveMes[j+1:len(listHaveMes)-1],(listHaveMes[0:j]).lower()]
+        return listHaveMes #[Name,type]
+    
+    def getDateTypeBylist(self,chooseList):
+        listHaveMes = chooseList.copy()
+        # print("listHaveMes :",listHaveMes)
+        if listHaveMes != []:
+            for i in range(len(listHaveMes)):
+                if listHaveMes[i][-1] == ")":
+                    j = listHaveMes[i].index("(")
+                    listHaveMes[i] = [listHaveMes[i][j+1:len(listHaveMes[i])-1],(listHaveMes[i][0:j]).lower()]
+        return listHaveMes
+        
     def setFilter(self,filter):
         self.filDic = filter
         self.setplot()
@@ -730,7 +816,7 @@ class mainWindow(QMainWindow):
     def whichClicked(self):
         filterItem = self.filterList.currentRow()
         strItem = self.filterList.item(filterItem)
-        print("whichClicked : ",strItem.text())
+        # print("whichClicked : ",strItem.text())
         self.selectFil(strItem.text())
     
     def clickFunc(self):
@@ -787,7 +873,7 @@ class mainWindow(QMainWindow):
                     cm.di.insert(i,j)
                 cm.di.remove(pt)
                 break
-        print(cm.di)
+        # print(cm.di)
         self.setFileListDimension()
 
     def eventFilter(self, source, event):
@@ -1014,7 +1100,7 @@ class mainWindow(QMainWindow):
         tmpc = [] 
         tmpc =  [str(self.ColList.item(i).text()) for i in range(self.ColList.count())]
         
-        # print("Before",tmpr,tmpc)
+        # print("----------- Before ---------------",tmpr,tmpc)
         
         while (tmpr.count('')): tmpr.remove('')
         while (tmpc.count('')): tmpc.remove('')
@@ -1029,6 +1115,8 @@ class mainWindow(QMainWindow):
         self.isInterRow = [value for value in r if value in list(self.Measure.keys())]
         self.isInterCol = [value for value in c if value in list(self.Measure.keys())]
         
+        # print("----------- set Measure to last ---------------",tmpr,tmpc)
+        
         for i in self.isInterRow:
             if i in tmpr:
                 tmpr.remove(i)
@@ -1042,6 +1130,7 @@ class mainWindow(QMainWindow):
         ##########################################
         
         ########## Set For Show ###################
+        # print("-------------- Set For Show ",tmpr,tmpc)
         self.ColList.clear()
         # self.ColList.addItem(tmpc)
         for i in range(len(tmpc)):
@@ -1114,7 +1203,7 @@ class mainWindow(QMainWindow):
             if buf in list(self.typeDate.keys()):
                 self.ColChoose[i] = [buf,self.typeDate[buf]]
                 
-        # print("\n Row Col Change :",self.RowChoose,self.ColChoose)
+        print("\n Row Col Change :",self.RowChoose,self.ColChoose)
         
         self.setplot()
         
