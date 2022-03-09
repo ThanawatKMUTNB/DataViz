@@ -287,15 +287,15 @@ class graphManager():
         if typ == 'year':
             s = str(Dimension+' year')
             self.df[s] = self.df[Dimension].dt.year.astype(str)
-            return self.df[s]
+            #return self.df[s]
         elif typ == 'month':
             s = str(Dimension+' month')
             self.df[s] = self.df[Dimension].dt.month.astype(str)
-            return self.df[s]
+            #return self.df[s]
         elif typ == 'day':
             s = str(Dimension+' day')
             self.df[s] = self.df[Dimension].dt.day.astype(str)
-            return self.df[s]
+            #return self.df[s]
 
     def rangeScale(self,Di,Meas):
         fil = Meas[1]
@@ -369,7 +369,7 @@ class graphManager():
         lc = l[1]
         if len(lr) == 2 and len(lc) == 0:           # 1 dimension and Measurement on row
             c = alt.Chart(df).mark_bar().encode(
-                y= alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                y= alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                 tooltip = [lr[-2],lr[-1]]
             ).facet(row=lr[-2]
             ).resolve_scale(x = 'independent',y = 'independent')
@@ -377,7 +377,7 @@ class graphManager():
         
         elif len(lr) == 0 and len(lc) == 2:         # 1 dimension and Measurement on column
             c = alt.Chart(df).mark_bar().encode(
-                x= alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                x= alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                 tooltip = [lc[-2],lc[-1]]
             ).facet(column=lc[-2]
             ).resolve_scale(x = 'independent',y = 'independent')
@@ -395,14 +395,14 @@ class graphManager():
             if mes == 'row':
                 c = alt.Chart(df).mark_bar().encode(
                     x=lc[-1],
-                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                     tooltip = [lr[-2],lr[-1],lc[-1]]
                 ).facet(row=lr[-2]
                 ).resolve_scale(x = 'independent',y = 'independent')
                 self.Chart = c
             else:
                 c = alt.Chart(df).mark_bar().encode(
-                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                     y=lr[-1],
                     tooltip = [lr[-2],lr[-1],lc[-1]]
                 ).facet(row=lr[-2]
@@ -414,14 +414,14 @@ class graphManager():
             if mes == 'row':   
                 c = alt.Chart(df).mark_bar().encode(
                     x=lc[-1],
-                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                     tooltip = [lc[-2],lr[-1],lc[-1]]
                 ).facet(column=lc[-2]
                 ).resolve_scale(x = 'independent',y = 'independent')
                 self.Chart = c
             else:
                 c = alt.Chart(df).mark_bar().encode(
-                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                     y=lr[-1],
                     tooltip = [lc[-2],lr[-1],lc[-1]]
                 ).facet(column=lc[-2]
@@ -432,14 +432,14 @@ class graphManager():
             if mes == 'row':
                 c = alt.Chart(df).mark_bar().encode(
                     x=lc[-1],
-                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                     tooltip = [lc[-2],lr[-1],lc[-2],lc[-1]]
                 ).facet(column=lc[-2],row=lr[-2]
                 ).resolve_scale(x = 'independent',y = 'independent')
                 self.Chart = c
             else:
                 c = alt.Chart(df).mark_bar().encode(
-                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                     y=lr[-1],
                     tooltip = [lc[-2],lr[-1],lc[-2],lc[-1]]
                 ).facet(column=lc[-2],row=lr[-2]
@@ -451,7 +451,7 @@ class graphManager():
             if mes == 'row':                
                 c = alt.Chart(df).mark_bar().encode(        #all Dimen on Col or Row
                     x=lc[-2],
-                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                     color = lc[-1],
                     tooltip = [lc[-3],lc[-2],lc[-1],lr[-1]]
                 ).facet(column=lc[-3]
@@ -461,7 +461,7 @@ class graphManager():
                 if column[2][0] in Measure:
                     print('x=',lc[-2],'y=',lr[-1],'color=',lc[-1],'col=',lc[-3])
                     c = alt.Chart(df).mark_bar().encode(
-                        x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                        x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                         y=lr[-1],
                         color = lc[-2],
                         tooltip = [lc[-3],lc[-2],lc[-1],lr[-1]]
@@ -471,7 +471,7 @@ class graphManager():
                     
                 else:
                     c = alt.Chart(df).mark_bar().encode(
-                        x=alt.X(lc[-2],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                        x=alt.X(lc[-2],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                         y=lr[-1],
                         color = lc[-1],
                         tooltip = [lc[-3],lc[-2],lc[-1],lr[-1]]
@@ -484,7 +484,7 @@ class graphManager():
                 if row[2][0] in Measure:
                     c = alt.Chart(df).mark_bar().encode(
                         x=lc[-1],
-                        y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                        y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                         color = lr[-2],
                         tooltip = [lc[-1],lr[-3],lr[-2],lr[-1]]
                     ).facet(row=lr[-3]
@@ -493,7 +493,7 @@ class graphManager():
                 else:
                     c = alt.Chart(df).mark_bar().encode(
                         x=lc[-1],
-                        y=alt.Y(lr[-2],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                        y=alt.Y(lr[-2],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                         color = lr[-1],
                         tooltip = [lc[-1],lr[-3],lr[-2],lr[-1]]
                     ).facet(row=lr[-3]
@@ -503,7 +503,7 @@ class graphManager():
                 #print('x=',lc[-1],'y=',lr[-2],'color=',lr[-1],'row=',lr[-3])
                 #print(di,meas)
                 c = alt.Chart(df).mark_bar().encode(
-                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                     y=lr[-2],
                     color = lr[-1],
                     tooltip = [lc[-1],lr[-3],lr[-2],lr[-1]]
@@ -515,7 +515,7 @@ class graphManager():
             #print('x=',lc[-1],'y=',lr[-1],'color=',lr[-2],'row=',lr[-3],'column=',lc[-2])
             c = alt.Chart(df).mark_bar().encode(
                 x=lc[-1],
-                y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                 color = lr[-2],
                 tooltip = [lc[-1],lr[-3],lr[-2],lr[-1]]
             ).facet(row=lr[-3] , column = lc[-2]
@@ -524,7 +524,7 @@ class graphManager():
 
         elif len(lr) == 2 and len(lc) == 3: 
             c = alt.Chart(df).mark_bar().encode(
-                x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                 y=lr[-1],
                 color = lc[-2],
                 tooltip = [lc[-3],lc[-2],lc[-1],lr[-1]]
@@ -562,14 +562,14 @@ class graphManager():
             if mes == 'row':
                 c = alt.Chart(df).mark_line(point=True).encode(
                     x=lc[-1],
-                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                     tooltip = [lc[-1],lr[-1]]
                 ).facet(row=lr[-2]
                 ).resolve_scale(x = 'independent',y = 'independent')
                 self.Chart = c
             else:
                 c = alt.Chart(df).mark_line(point=True).encode(
-                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                     y=lr[-1],
                     tooltip = [lr[-1],lc[-1]]
                 ).facet(row=lr[-2]
@@ -580,14 +580,14 @@ class graphManager():
             if mes == 'row':   
                 c = alt.Chart(df).mark_line(point=True).encode(
                     x=lc[-1],
-                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                     tooltip = [lc[-1],lr[-1]]
                 ).facet(column=lc[-2]
                 ).resolve_scale(x = 'independent',y = 'independent')
                 self.Chart = c
             else:
                 c = alt.Chart(df).mark_line(point=True).encode(
-                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                     y=lr[-1],
                     tooltip = [lr[-1],lc[-1]]
                 ).facet(column=lc[-2]
@@ -598,14 +598,14 @@ class graphManager():
             if mes == 'row':
                 c = alt.Chart(df).mark_line(point=True).encode(
                     x=lc[-1],
-                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    y=alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                     tooltip = [lc[-1],lr[-1]]
                 ).facet(column=lc[-2],row=lr[-2]
                 ).resolve_scale(x = 'independent',y = 'independent')
                 self.Chart = c
             else:
                 c = alt.Chart(df).mark_line(point=True).encode(
-                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas))),
+                    x=alt.X(lc[-1],scale=alt.Scale(domain=self.rangeScale(di,meas)),axis=alt.Axis(format='.0f')),
                     y=lr[-1],
                     tooltip = [lr[-1],lc[-1]]
                 ).facet(column=lc[-2],row=lr[-2]
