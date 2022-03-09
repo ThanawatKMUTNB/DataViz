@@ -1,99 +1,92 @@
-from PyQt5 import QtCore, QtWidgets, QtGui
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTreeWidgetItem
-import sys
+import pandas as pd
+from csvManager import csvManager
 
-class Tree(QtWidgets.QTreeWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+ex = csvManager()
+ex.Measure = {'Sales':"sum",'Quantity':"sum",'Discount':"sum",'Profit':"average"}        
+ex.df = pd.read_csv("Superstore.csv", encoding='windows-1252')
+# ex.df = pd.read_csv("SS_20lines.csv", encoding='windows-1252')
 
-        self.setDragDropMode(self.DragDrop)
-        self.setSelectionMode(self.ExtendedSelection)
-        self.setAcceptDrops(True)
+# ex.df = pd.read_csv("all-states-history.csv", encoding='windows-1252')
 
-        for text in ['tree1','tree2','tree3']:
-            treeItem = QtWidgets.QTreeWidgetItem(self, [text])
-            treeItem.setFlags(treeItem.flags() & ~QtCore.Qt.ItemIsDropEnabled)
-            self.addTopLevelItem(treeItem)
+ex.getHead()
+ex.typeDate = ex.readDate()
+p = ex.getDataWithPandasByHead("Region")
 
-    def dropEvent(self, event):
-        if event.source() == self:
-            event.setDropAction(QtCore.Qt.MoveAction)
-            super().dropEvent(event)
-        elif isinstance(event.source(), QtWidgets.QListWidget):
-            item = self.itemAt(event.pos())
-            ix = self.indexAt(event.pos())
-            col = 0 if item is None else ix.column()
-            item = self.invisibleRootItem() if item is None else item
-            ba = event.mimeData().data('application/x-qabstractitemmodeldatalist')
-            data_items = decode_data(ba)
-            for data_item in data_items:
-                it = QtWidgets.QTreeWidgetItem()
-                item.addChild(it)
-                for data in data_items:
-                    for r, v in data.items():
-                        it.setData(col, r, v)
+# print(p.drop_duplicates().to_list())
+# def getDi(n):
+#     if n[-1] == ")":
+#         j = n.index("(")
+#         n = n[j+1:len(n)-1]
+#     print(n)
+#     return n
+
+# getDi('YEAR(Order Date)')
+# ex.readMeasure()
 
 
-class List(QtWidgets.QListWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+# ex.setRowAndColumn(["Segment"],[])
+# ex.setRowAndColumn([],["Segment"])
 
-        self.setDragDropMode(self.DragDrop)
-        self.setSelectionMode(self.ExtendedSelection)
-        self.setAcceptDrops(True)
+# ex.setRowAndColumn([],[["Sales", 'sum']])
+# ex.setRowAndColumn([["Sales", 'sum']],[])
 
-        for text in ['list1','list2','list3']:
-            self.addItem(text)
+# ex.setRowAndColumn([],["Sales","Profit"])
+# ex.setRowAndColumn(["Sales","Profit"],[])
 
-    def dropEvent(self, event):
-        if event.source() == self:
-            event.setDropAction(QtCore.Qt.MoveAction)
-            QtWidgets.QListWidget.dropEvent(self, event)
-        elif isinstance(event.source(), QtWidgets.QTreeWidget):
-            item = self.itemAt(event.pos())
-            row = self.row(item) if item else self.count()
-            ba = event.mimeData().data('application/x-qabstractitemmodeldatalist')
-            data_items = decode_data(ba)
-            for i, data_item in enumerate(data_items):
-                it = QtWidgets.QListWidgetItem()
-                self.insertItem(row+i, it)
-                for r, v in data_item.items():
-                    it.setData(r,v)
+# ex.setRowAndColumn(["Segment","Sales"],[])
+# ex.setRowAndColumn([],["Segment","Sales"])
 
+# ex.setRowAndColumn(["Segment"],["Sales","Profit"])
+# ex.setRowAndColumn(["Sales","Profit"],["Segment"])
 
-def decode_data(bytearray):
+# ex.setRowAndColumn(["Ship Mode","Segment"],["Sales"])
+# ex.setRowAndColumn(["Sales"],["Ship Mode","Segment"])
 
-    data = []
-    item = {}
+# ex.setRowAndColumn(["Ship Mode","Segment"],["Sales","Profit"])
+# ex.setRowAndColumn(["Sales","Profit"],["Ship Mode","Segment"])
 
-    ds = QtCore.QDataStream(bytearray)
-    while not ds.atEnd():
+# ex.setRowAndColumn(["Segment","Sales","Profit"],["Region"])
+# ex.setRowAndColumn(["Region"],["Segment","Sales","Profit"])
 
-        row = ds.readInt32()
-        column = ds.readInt32()
+# ex.setRowAndColumn(["Region","Segment"],["Region","Sales","Profit"])
+# ex.setRowAndColumn(["Segment","Region"],["Ship Mode",["Profit","sum"],["Sales","sum"]])
+# ex.setRowAndColumn(["Segment","Region","Sales","Profit"],[])
 
-        map_items = ds.readInt32()
-        for i in range(map_items):
-            key = ds.readInt32()
+# ex.setRowAndColumn(["Segment","Profit","Sales"],[])
+# ex.setRowAndColumn([],["Segment","Profit","Sales"])
+# ex.setRowAndColumn(["Ship Mode",["Profit","sum"],["Sales","sum"]],["Segment","Region"])
 
-            value = QtCore.QVariant()
-            ds >> value
-            item[Qt.ItemDataRole(key)] = value
+# ex.setRowAndColumn(["Segment",["Sales","sum"]],["Category","Region"])
+# ex.setRowAndColumn(["Category","Region"],["Segment",["Sales","sum"]])
 
-        data.append(item)
-    return data
+# ex.setRowAndColumn(['Region'],[['Order Date', 'year'],"Segment", ['Discount', 'sum']])
+# ex.setRowAndColumn(['Region',"Segment", ['Discount', 'sum']],[['Order Date', 'year']])
 
-if __name__=='__main__':
+#
+# ex.filter = {'Region': ['South', 'West', 'Central'], 'Ship Date year': ['2019', '2020']}
+# ex.setRowAndColumn([],['Region', ['Ship Date','year']])
 
-    app = QtWidgets.QApplication(sys.argv)
+# ex.filter = {'Region': ['South', 'West'], 'Ship Date year': ['2019', '2020']}
+# ex.setRowAndColumn([],['Region', 'Ship Date year'])
 
-    layout = QtWidgets.QHBoxLayout()
-    layout.addWidget(Tree())
-    layout.addWidget(List())
+###
+# ex.filter = {'Region': ['South', 'East', 'Central']}
+# ex.filter = {'Ship Date year': [2019, 2018, 2017, 2020]}
+# ex.setRowAndColumn([['Sales', 'sum']],[['Ship Date','year']])
 
-    container = QtWidgets.QWidget()
-    container.setLayout(layout)
-    container.show()
+# ex.setRowAndColumn([],[["Sales",'average'],["Profit",'sum']])
+# ex.setRowAndColumn([["Sales",'average'],["Profit",'sum'],["Profit",'sum']],[])
 
-    app.exec_()
+# ex.setRowAndColumn(['Region',["Profit",'average'],["Profit",'average']],[])
+# ex.setRowAndColumn([],['Region',["Profit",'average'],["Profit",'average']])
+
+# ex.setRowAndColumn(['Region',["Profit",'sum'],["Sales",'average']],[])
+# ex.setRowAndColumn(['Region',["Profit",'count']],[])
+
+# ex.setRowAndColumn([["Profit",'sum']],['Region','Segment'])
+# ex.filter = {'Region': ['South', 'East', 'Central'],'Segment':['Consumer']}
+# ex.setRowAndColumn([["Profit",'sum']],['Region','Segment'])
+
+# ex.filter = {'Discount': [300, 560],'Sales': [300, 560]}
+# ex.setRowAndColumn(['Region', ["Discount",'sum']],[])
+# ex.setRowAndColumn([],['Region', ["Discount",'sum']])

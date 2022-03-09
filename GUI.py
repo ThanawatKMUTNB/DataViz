@@ -36,6 +36,11 @@ class filterMesWindow(QMainWindow):
         self.atLeatSlider_2 = self.findChild(QSlider,"atLeatSlider_2")
         self.atMostSlider_2 = self.findChild(QSlider,"atMostSlider_2")
         
+        # self.atLeatSlider.setSingleStep(0.01)
+        # self.atMostSlider.setSingleStep(0.01)
+        # self.atLeatSlider_2.setSingleStep(0.01)
+        # self.atMostSlider_2.setSingleStep(0.01)
+        
         self.rangeMax = self.findChild(QLineEdit,"rangeMax")
         self.rangeMin = self.findChild(QLineEdit,"rangeMin")
         self.atLeastMax = self.findChild(QLineEdit,"atLeastMax")
@@ -157,14 +162,14 @@ class filterMesWindow(QMainWindow):
         # print(self.dimen,mainW.RowChoose,mainW.ColChoose)
         if (self.dimen in self.row) or (self.dimen in self.col):
             self.sheet = mainW.dataSheet
-            tmp = self.sheet.values.tolist()
-            self.filtered[self.dimen] = tmp[0]
-            self.filtered[self.dimen] = [min(self.filtered[self.dimen]),max(self.filtered[self.dimen])]
+            tmp = self.sheet.values.tolist()[0]
+            # self.filtered[self.dimen] = tmp[0]
+            self.filtered[self.dimen] = [min(tmp),max(tmp)]
         else :
             self.sheet = mainW.data
             self.filtered = mainW.filDic
-        print("start",self.filtered)
-        print(self.sheet)
+        print("-------------------- start",self.filtered)
+        print(self.sheet)#max(data.values.tolist()[0])
         print(self.sheet.values.tolist())
         # print(mainW.data)
         # self.filtered[self.dimen] = [min(self.sheet[self.dimen]),max(self.sheet[self.dimen])]
@@ -1093,6 +1098,9 @@ class mainWindow(QMainWindow):
             if self.Chart != None:
                 # print(type(self.Chart))
                 self.view.updateChart(self.Chart)
+            # else:
+                # delete self.vbox
+            
     
     def rowcolChange(self):
         tmpr = []
@@ -1282,12 +1290,13 @@ class mainWindow(QMainWindow):
             
     def showSheet(self):
         # cm.filter = self.filDic
-        buf = self.dataSheet
-        # print(buf)
-        for i in self.filDic.keys():
-            if i in self.Measure.keys():
-                print("show sheet",self.filDic)
-                buf = self.dataSheet[self.dataSheet[i].between(min(self.filDic[i]), max(self.filDic[i]))]
+        buf = cm.filterMes(self.dataSheet)
+
+        # for i in self.filDic.keys():
+        #     if i in self.Measure.keys():
+        #         print("show sheet",self.filDic)
+        #         buf = self.dataSheet[self.dataSheet[i].between(min(self.filDic[i]), max(self.filDic[i]))]
+
         self.model = TableModel2(buf)
         # self.model = TableModel2(self.dataSheet)
         self.sheetTable.setModel(self.model)

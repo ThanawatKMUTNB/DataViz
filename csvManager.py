@@ -346,46 +346,22 @@ class csvManager:
     
     def filterMes(self,data):
         print("Filter " ,self.filter)
+        # print(max(data.values.tolist()[0]))
+        
         for i in list(self.filter.keys()):
             if i in list(self.Measure.keys()):
-                print("i : ",i)
-                print(data.to_records())
-                
-                # data = data.filter(like = i, axis=0)
-                
-                # print(data.filter(like = self.ColChoose+self.RowChoose, axis=0) < min(self.filter[i]))
-                
-                # data = data.loc[(data.values >= min(self.filter[i])) & (data.values <= max(self.filter[i]))]
-                # data = data.unstack()
-                tmp = []
-                if type(data.index) == pd.MultiIndex:
-                    id = [list(p) for p in list(data.index)]
-                    for s in id :
-                        if i in s:    
-                            # print(i,s)
-                            tmp.append(tuple(s))
-                if type(data.columns) == pd.MultiIndex:
-                    cl = [",".join(p) for p in list(data.columns)]
-                    # id = [",".join(id)]
-                    print(cl)
-                
-                # print(tmp)
-                # for r in tmp:
-                #     mask = (data[r]>=min(self.filter[i])) & (data[r]<=max(self.filter[i]))
-                #     # data = data.loc[idx[mask,:,['C1','C3']],idx[:,'foo']]
-                    
-                #     print(r)
-                    # data = data.loc[(data.values >= min(self.filter[i])) & (data.values <= max(self.filter[i]))]
-                # data = data.filter(like = i, axis=0)
+                # print("i : ",i)
                 # print(data)
-                
-                # # # print(col)
-                # # if i not in col:
-                # #     print('Not in')
-                # #     i = i + ' ' + self.Measure[i]
-                
-                # # s = data.loc[i].between(min(self.filter[i]), max(self.filter[i]), inclusive = True)
-                
+                if type(data.index) == pd.MultiIndex:
+                    for j in list(data.index):
+                        if i in j:
+                            if float(data.loc[j]) < min(self.filter[i]) or float(data.loc[j]) > max(self.filter[i]):
+                                data = data.drop(index =j)
+                if type(data.columns) == pd.MultiIndex:
+                    for j in list(data.columns):
+                        if i in j:
+                            if float(data[j]) < min(self.filter[i]) or float(data[j]) > max(self.filter[i]):
+                                data = data.drop(columns =j)
         return data
             
     def filterDate(self,data,Dimension,typ): #Date only
