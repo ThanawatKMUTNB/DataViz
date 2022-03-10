@@ -351,7 +351,7 @@ class csvManager:
         for i in list(self.filter.keys()):
             if i in list(self.Measure.keys()):
                 # print("i : ",i)
-                # print(data)
+                print(data)
                 if type(data.index) == pd.MultiIndex:
                     for j in list(data.index):
                         if i in j:
@@ -743,7 +743,8 @@ class csvManager:
             k = k.to_frame()
         # print(k)
         # print(self.MeaFunc)
-        print(self.filter)
+        # print(self.filter)
+        
         if isInterCol!=[] or isInterRow!=[]:
             # print(isInterCol, isInterRow)
             k = self.filterMes(k)
