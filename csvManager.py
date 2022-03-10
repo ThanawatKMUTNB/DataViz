@@ -345,23 +345,37 @@ class csvManager:
         return self.dfFil
     
     def filterMes(self,data):
-        print("Filter " ,self.filter)
+        print("Filter Measure " ,self.filter)
         # print(max(data.values.tolist()[0]))
         
         for i in list(self.filter.keys()):
             if i in list(self.Measure.keys()):
-                # print("i : ",i)
-                print(data)
+                print("i : ",i)
+                # print(data.index.tolist())
+                # print(data.columns.tolist())
+                print(type(data))
                 if type(data.index) == pd.MultiIndex:
                     for j in list(data.index):
                         if i in j:
                             if float(data.loc[j]) < min(self.filter[i]) or float(data.loc[j]) > max(self.filter[i]):
                                 data = data.drop(index =j)
-                if type(data.columns) == pd.MultiIndex:
+                elif type(data.columns) == pd.MultiIndex:
                     for j in list(data.columns):
                         if i in j:
                             if float(data[j]) < min(self.filter[i]) or float(data[j]) > max(self.filter[i]):
                                 data = data.drop(columns =j)
+                else:
+                    if i in data.index.tolist():
+                        # print("Index")
+                        s = data.loc[i].between(min(self.filter[i]), max(self.filter[i]), inclusive = True)
+                        # print(s)
+                        data = data.loc[s]
+                    if i in data.columns.tolist():
+                        # print("Columns")
+                        # print(data[i])
+                        s = data[i].between(min(self.filter[i]), max(self.filter[i]), inclusive = True)
+                        data = data[s]
+                    # print("\n",data.iloc[i])
         return data
             
     def filterDate(self,data,Dimension,typ): #Date only
@@ -671,11 +685,11 @@ class csvManager:
                             k=k.unstack()
                         else:
                             # print(isInterRow)
-                            print(self.Measure)
-                            tmp = []
-                            for i in isInterRow:
-                                tmp.append(i+" "+self.Measure[i])
-                            k.columns = tmp
+                            # print(self.Measure)
+                            # tmp = []
+                            # for i in isInterRow:
+                            #     tmp.append(i+" "+self.Measure[i])
+                            k.columns = isInterRow
                             k=k.unstack()
                 else: #mes in col
                     print("meas in col")
@@ -692,7 +706,7 @@ class csvManager:
                             # print(k)
                             # print(type(k.columns))
                             if type(k.columns) == pd.MultiIndex:
-                                print("c")
+                                # print("c")
                                 olddi = [list(ele) for ele in k.columns]
                                 # isInterCol = k.columns.tolist()
                                 # print(isInterCol)
@@ -702,7 +716,7 @@ class csvManager:
                                     olddi[i] = buf
                                 # print(olddi)
                                 # k.columns = olddi
-                            # print(k.columns)
+                            else: k.columns=isInterCol
                         else:
                             # print(k.columns)
                             # print(oriRow,oriCol)
@@ -717,7 +731,7 @@ class csvManager:
                                 for i,j in zip(list(changname.keys()),isInterCol):
                                     changname[i] = j 
                                 k = k.rename(columns = changname)
-                        # print(k)
+                        print(k)
                     else :
                         # print("c")
                         # print("cc",beforMesual)
