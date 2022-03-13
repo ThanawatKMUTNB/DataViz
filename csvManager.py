@@ -350,10 +350,10 @@ class csvManager:
         
         for i in list(self.filter.keys()):
             if i in list(self.Measure.keys()):
-                print("i : ",i)
+                # print("i : ",i)
                 # print(data.index.tolist())
                 # print(data.columns.tolist())
-                print(type(data))
+                # print(type(data))
                 if type(data.index) == pd.MultiIndex:
                     for j in list(data.index):
                         if i in j:
@@ -731,7 +731,7 @@ class csvManager:
                                 for i,j in zip(list(changname.keys()),isInterCol):
                                     changname[i] = j 
                                 k = k.rename(columns = changname)
-                        print(k)
+                        # print(k)
                     else :
                         # print("c")
                         # print("cc",beforMesual)
