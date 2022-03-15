@@ -91,4 +91,4 @@ p = ex.getDataWithPandasByHead("Region")
 # ex.setRowAndColumn([["Discount",'sum'],["Profit",'average']],['Region'])
 # ex.setRowAndColumn([["Discount",'sum'],["Profit",'average']],['Region'])
 
-# ex.setRowAndColumn([['Quantity','sum']],['Region',"Segment"])
+ex.setRowAndColumn([['Quantity','sum']],['Region',"Segment"])

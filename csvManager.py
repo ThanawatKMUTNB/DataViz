@@ -684,14 +684,14 @@ class csvManager:
                             k.index = isInterRow
                             k=k.unstack()
                         else:
-                            print("in")
+                            # print("in")
                             # print(isInterRow)
                             # print(self.Measure)
                             # tmp = []
                             # for i in isInterRow:
                             #     tmp.append(i+" "+self.Measure[i])
                             k.columns = isInterRow
-                            if Coldi != [] and Rowdi == []:
+                            if Coldi != [] and Rowdi == [] and len(isInterRow) == 1:
                                 k.index.names = Coldi
                                 k=k.T
                             else:
