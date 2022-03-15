@@ -171,13 +171,24 @@ class filterMesWindow(QMainWindow):
         self.setRC()
         # print(self.dimen,mainW.RowChoose,mainW.ColChoose)
         if (self.dimen in self.row) or (self.dimen in self.col):
+            print("---------------- self.dimen in self.row -------------------")
             print("mainW dataSheet\n",mainW.dataSheet)
             self.sheet = mainW.dataSheet.copy()
-            tmp = self.sheet.values.tolist()[0]
-            print("Values :",tmp)
+            if type(self.sheet.values.tolist()[0]) == list and len(self.sheet.values.tolist()) == 1:
+                # print("Values :",self.sheet.values.tolist())
+                tmp = self.sheet.values.tolist()[0]
+                print("Values :",tmp)
+            if type(self.sheet.values.tolist()[0]) == list and len(self.sheet.values.tolist()) > 1:
+                tmp = self.sheet.values
+                print("Values :",tmp)
+            else:
+                tmp = self.sheet.values()
+                print(type(self.sheet))
+                print("Values :",tmp)
             # self.filtered[self.dimen] = tmp[0]
             self.filtered[self.dimen] = [min(tmp),max(tmp)]
         else :
+            print("---------------- self.dimen not self.row -------------------")
             self.sheet = mainW.data.copy(deep=True)
             self.filtered = mainW.filDic
         print("\n\n--------------- start fillter measure ---------------\n",self.filtered)
