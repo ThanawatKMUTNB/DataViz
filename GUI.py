@@ -1382,7 +1382,8 @@ class mainWindow(QMainWindow):
                     self.sheetTable.setModel(None)
                 else:
                     self.sheetTable.setModel(self.model)
-        # print("Row Col after set sheet",self.RowChoose,self.ColChoose)
+        print("Row Col after set sheet",self.RowChoose,self.ColChoose)
+        # print(self.dataSheet)
     
     def sheetPageRowAndCol(self):
         Row = self.RowChoose
