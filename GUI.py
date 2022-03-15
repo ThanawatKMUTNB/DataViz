@@ -184,7 +184,7 @@ class filterMesWindow(QMainWindow):
         print("Dimen :",self.dimen)
         print("Row :",self.row)
         print("Col :",self.col)
-        print(self.sheet)
+        print("dataSheet\n",self.sheet)
         print("mainW dataSheet\n",mainW.dataSheet)
         #max(data.values.tolist()[0])
         # print(self.sheet.values.tolist())
