@@ -646,7 +646,7 @@ class csvManager:
                             
                                     # k.index = Rowdi
                         else:
-                            print("Cbbbbbbbbbbbbbbbbb")
+                            # print("Cbbbbbbbbbbbbbbbbb")
                             
                             if Coldi != []:
                                 # print("c")
@@ -684,13 +684,18 @@ class csvManager:
                             k.index = isInterRow
                             k=k.unstack()
                         else:
+                            print("in")
                             # print(isInterRow)
                             # print(self.Measure)
                             # tmp = []
                             # for i in isInterRow:
                             #     tmp.append(i+" "+self.Measure[i])
                             k.columns = isInterRow
-                            k=k.unstack()
+                            if Coldi != [] and Rowdi == []:
+                                k.index.names = Coldi
+                                k=k.T
+                            else:
+                                k=k.unstack()
                 else: #mes in col
                     print("meas in col")
                     # print(self.MeaFunc)
@@ -716,7 +721,13 @@ class csvManager:
                                     olddi[i] = buf
                                 # print(olddi)
                                 # k.columns = olddi
-                            else: k.columns=isInterCol
+                            else: 
+                                # print(Rowdi,Coldi)
+                                k.columns=isInterCol
+                                if Coldi == [] and Rowdi != []:
+                                    k.index.names = Rowdi
+                                if Coldi != [] and Rowdi == []:
+                                    k.index.names = Coldi
                         else:
                             # print(k.columns)
                             # print(oriRow,oriCol)
