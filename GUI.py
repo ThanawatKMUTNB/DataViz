@@ -1064,7 +1064,7 @@ class mainWindow(QMainWindow):
         # print("--------IR IC",self.isInterRow,self.isInterCol)
         #gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.dfOriginal,self.typeDate)
         #print('-------------\n\n\n',cm.dataFiltered,'\n\n\n-----------------')
-        gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data,self.typeDate,cm.dataFiltered)
+        gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data,self.typeDate,cm.dataFiltered,cm.filter)
         Measure = list(self.Measure.keys())
         self.typeChart = []
         # print("--->",self.isInterRow,self.isInterCol)

@@ -35,7 +35,7 @@ class csvManager:
         self.obj = ''
     
     def setPath(self):
-        # print(self.path,self.selectFile)
+        print("setPath : ",self.path,self.selectFile)
         pathBuf = os.path.join(self.path,self.selectFile) 
         self.df = self.readFile(pathBuf)
         self.Measure = self.readMeasure()
