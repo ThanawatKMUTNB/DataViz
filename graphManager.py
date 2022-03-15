@@ -26,6 +26,7 @@ class graphManager():
         self.Chart = None
         self.dataFiltered = None
         self.filMeas = {}
+        self.dff = None
 
     def setMes(self):
         for i in list(self.MeasureDic.keys()):
@@ -105,10 +106,7 @@ class graphManager():
         row = self.RowChoose
         column = self.ColChoose
         scale = self.filMeas
-        Measure = []
-        for m in self.Measure:
-            Measure.append(m[0])
-        Measure = list(set(Measure))
+        Measure = list(self.MeasureDic.keys())
         #print(self.MeasureDic,self.Measure,self.RowChoose,self.ColChoose)
         
         if chart == 'Bar':
@@ -346,7 +344,8 @@ class graphManager():
     def functionRC(self,row,column,scale,meas):
         lr = []
         lc = []
-        Measure = self.Measure
+        print('\n\n\n------##--------',row,column,scale,meas)
+        Measure = list(self.MeasureDic.keys())
         for r in row:
             if type(r) == type(['list']):
                 if r[0] in Measure and scale != {} and meas[0] in list(scale.keys()):                         #!!!!!!!!!!!!!!!
@@ -363,6 +362,7 @@ class graphManager():
 
         for c in column:
             if type(c) == type(['list']):
+                #print('\n\n\n----------------',c[0],self.Measure,scale,meas[0])
                 if c[0] in Measure and scale != {} and meas[0] in list(scale.keys()):                         #!!!!!!!!!!!!!!!!!
                     s = c[0]
                     lc.append(s)
@@ -394,14 +394,16 @@ class graphManager():
         return dfff
 
     def plotBar(self,row,column,meas,di,mes,scale):
-        df = self.df
-        Measure = self.Measure
+        Measure = list(self.MeasureDic.keys())
         if meas[1] == 'average':
             meas = [meas[0],'mean']
-        dff = self.newdf(df,di,meas,scale)
+        self.dff = self.newdf(self.df,di,meas,scale)
+        dff = self.dff
+        #print('########\n\n\n',dff,'\n#######\n\n\n')
         l = self.functionRC(row,column,scale,meas)
         lr = l[0]
         lc = l[1]
+        print(l)
         if len(lr) == 2 and len(lc) == 0:           # 1 dimension and Measurement on row
             c = alt.Chart(dff).mark_bar(clip=True).encode(
                 y= alt.Y(lr[-1],scale=alt.Scale(domain=self.rangeScale(di,meas,dff)),axis=alt.Axis(format='.0f')),
@@ -419,6 +421,7 @@ class graphManager():
             self.Chart = c
         
         elif len(lr) == 1 and len(lc) == 1:         #1 dimension and Measurement with row and column
+            
             c = alt.Chart(dff).mark_bar(clip=True).encode(
                 x=lc[-1],
                 y=lr[-1],
