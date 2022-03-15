@@ -25,6 +25,7 @@ class graphManager():
         self.DateDict = {}
         self.Chart = None
         self.dataFiltered = None
+        self.filMeas = {}
 
     def setMes(self):
         for i in list(self.MeasureDic.keys()):
@@ -70,7 +71,7 @@ class graphManager():
                 tmp.append(self.DateDict[self.ColChoose[i]])
                 self.ColChoose[i] = tmp
         
-    def setList(self,row,col,mes,dataSheet,dateDic,fil):
+    def setList(self,row,col,mes,dataSheet,dateDic,fildi,filmeas):
         #print(dataSheet.columns.tolist())
         # print('-----------------------\n\n',dataSheet.columns)
         #print(dataSheet['Region'].value_counts())
@@ -79,9 +80,10 @@ class graphManager():
         self.ColChoose = col
         self.DateDict = dateDic
         self.df = dataSheet
-        if type(fil) != dict:
-            self.df = fil
-        #print('#####################################\n\n',fil)
+        if type(fildi) != dict:
+            self.df = fildi
+        self.fileMeas = filmeas
+        print('#####################################\n\n',filmeas)
 
         #self.df = pd.read_csv('Superstore.csv', encoding='windows-1252')
         self.setDate()

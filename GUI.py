@@ -1104,7 +1104,7 @@ class mainWindow(QMainWindow):
             # if self.chartTypeS != "":
             # print("----------------",self.chartTypeS)
             #gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.dfOriginal,self.typeDate)
-            gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data,self.typeDate,cm.dataFiltered)
+            gm.setList(self.RowChoose,self.ColChoose,self.Measure,self.data,self.typeDate,cm.dataFiltered,cm.filter)
             self.Chart = gm.chooseChart(str(self.chartTypeS))
     
             # self.widget.setLayout(self.view)
