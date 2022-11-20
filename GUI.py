@@ -7,7 +7,7 @@ from PyQt5 import uic,QtCore,QtWebEngineWidgets,QtGui
 # from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
-from Altair_Graph.Bar_Chart import WebEngineView
+from graphManager import WebEngineView
 from io import StringIO
 import graphManager 
 

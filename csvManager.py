@@ -54,15 +54,15 @@ class csvManager:
             return True
         else :
             return False
-    
+
     def readFile(self,path):
         isdir = os.path.isdir(path)
         if isdir == False:
             fileExtension = path.split(".")
             # print(fileExtension[-1])
             if fileExtension[-1] == "csv":
-                #df = pd.read_csv(path, encoding='windows-1252')        #for superstore.csv
-                df = pd.read_csv(path, encoding='utf-8')
+                df = pd.read_csv(path, encoding='windows-1252')        #for superstore.csv
+                #df = pd.read_csv(path, encoding='utf-8')
             else:
                 print("Excel ",path)
                 #print(fileExtension[-1])

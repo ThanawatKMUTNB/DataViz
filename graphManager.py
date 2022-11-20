@@ -2,6 +2,8 @@ import altair as alt
 from altair import pipe, limit_rows, to_values
 import altair_viewer
 import pandas as pd
+from PyQt5 import QtCore, QtWidgets, QtWebEngineWidgets
+from io import StringIO
 
 '''t = lambda data: pipe(data, limit_rows(max_rows=10000), to_values)
 alt.data_transformers.register('custom', t)
@@ -13,6 +15,38 @@ alt.data_transformers.enable('data_server')
 '''df = pd.read_csv('Superstore.csv', encoding='windows-1252')
 df['Order Date'] = pd.to_datetime(df['Order Date'],format='%d/%m/%Y')
 df['Ship Date'] = pd.to_datetime(df['Ship Date'],format='%d/%m/%Y')'''
+class WebEngineView(QtWebEngineWidgets.QWebEngineView):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.page().profile().downloadRequested.connect(self.onDownloadRequested)
+        self.windows = []
+
+    @QtCore.pyqtSlot(QtWebEngineWidgets.QWebEngineDownloadItem)
+    def onDownloadRequested(self, download):
+        if (
+            download.state()
+            == QtWebEngineWidgets.QWebEngineDownloadItem.DownloadRequested
+        ):
+            path, _ = QtWidgets.QFileDialog.getSaveFileName(
+                self, self.tr("Save as"), download.path()
+            )
+            if path:
+                download.setPath(path)
+                download.accept()
+
+    def createWindow(self, type_):
+        if type_ == QtWebEngineWidgets.QWebEnginePage.WebBrowserTab:
+            window = QtWidgets.QMainWindow(self)
+            view = QtWebEngineWidgets.QWebEngineView(window)
+            window.resize(640, 480)
+            window.setCentralWidget(view)
+            window.show()
+            return view
+
+    def updateChart(self, chart, **kwargs):
+        output = StringIO()
+        chart.save(output, "html", **kwargs)
+        self.setHtml(output.getvalue())
 
 class graphManager():
 
