@@ -61,7 +61,8 @@ class csvManager:
             fileExtension = path.split(".")
             # print(fileExtension[-1])
             if fileExtension[-1] == "csv":
-                df = pd.read_csv(path, encoding='windows-1252')
+                #df = pd.read_csv(path, encoding='windows-1252')        #for superstore.csv
+                df = pd.read_csv(path, encoding='utf-8')
             else:
                 print("Excel ",path)
                 #print(fileExtension[-1])
