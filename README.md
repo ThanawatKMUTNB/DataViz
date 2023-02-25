@@ -11,15 +11,14 @@ Data can be displayed in various formats such as tables, Bar charts, Line charts
 
 ## Features
 
-- Can bring data from multiple files to union to connect tables
-- Display data in Table, Line Chart, Line Chart and Line Chart formats.
-- Up to 3 dimensions can be set.
-- Set unlimited number of measurements
-- Able to filter values for configuring the Dimension display that needs to be displayed.
-- Able to set the range of measurements to be displayed.
-- Can select calculation functions for Measurement: max, min, count, sum, median and average.
-- When Dimension is selected as the Interval type You can double click to add dimensions from Year to Month and Date.
-- Define a chart that displays data according to that type (e.g. Dimension, date range type can be used with Line Chart, etc.)
-- Show Pop up to tell the value of the Chart that the mouse can point to.
-- Values can be swapped between dimensions and measurements, and the swapped value becomes a number value.
+- Import data from multiple files and connect tables
+- Display data in various formats: tables, bar charts, line charts, and pie charts
+- Set up to 3 dimensions and an unlimited number of measurements
+- Filter values to configure the dimension display that needs to be displayed
+- Set the range of measurements to be displayed
+- Select calculation functions for measurements: max, min, count, sum, median, and average
+- Double-click to add dimensions from Year to Month and Date when dimension is selected as the Interval type
+- Define a chart that displays data according to that type (e.g., dimension, date range type can be used with line charts, etc.)
+- Show pop up to tell the value of the chart that the mouse can point to
+- Swap values between dimensions and measurements, which then becomes a number value
 
