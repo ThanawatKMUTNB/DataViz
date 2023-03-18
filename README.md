@@ -8,7 +8,6 @@ Data can be displayed in various formats such as tables, Bar charts, Line charts
 ![image](https://user-images.githubusercontent.com/87508790/204735137-02cf5772-98bf-4d96-9bac-863c19ca79b7.png)
 
 
-
 ## Features
 
 - Import data from multiple files and connect tables
