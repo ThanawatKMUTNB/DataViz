@@ -1,4 +1,5 @@
 # Data visualization
+It is a powerful data visualization tool that empowers users to explore and analyze data through an extensive collection of charts and graphs, akin to Tableau. It provides the tools you need to transform raw data into actionable insights.
 
 This is a data visualization program for analysis. It can bring existing data to create a visualization. For displaying existing data in various formats by using the altair module to help in the Chart display
 Can be used by importing data from .csv or .xlsx file types to display data. You can choose dimensions and measurements. In the form of drag and drop, the program will display the results immediately.
@@ -18,6 +19,6 @@ Data can be displayed in various formats such as tables, Bar charts, Line charts
 - Select calculation functions for measurements: max, min, count, sum, median, and average
 - Double-click to add dimensions from Year to Month and Date when dimension is selected as the Interval type
 - Define a chart that displays data according to that type (e.g., dimension, date range type can be used with line charts, etc.)
-- Show pop up to tell the value of the chart that the mouse can point to
+- Show pop-up to tell the value of the chart that the mouse can point to
 - Swap values between dimensions and measurements, which then becomes a number value
 
